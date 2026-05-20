@@ -43,3 +43,6 @@ playwright-report/
 
 # Supabase CLI — fichiers temporaires locaux (project-ref, pooler-url, etc.)
 supabase/.temp/
+
+# Claude / Superpowers — fichiers générés par l'outil IA (brainstorm, state, pid)
+.superpowers/
