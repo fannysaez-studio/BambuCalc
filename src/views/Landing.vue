@@ -465,86 +465,91 @@ export default {
   transform: translateY(-2px);
 }
 
+/* ===== Mobile : ≤ 768px ===== */
 @media (max-width: 768px) {
   .landing-page {
     grid-template-columns: 1fr;
     padding: 0.5rem;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .landing-visual,
   .landing-card {
-    border-radius: 24px;
+    border-radius: 18px;
   }
 
   .landing-visual {
-    min-height: 20rem;
-    padding: 1.1rem 1rem 0.9rem;
+    padding: 1.1rem 1rem 0.8rem;
+    min-height: auto;
   }
 
   .visual-copy {
-    margin-top: 1.35rem;
+    margin-top: 1rem;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.45rem, 7vw, 1.9rem);
+    font-size: clamp(1.35rem, 6.5vw, 1.8rem);
   }
 
   .visual-copy p {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
   }
 
+  /* Illustration très compacte */
   .visual-illustration {
-    min-height: 15.5rem;
+    min-height: 10rem;
+    flex: unset;
   }
 
   .visual-composition {
-    transform: translateX(10px) translateY(0) rotate(-6deg);
+    transform: translateX(8px) translateY(0) rotate(-6deg);
     gap: 0;
   }
 
   .visual-printer {
-    width: min(100%, 120px);
-    max-width: 120px;
-    transform: translateY(-10px);
+    width: min(100%, 90px);
+    max-width: 90px;
+    transform: translateY(-8px);
   }
 
   .visual-main {
-    width: min(100%, 180px);
-    max-width: 180px;
-    margin-left: -0.6rem;
-    transform: translateY(-4px);
+    width: min(100%, 135px);
+    max-width: 135px;
+    margin-left: -0.5rem;
+    transform: translateY(-3px);
   }
 
   .landing-card {
-    padding: 1.35rem 0.95rem 1.15rem;
+    padding: 1.2rem 0.95rem 1rem;
+  }
+
+  .landing-card h2 {
+    font-size: clamp(1.3rem, 5.5vw, 1.6rem);
+    margin-top: 0.85rem;
+  }
+
+  .landing-description {
+    font-size: 0.78rem;
+    margin-top: 0.35rem;
   }
 
   .landing-features {
     grid-template-columns: 1fr;
-    margin-top: 1rem;
-    gap: 0.5rem;
+    margin-top: 0.9rem;
+    gap: 0.45rem;
   }
 
-  .landing-card h2 {
-    font-size: clamp(1.45rem, 6.2vw, 1.75rem);
-    margin-top: 1.05rem;
-  }
-
-  .landing-description {
-    font-size: 0.82rem;
-  }
-
-  /* Cards horizontales sur mobile : icône à gauche, texte à droite */
+  /* Feature cards : horizontales (icône à gauche, texte à droite) */
   .feature-card {
     display: grid;
-    grid-template-columns: 2.6rem 1fr;
+    grid-template-columns: 2.4rem 1fr;
     grid-template-rows: auto auto;
-    column-gap: 0.85rem;
-    row-gap: 0.1rem;
+    column-gap: 0.75rem;
+    row-gap: 0.08rem;
     align-items: center;
     text-align: left;
-    padding: 0.8rem 1rem;
+    padding: 0.65rem 0.9rem;
     min-height: 0;
     aspect-ratio: unset;
     max-width: none;
@@ -553,11 +558,11 @@ export default {
   .feature-icon {
     grid-column: 1;
     grid-row: 1 / 3;
-    width: 2.6rem;
-    height: 2.6rem;
-    padding: 0.5rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0.45rem;
     background: rgba(46, 154, 171, 0.12);
-    border-radius: 0.65rem;
+    border-radius: 0.6rem;
     margin-bottom: 0;
     align-self: center;
     justify-self: center;
@@ -566,29 +571,57 @@ export default {
   .feature-title {
     grid-column: 2;
     grid-row: 1;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     align-self: end;
   }
 
   .feature-text {
     grid-column: 2;
     grid-row: 2;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     align-self: start;
   }
 
-  /* CTAs côte à côte sur mobile */
   .landing-cta {
     flex-direction: row;
-    margin-top: 1.4rem;
-    gap: 0.75rem;
+    margin-top: 1.1rem;
+    gap: 0.65rem;
   }
 
   .btn {
     flex: 1;
     text-align: center;
-    padding: 0.78rem 0.85rem;
-    font-size: 0.88rem;
+    padding: 0.75rem 0.75rem;
+    font-size: 0.86rem;
+  }
+}
+
+/* ===== Mini-mobile : ≤ 420px ===== */
+@media (max-width: 420px) {
+  .landing-page {
+    padding: 0.25rem;
+    gap: 0.35rem;
+  }
+
+  .landing-visual {
+    padding: 0.9rem 0.85rem 0.6rem;
+  }
+
+  /* Masquer l'illustration pour maximiser l'espace du contenu */
+  .visual-illustration {
+    display: none;
+  }
+
+  /* CTAs empilés en colonne sur très petit écran */
+  .landing-cta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -623,25 +656,27 @@ export default {
   }
 }
 
+/* ===== Tablette : 769px – 1024px ===== */
 @media (max-width: 1024px) and (min-width: 769px) {
   .landing-page {
     grid-template-columns: 1fr;
     padding: 0.75rem;
-    gap: 0.85rem;
+    gap: 0.75rem;
   }
 
   .landing-visual,
   .landing-card {
-    border-radius: 24px;
+    border-radius: 20px;
   }
 
+  /* Visual compact mais présent, scroll autorisé si contenu déborde */
   .landing-visual {
-    min-height: 26rem;
-    padding: 1.4rem 1.25rem 1.2rem;
+    padding: 1.4rem 1.25rem 1rem;
+    min-height: auto;
   }
 
   .visual-copy {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
 
   .visual-copy h1 {
@@ -649,7 +684,8 @@ export default {
   }
 
   .visual-illustration {
-    min-height: 17rem;
+    min-height: 13rem;
+    flex: unset;
   }
 
   .visual-composition {
@@ -657,28 +693,40 @@ export default {
   }
 
   .visual-printer {
-    width: min(100%, 140px);
-    max-width: 140px;
+    width: min(100%, 120px);
+    max-width: 120px;
   }
 
   .visual-main {
-    width: min(100%, 210px);
-    max-width: 210px;
+    width: min(100%, 185px);
+    max-width: 185px;
   }
 
   .landing-card {
-    padding: 1.5rem 1.2rem 1.35rem;
+    padding: 1.75rem 1.5rem 1.5rem;
   }
 
+  .landing-card h2 {
+    font-size: clamp(1.55rem, 3vw, 2rem);
+    margin-top: 1rem;
+  }
+
+  .landing-description {
+    font-size: 0.82rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Grille 2×2 sur tablette */
   .landing-features {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.85rem;
+    margin-top: 1.5rem;
   }
 
   .feature-card {
     max-width: none;
     aspect-ratio: unset;
-    min-height: 130px;
+    min-height: 110px;
     padding: 1rem;
     flex-direction: column;
     align-items: center;
@@ -686,13 +734,21 @@ export default {
   }
 
   .feature-icon {
-    width: 1.55rem;
-    height: 1.55rem;
-    margin-bottom: 0.4rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .feature-title {
+    font-size: 0.74rem;
+  }
+
+  .feature-text {
+    font-size: 0.68rem;
   }
 
   .landing-cta {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     gap: 1rem;
   }
 

@@ -691,24 +691,142 @@ export default comp
   }
 }
 
-@media (max-width: 1100px) {
+/* ===== Tablette : 769px – 1100px ===== */
+@media (max-width: 1100px) and (min-width: 769px) {
   .auth-page {
     grid-template-columns: 1fr;
-    padding: 0.85rem 0.85rem 1.25rem;
-    gap: 0.85rem;
+    padding: 0.75rem;
+    gap: 0.75rem;
   }
 
   .auth-visual,
   .auth-card {
-    border-radius: 24px;
+    border-radius: 20px;
   }
 
-  .auth-card {
-    padding: 2.25rem 1.5rem 1.75rem;
+  .auth-visual {
+    padding: 1.5rem 1.5rem 1rem;
   }
 
   .visual-copy {
-    max-width: 24rem;
+    margin-top: 1.5rem;
+    max-width: 26rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .visual-copy h1 {
+    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  }
+
+  /* Illustration présente mais compacte */
+  .visual-illustration {
+    min-height: 12rem;
+    flex: unset;
+  }
+
+  .visual-illustration img {
+    width: min(100%, 260px);
+    max-width: 260px;
+  }
+
+  .auth-card {
+    padding: 2.25rem 2rem 1.75rem;
+  }
+
+  .auth-form {
+    margin-top: 1.75rem;
+    gap: 0.9rem;
+  }
+}
+
+/* ===== Mobile : ≤ 768px ===== */
+@media (max-width: 768px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+    gap: 0.6rem;
+  }
+
+  .auth-visual,
+  .auth-card {
+    border-radius: 18px;
+  }
+
+  .auth-visual {
+    padding: 1.1rem 1rem 0.75rem;
+  }
+
+  .visual-copy {
+    margin-top: 1rem;
+  }
+
+  .visual-copy h1 {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+
+  .visual-copy p {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Illustration compacte (en haut sur Signup via DOM order) */
+  .visual-illustration {
+    min-height: 9rem;
+    flex: unset;
+  }
+
+  .visual-illustration img {
+    width: min(100%, 200px);
+    max-width: 200px;
+  }
+
+  .auth-card {
+    padding: 1.75rem 1.25rem 1.5rem;
+  }
+
+  .auth-form {
+    margin-top: 1.5rem;
+    gap: 0.85rem;
+  }
+
+  .field input {
+    min-height: 2.9rem;
+    padding: 0.72rem 0.95rem;
+  }
+
+  .primary-btn {
+    min-height: 2.9rem;
+  }
+
+  .auth-divider {
+    margin: 1rem 0 0.85rem;
+  }
+}
+
+/* ===== Mini-mobile : ≤ 420px ===== */
+@media (max-width: 420px) {
+  .auth-page {
+    padding: 0.25rem;
+    gap: 0.4rem;
+  }
+
+  /* Masquer l'illustration (en haut sur Signup) pour maximiser l'espace formulaire */
+  .visual-illustration {
+    display: none;
+  }
+
+  .auth-visual {
+    padding: 0.9rem 0.85rem 0.65rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem 1rem 1.25rem;
+  }
+
+  /* Empiler prénom + nom verticalement sur très petit écran */
+  .field-grid {
+    grid-template-columns: 1fr;
   }
 }
 
