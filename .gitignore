@@ -47,3 +47,8 @@ supabase/.temp/
 # Claude / Superpowers — fichiers générés par l'outil IA (brainstorm, state, pid)
 .superpowers/
 docs/superpowers/
+
+# Guides locaux — documentation de déploiement (usage personnel, pas sur GitHub)
+NETLIFY-DEPLOY.md
+AUDIT.md
+RECAP.md
