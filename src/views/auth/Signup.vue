@@ -98,14 +98,13 @@
           />
 
           <!-- RGPD -->
-          <label class="gdpr-check">
+          <label class="gdpr-check gdpr-small">
             <input type="checkbox" v-model="gdprAccepted" />
             <span>
               J'accepte la
               <router-link to="/privacy" target="_blank" class="gdpr-link"
                 >politique de confidentialité</router-link
               >
-              et le traitement de mes données personnelles conformément au RGPD.
             </span>
           </label>
 
@@ -115,6 +114,8 @@
             {{ loading ? 'Création…' : 'Créer un compte' }}
           </button>
         </form>
+
+        <div style="height: 1rem"></div>
 
         <div class="auth-divider"><span>ou</span></div>
 
@@ -154,9 +155,11 @@ import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
 
 function sendWelcomeEmail(email, firstName, lastName) {
-  supabase.functions.invoke('send-welcome-email', {
-    body: { email, firstName, lastName, appUrl: window.location.origin },
-  }).catch(() => {})
+  supabase.functions
+    .invoke('send-welcome-email', {
+      body: { email, firstName, lastName, appUrl: window.location.origin },
+    })
+    .catch(() => {})
 }
 
 export default defineComponent({

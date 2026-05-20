@@ -22,7 +22,13 @@
           <router-link to="/signup" class="auth-tab" aria-label="S'inscrire" title="S'inscrire">
             <UserPlus class="auth-tab-icon" aria-hidden="true" />
           </router-link>
-          <button type="button" class="auth-tab auth-tab-guest" aria-label="Mode invité" title="Continuer sans compte" @click="onGuest">
+          <button
+            type="button"
+            class="auth-tab auth-tab-guest"
+            aria-label="Mode invité"
+            title="Continuer sans compte"
+            @click="onGuest"
+          >
             <UserX class="auth-tab-icon" aria-hidden="true" />
           </button>
         </div>
@@ -35,7 +41,7 @@
         <!-- ── Mode connexion normal ── -->
         <template v-if="!forgotMode">
           <form @submit.prevent="onSubmit" class="auth-form">
-            <div class="field">
+            <div class="field" style="margin-bottom: 1rem">
               <label for="login-email">Email</label>
               <input
                 id="login-email"
@@ -46,13 +52,8 @@
               />
             </div>
 
-            <div class="field">
-              <div class="field-label-row">
-                <label for="login-password">Mot de passe</label>
-                <button type="button" class="forgot-link" @click="forgotMode = true">
-                  Mot de passe oublié ?
-                </button>
-              </div>
+            <div class="field" style="margin-bottom: 1rem">
+              <label for="login-password">Mot de passe</label>
               <input
                 id="login-password"
                 v-model="password"
@@ -60,11 +61,16 @@
                 placeholder="••••••••"
                 required
               />
+              <div style="text-align: right; margin-top: 0.5rem">
+                <button type="button" class="forgot-link" @click="forgotMode = true">
+                  Mot de passe oublié ?
+                </button>
+              </div>
             </div>
 
             <p v-if="error" class="auth-error">{{ error }}</p>
 
-            <button type="submit" class="primary-btn" :disabled="loading">
+            <button type="submit" class="primary-btn" style="margin-bottom: 1rem" :disabled="loading">
               {{ loading ? 'Connexion…' : 'Se connecter' }}
             </button>
           </form>
@@ -74,10 +80,22 @@
           <div class="social-grid">
             <button type="button" class="social-btn social-google" @click="onGoogle">
               <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
               </svg>
               Se connecter avec Google
             </button>
@@ -99,7 +117,9 @@
             <form v-else @submit.prevent="onForgot" class="auth-form">
               <div class="forgot-header">
                 <h3 class="forgot-title">Mot de passe oublié</h3>
-                <p class="forgot-sub">Saisis ton email pour recevoir un lien de réinitialisation.</p>
+                <p class="forgot-sub">
+                  Saisis ton email pour recevoir un lien de réinitialisation.
+                </p>
               </div>
               <div class="field">
                 <label for="forgot-email">Email</label>
@@ -115,7 +135,9 @@
               <button type="submit" class="primary-btn" :disabled="forgotLoading">
                 {{ forgotLoading ? 'Envoi…' : 'Envoyer le lien' }}
               </button>
-              <button type="button" class="back-link" @click="backToLogin">← Retour à la connexion</button>
+              <button type="button" class="back-link" @click="backToLogin">
+                ← Retour à la connexion
+              </button>
             </form>
           </div>
         </template>
@@ -588,7 +610,9 @@ export default defineComponent({
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 10px 18px rgba(25, 108, 133, 0.2);
-  transition: filter 0.2s ease, opacity 0.2s ease;
+  transition:
+    filter 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .primary-btn:disabled {
@@ -687,13 +711,31 @@ export default defineComponent({
   font-family: inherit;
   transition: color 0.2s ease;
 }
-.forgot-link:hover { color: #1f7f97; text-decoration: underline; }
+.forgot-link:hover {
+  color: #1f7f97;
+  text-decoration: underline;
+}
 
-.forgot-wrap { margin-top: 2rem; }
+.forgot-wrap {
+  margin-top: 2rem;
+}
 
-.forgot-header { text-align: center; margin-bottom: 1.25rem; }
-.forgot-title { font-size: 1.5rem; font-weight: 800; color: #1b2f39; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
-.forgot-sub   { font-size: 0.92rem; color: #4f6570; margin: 0; }
+.forgot-header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+.forgot-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #1b2f39;
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.02em;
+}
+.forgot-sub {
+  font-size: 0.92rem;
+  color: #4f6570;
+  margin: 0;
+}
 
 .back-link {
   background: none;
@@ -710,7 +752,9 @@ export default defineComponent({
   transition: color 0.2s ease;
   margin-top: 0.25rem;
 }
-.back-link:hover { color: #2e9cab; }
+.back-link:hover {
+  color: #2e9cab;
+}
 
 .forgot-success {
   display: flex;
@@ -724,8 +768,18 @@ export default defineComponent({
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
 }
-.forgot-success h3 { font-size: 1.3rem; font-weight: 800; color: #1b2f39; margin: 0; }
-.forgot-success p  { font-size: 0.9rem; color: #4f6570; margin: 0; line-height: 1.5; }
+.forgot-success h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1b2f39;
+  margin: 0;
+}
+.forgot-success p {
+  font-size: 0.9rem;
+  color: #4f6570;
+  margin: 0;
+  line-height: 1.5;
+}
 
 /* ===== Desktop only: hero 100dvh sans scroll ===== */
 @media (min-width: 1101px) {
