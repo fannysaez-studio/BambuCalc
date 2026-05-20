@@ -60,7 +60,7 @@
           situés dans l'Union Européenne. Supabase est conforme au RGPD.
         </p>
         <p>
-          Le service est hébergé sur <strong>Vercel</strong> / serveur de développement local.
+          Le service est hébergé sur <strong>Netlify, Inc.</strong> (CDN international, conforme aux clauses contractuelles types SCCs).
           Aucune donnée n'est revendue à des tiers.
         </p>
       </section>
@@ -100,6 +100,11 @@
         <p>
           BambuCalc n'utilise pas de cookies de tracking ou publicitaires.
           Un cookie de session est utilisé uniquement pour maintenir votre connexion (cookie technique, exempté de consentement).
+        </p>
+        <p>
+          Si vous choisissez de régler votre commande en ligne, le service <strong>Stripe</strong> (Stripe, Inc. — sous-traitant de traitement financier)
+          est chargé uniquement après votre consentement explicite. Stripe peut déposer des cookies techniques nécessaires au traitement sécurisé du paiement.
+          Ces cookies ne sont actifs que lors d'une transaction et ne servent pas à du profilage publicitaire.
         </p>
       </section>
 

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { handlePreflight, jsonResponse, errorResponse } from '../_shared/cors.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
 const SUPABASE_URL   = Deno.env.get('SUPABASE_URL')   ?? ''
@@ -95,17 +96,7 @@ async function sendViaResend(payload: object, label: string): Promise<void> {
 // ── Handler principal ─────────────────────────────────────────────────────────
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin':  'https://bambucalc.fr',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-        'Access-Control-Max-Age':       '86400',
-      },
-    })
-  }
+  if (req.method === 'OPTIONS') return handlePreflight()
 
   // ── LOG 1 : Entrée de la fonction ─────────────────────────────
   console.log('═══════════════════════════════════════════════')
@@ -121,10 +112,7 @@ serve(async (req) => {
   if (!RESEND_API_KEY) {
     const msg = 'RESEND_API_KEY vide — ajoutez le secret dans le dashboard Supabase puis redéployez'
     console.log('[ERREUR FATALE]', msg)
-    return new Response(JSON.stringify({ error: msg }), {
-      status:  500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    })
+    return errorResponse(msg, 500)
   }
 
   try {
@@ -138,10 +126,7 @@ serve(async (req) => {
 
     if (!quote) {
       console.log('[ERREUR] Champ "quote" absent du body')
-      return new Response(JSON.stringify({ error: 'No quote data' }), {
-        status:  400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      })
+      return errorResponse('No quote data', 400)
     }
 
     // ── LOG 4 : Informations devis & PDF ─────────────────────────
@@ -367,16 +352,11 @@ serve(async (req) => {
     console.log('[SUCCÈS] tous les emails ont été acceptés par Resend')
     console.log('═══════════════════════════════════════════════')
 
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    })
+    return jsonResponse({ ok: true })
 
   } catch (err) {
     console.log('[ERREUR FATALE]', String(err))
     console.log('═══════════════════════════════════════════════')
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status:  500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    })
+    return errorResponse(String(err), 500)
   }
 })

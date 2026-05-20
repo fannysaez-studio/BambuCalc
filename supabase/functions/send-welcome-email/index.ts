@@ -1,26 +1,17 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { handlePreflight, jsonResponse, errorResponse } from '../_shared/cors.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
 const ADMIN_EMAIL    = 'fanny.saez.0486@gmail.com'
 const BRAND_COLOR    = '#2e9cab'
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 204,
-      headers: {
-        'Access-Control-Allow-Origin':  'https://bambucalc.fr',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-        'Access-Control-Max-Age':       '86400',
-      },
-    })
-  }
+  if (req.method === 'OPTIONS') return handlePreflight()
 
   try {
     const { email, firstName, lastName, appUrl = 'https://bambucalc.fr' } = await req.json()
-    if (!email) return new Response(JSON.stringify({ error: 'No email' }), { status: 400 })
+    if (!email) return errorResponse('No email', 400)
 
     const displayName   = [firstName, lastName].filter(Boolean).join(' ') || 'là'
     const firstNameOnly = firstName || displayName
@@ -156,19 +147,11 @@ serve(async (req) => {
 
     if (!res.ok) {
       const body = await res.text()
-      return new Response(JSON.stringify({ error: body }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-      })
+      return errorResponse(body, 500)
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    })
+    return jsonResponse({ ok: true })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-    })
+    return errorResponse(String(err), 500)
   }
 })

@@ -46,3 +46,4 @@ supabase/.temp/
 
 # Claude / Superpowers — fichiers générés par l'outil IA (brainstorm, state, pid)
 .superpowers/
+docs/superpowers/
