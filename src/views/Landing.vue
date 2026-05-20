@@ -592,6 +592,37 @@ export default {
   }
 }
 
+/* ===== Desktop only: hero 100dvh sans scroll ===== */
+@media (min-width: 1025px) {
+  /* 1. Bloquer la hauteur à exactement 100dvh et couper le débordement */
+  .landing-page {
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  /* 2. Permettre aux colonnes du grid de se comprimer (min-height: auto → 0) */
+  .landing-visual,
+  .landing-panel {
+    min-height: 0;
+  }
+
+  /* 3. L'illustration prend l'espace restant au lieu de tenir un min-height fixe */
+  .visual-illustration {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* 4. Réduire les marges qui forcent le débordement vertical */
+  .visual-copy {
+    margin-top: 1.5rem;
+  }
+
+  .landing-cta {
+    margin-top: 1.5rem;
+  }
+}
+
 @media (max-width: 1024px) and (min-width: 769px) {
   .landing-page {
     grid-template-columns: 1fr;

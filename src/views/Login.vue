@@ -658,6 +658,72 @@ export default comp
 .forgot-success h3 { font-size: 1.3rem; font-weight: 800; color: #1b2f39; margin: 0; }
 .forgot-success p  { font-size: 0.9rem; color: #4f6570; margin: 0; line-height: 1.5; }
 
+/* ===== Desktop only: hero 100dvh sans scroll ===== */
+@media (min-width: 1101px) {
+  /* 1. Fixer la hauteur exacte du viewport
+     - width: 100% force l'étirement dans le flex container (page-wrap a align-items: center)
+       → sans ça, le grid avec fr units se réduit à son min-content et l'app background #f0f4f8
+         apparaît sur les côtés (contour gris). Le padding: 1rem de base RESTE pour conserver
+         la respiration visible autour de la carte (comme Landing et Signup).
+     - height: 100dvh bloque la page au viewport, min-height: unset annule l'ancienne valeur
+     - overflow: hidden coupe tout débordement interne */
+  .auth-page {
+    width: 100%;
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  /* 2. Permettre aux colonnes du grid de se comprimer (min-height: auto → 0) */
+  .auth-form-panel,
+  .auth-visual {
+    min-height: 0;
+  }
+
+  /* 3. L'illustration prend l'espace restant au lieu de tenir min-height: 21rem figé */
+  .visual-illustration {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* 4. Réduire le margin du titre côté visuel */
+  .visual-copy {
+    margin-top: 1.5rem;
+  }
+
+  /* 5. Réduire le padding de la carte formulaire */
+  .auth-card {
+    padding: 2rem 2.5rem 1.5rem;
+  }
+
+  /* 6. Réduire l'espacement interne du formulaire */
+  .auth-form {
+    margin-top: 1.5rem;
+    gap: 0.75rem;
+  }
+
+  /* 7. Sous-titre du header moins espacé */
+  .auth-header p {
+    margin-top: 0.5rem;
+  }
+
+  /* 8. Inputs légèrement moins hauts */
+  .field input {
+    min-height: 2.6rem;
+    padding: 0.6rem 0.95rem;
+  }
+
+  /* 9. Bouton principal légèrement moins haut */
+  .primary-btn {
+    min-height: 2.6rem;
+  }
+
+  /* 10. Séparateur "ou" plus compact */
+  .auth-divider {
+    margin: 0.7rem 0;
+  }
+}
+
 @media (max-width: 1100px) {
   .auth-page {
     grid-template-columns: 1fr;

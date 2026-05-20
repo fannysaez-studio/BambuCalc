@@ -38,7 +38,13 @@
           >
             <UserPlus class="auth-tab-icon" aria-hidden="true" />
           </router-link>
-          <button type="button" class="auth-tab auth-tab-guest" aria-label="Mode invité" title="Continuer sans compte" @click="onGuest">
+          <button
+            type="button"
+            class="auth-tab auth-tab-guest"
+            aria-label="Mode invité"
+            title="Continuer sans compte"
+            @click="onGuest"
+          >
             <UserX class="auth-tab-icon" aria-hidden="true" />
           </button>
         </div>
@@ -96,7 +102,9 @@
             <input type="checkbox" v-model="gdprAccepted" />
             <span>
               J'accepte la
-              <router-link to="/privacy" target="_blank" class="gdpr-link">politique de confidentialité</router-link>
+              <router-link to="/privacy" target="_blank" class="gdpr-link"
+                >politique de confidentialité</router-link
+              >
               et le traitement de mes données personnelles conformément au RGPD.
             </span>
           </label>
@@ -517,7 +525,9 @@ export default comp
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 10px 18px rgba(25, 108, 133, 0.2);
-  transition: filter 0.2s ease, opacity 0.2s ease;
+  transition:
+    filter 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .primary-btn:disabled {
@@ -534,7 +544,7 @@ export default comp
   line-height: 1.5;
   cursor: pointer;
 }
-.gdpr-check input[type="checkbox"] {
+.gdpr-check input[type='checkbox'] {
   width: 1rem;
   height: 1rem;
   margin-top: 0.15rem;
@@ -619,6 +629,66 @@ export default comp
 
 .social-x .social-icon {
   background: #222;
+}
+
+/* ===== Desktop only: hero 100dvh sans scroll ===== */
+@media (min-width: 1101px) {
+  /* 1. Fixer la hauteur à exactement 100dvh et couper le débordement */
+  .auth-page {
+    width: 100%;
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
+  }
+
+  /* 2. Permettre aux colonnes du grid de se comprimer */
+  .auth-visual,
+  .auth-form-panel {
+    min-height: 0;
+  }
+
+  /* 3. L'illustration prend l'espace restant au lieu de tenir min-height: 21rem */
+  .visual-illustration {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* 4. Réduire le titre pour gagner de la hauteur côté visuel */
+  .visual-copy {
+    margin-top: 1.5rem;
+  }
+
+  /* 5. Réduire le padding de la carte formulaire */
+  .auth-card {
+    padding: 2rem 2.5rem 1.5rem;
+  }
+
+  /* 6. Réduire les espaces internes du formulaire */
+  .auth-form {
+    margin-top: 1.25rem;
+    gap: 0.75rem;
+  }
+
+  /* 7. Sous-titre du header moins espacé */
+  .auth-header p {
+    margin-top: 0.5rem;
+  }
+
+  /* 8. Inputs légèrement moins hauts */
+  .field input {
+    min-height: 2.6rem;
+    padding: 0.6rem 0.95rem;
+  }
+
+  /* 9. Bouton principal légèrement moins haut */
+  .primary-btn {
+    min-height: 2.6rem;
+  }
+
+  /* 10. Séparateur "ou" plus compact */
+  .auth-divider {
+    margin: 0.7rem 0;
+  }
 }
 
 @media (max-width: 1100px) {

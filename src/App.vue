@@ -28,15 +28,15 @@ export default {
   async created() {
     await this.checkAuth()
     supabase.auth.onAuthStateChange(async (_event, session) => {
-      this.isAuth       = !!session
-      this.displayName  = session ? this.extractName(session.user) : ''
-      this.isAdminUser  = session ? await this.checkAdmin() : false
+      this.isAuth = !!session
+      this.displayName = session ? this.extractName(session.user) : ''
+      this.isAdminUser = session ? await this.checkAdmin() : false
     })
   },
   methods: {
     async checkAuth() {
       const { data } = await supabase.auth.getSession()
-      this.isAuth      = !!data.session
+      this.isAuth = !!data.session
       this.displayName = data.session ? this.extractName(data.session.user) : ''
       this.isAdminUser = data.session ? await this.checkAdmin() : false
     },
@@ -53,7 +53,7 @@ export default {
     },
     async logout() {
       await authLogout()
-      this.isAuth      = false
+      this.isAuth = false
       this.displayName = ''
       this.isAdminUser = false
       this.$router.push({ name: 'landing' })
@@ -63,7 +63,11 @@ export default {
 </script>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 .app {
   min-height: 100vh;
@@ -78,7 +82,7 @@ export default {
   justify-content: center;
   min-height: 100vh;
   width: 100%;
-  padding: 2rem 1rem 92px;
+  /* padding: 2rem 1rem 92px; */
 }
 
 /* Tablette — aligne en haut comme mobile */
