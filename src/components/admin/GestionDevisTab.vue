@@ -685,7 +685,7 @@ function fmtDate(iso) {
   padding: 0.38rem 0.9rem; border: 1.5px solid #e2e8f0; border-radius: 999px;
   background: #fff; color: #718096;
   font-size: 0.78rem; font-weight: 700;
-  cursor: pointer; font-family: inherit; transition: all 0.15s ease; align-self: flex-start;
+  cursor: pointer; font-family: inherit; transition: all 0.15s ease; align-self: center;
 }
 .btn-manage-prev:hover { background: #f7f9fc; border-color: #cbd5e0; color: #4a5568; }
 .manage-send-card {
@@ -769,8 +769,8 @@ function fmtDate(iso) {
 }
 .btn-validate-quote:hover { background: #d0eff4; }
 .btn-confirm-send {
-  flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-  padding: 0.6rem; border: none; border-radius: 10px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  margin-left: auto; padding: 0.6rem 1.25rem; border: none; border-radius: 10px;
   background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
   color: #fff; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit;
   box-shadow: 0 4px 12px rgba(46,156,171,0.3); transition: filter 0.15s ease;

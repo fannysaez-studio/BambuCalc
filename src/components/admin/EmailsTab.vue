@@ -480,7 +480,7 @@ onMounted(async () => {
   padding: 0.55rem 0.85rem 0.3rem;
   gap: 0; flex-shrink: 0;
 }
-.email-steps-bar { padding: 0; flex: 0 0 auto; min-width: 130px; }
+.email-steps-bar { padding: 0; flex: 0 0 auto; min-width: 130px; margin-left: auto; }
 .sim-step-dot {
   width: 1.55rem; height: 1.55rem; border-radius: 50%;
   border: 2px solid #d6bcfa; background: #fff;

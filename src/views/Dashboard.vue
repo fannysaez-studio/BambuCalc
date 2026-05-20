@@ -343,10 +343,10 @@ export default {
 
 <style scoped>
 .dash-page {
-  min-height: 100vh;
   background: #f0f4f8;
   padding: 1.5rem 1.5rem 3rem;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
 }
