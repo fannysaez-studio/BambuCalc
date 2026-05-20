@@ -5,10 +5,10 @@ import Dashboard from '@/views/dashboard/Dashboard.vue'
 import AdminDashboard from '@/views/admin/AdminDashboard.vue'
 import Login from '@/views/auth/Login.vue'
 import Signup from '@/views/auth/Signup.vue'
-import ResetPassword from '@/views/ResetPassword.vue'
+import ResetPassword from '@/views/auth/ResetPassword.vue'
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
 import NotFound from '@/views/NotFound.vue'
-import UserProfile from '@/views/UserProfile.vue'
+import UserProfile from '@/views/dashboard/UserProfile.vue'
 import { supabase } from '@/lib/supabase'
 
 const routes = [
