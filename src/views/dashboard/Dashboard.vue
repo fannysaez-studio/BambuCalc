@@ -220,10 +220,10 @@
 </template>
 
 <script>
-import { supabase } from '../lib/supabase'
-import { getQuotes } from '../utils/auth'
-import { generateQuotePDF } from '../utils/generateQuotePDF'
-import ToastMessage from '../components/ToastMessage.vue'
+import { supabase } from '@/lib/supabase'
+import { getQuotes } from '@/utils/auth'
+import { generateQuotePDF } from '@/utils/generateQuotePDF'
+import ToastMessage from '@/components/ui/ToastMessage.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard } from 'lucide-vue-next'
 
 export default {

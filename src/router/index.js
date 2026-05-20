@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Landing from '../views/Landing.vue'
-import CalculatorStep from '../views/CalculatorStep.vue'
-import Dashboard from '../views/Dashboard.vue'
-import AdminDashboard from '../views/AdminDashboard.vue'
-import Login from '../views/Login.vue'
-import Signup from '../views/Signup.vue'
-import ResetPassword from '../views/ResetPassword.vue'
-import PrivacyPolicy from '../views/PrivacyPolicy.vue'
-import NotFound from '../views/NotFound.vue'
-import UserProfile from '../views/UserProfile.vue'
-import { supabase } from '../lib/supabase'
+import Landing from '@/views/Landing.vue'
+import CalculatorStep from '@/views/calculator/CalculatorStep.vue'
+import Dashboard from '@/views/dashboard/Dashboard.vue'
+import AdminDashboard from '@/views/admin/AdminDashboard.vue'
+import Login from '@/views/auth/Login.vue'
+import Signup from '@/views/auth/Signup.vue'
+import ResetPassword from '@/views/ResetPassword.vue'
+import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
+import NotFound from '@/views/NotFound.vue'
+import UserProfile from '@/views/UserProfile.vue'
+import { supabase } from '@/lib/supabase'
 
 const routes = [
   { path: '/', name: 'landing', component: Landing, meta: { layout: 'landing' } },
@@ -25,7 +25,7 @@ const routes = [
   {
     path: '/pay/:quoteId',
     name: 'payment',
-    component: () => import('../views/PaymentView.vue'),
+    component: () => import('@/views/PaymentView.vue'),
     meta: { requiresAuth: true },
   },
   { path: '/guest', redirect: '/calculator/1' },

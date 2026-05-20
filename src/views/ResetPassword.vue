@@ -2,8 +2,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Lock } from 'lucide-vue-next'
-import { supabase } from '../lib/supabase'
-import PasswordField from '../components/PasswordField.vue'
+import { supabase } from '@/lib/supabase'
+import PasswordField from '@/components/ui/PasswordField.vue'
 
 const router = useRouter()
 

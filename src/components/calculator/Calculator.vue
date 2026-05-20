@@ -159,8 +159,8 @@ import FilamentSection from './FilamentSection.vue'
 import PrintingTime from './PrintingTime.vue'
 import CostBreakdown from './CostBreakdown.vue'
 import PricingSuggestions from './PricingSuggestions.vue'
-import styles from '../styles/Calculator.module.css'
-import { saveQuote as saveQuoteToDb } from '../utils/auth'
+import styles from '@/styles/Calculator.module.css'
+import { saveQuote as saveQuoteToDb } from '@/utils/auth'
 import { Layers, Package, Clock, Tag, BarChart3, Pencil } from 'lucide-vue-next'
 
 export default {

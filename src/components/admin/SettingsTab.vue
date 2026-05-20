@@ -237,7 +237,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import ToastMessage from '@/components/ToastMessage.vue'
+import ToastMessage from '@/components/ui/ToastMessage.vue'
 import { BarChart2, Save, Check, Loader2, BookOpen, ChevronRight } from 'lucide-vue-next'
 
 // ── Emits ─────────────────────────────────────────────────────────────────────

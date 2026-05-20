@@ -111,8 +111,8 @@
 </template>
 
 <script>
-import { supabase } from '../lib/supabase'
-import formStyles from '../styles/Form.module.css'
+import { supabase } from '@/lib/supabase'
+import formStyles from '@/styles/Form.module.css'
 
 export default {
   name: 'ProjectMatter',

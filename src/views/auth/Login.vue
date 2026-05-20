@@ -1,21 +1,5 @@
 <template>
   <div class="auth-page">
-    <section class="auth-visual" aria-hidden="true">
-      <div class="visual-badge">
-        <span class="badge-mark"></span>
-        <span>BambuCalc</span>
-      </div>
-
-      <div class="visual-copy">
-        <h1>S'inscrire en quelques secondes</h1>
-        <p>Une interface élégante pour suivre vos devis et vos séries.</p>
-      </div>
-
-      <div class="visual-illustration">
-        <img src="/signUp-hero.svg" alt="Illustration de création de compte" />
-      </div>
-    </section>
-
     <section class="auth-form-panel">
       <div class="auth-card">
         <router-link
@@ -27,128 +11,207 @@
           <Home class="auth-home-icon" aria-hidden="true" />
         </router-link>
         <div class="auth-switcher" aria-label="Basculer entre connexion et inscription">
-          <router-link to="/login" class="auth-tab" aria-label="Se connecter" title="Se connecter">
+          <router-link
+            to="/login"
+            class="auth-tab active"
+            aria-label="Se connecter"
+            title="Se connecter"
+          >
             <Lock class="auth-tab-icon" aria-hidden="true" />
           </router-link>
-          <router-link
-            to="/signup"
-            class="auth-tab active"
-            aria-label="S'inscrire"
-            title="S'inscrire"
-          >
+          <router-link to="/signup" class="auth-tab" aria-label="S'inscrire" title="S'inscrire">
             <UserPlus class="auth-tab-icon" aria-hidden="true" />
           </router-link>
-          <button
-            type="button"
-            class="auth-tab auth-tab-guest"
-            aria-label="Mode invité"
-            title="Continuer sans compte"
-            @click="onGuest"
-          >
+          <button type="button" class="auth-tab auth-tab-guest" aria-label="Mode invité" title="Continuer sans compte" @click="onGuest">
             <UserX class="auth-tab-icon" aria-hidden="true" />
           </button>
         </div>
 
         <div class="auth-header">
-          <h2>Inscription</h2>
-          <p>Rejoignez BambuCalc et gérez vos projets 3D.</p>
+          <h2>Connexion</h2>
+          <p>Accédez à vos devis et à vos projets.</p>
         </div>
 
-        <form @submit.prevent="onSubmit" class="auth-form">
-          <div class="field-grid">
+        <!-- ── Mode connexion normal ── -->
+        <template v-if="!forgotMode">
+          <form @submit.prevent="onSubmit" class="auth-form">
             <div class="field">
-              <label for="signup-first-name">Prénom</label>
+              <label for="login-email">Email</label>
               <input
-                id="signup-first-name"
-                v-model="firstName"
-                type="text"
-                placeholder="Jean"
+                id="login-email"
+                v-model="email"
+                type="email"
+                placeholder="vous@exemple.com"
                 required
               />
             </div>
 
             <div class="field">
-              <label for="signup-last-name">Nom</label>
+              <div class="field-label-row">
+                <label for="login-password">Mot de passe</label>
+                <button type="button" class="forgot-link" @click="forgotMode = true">
+                  Mot de passe oublié ?
+                </button>
+              </div>
               <input
-                id="signup-last-name"
-                v-model="lastName"
-                type="text"
-                placeholder="Dupont"
+                id="login-password"
+                v-model="password"
+                type="password"
+                placeholder="••••••••"
                 required
               />
             </div>
+
+            <p v-if="error" class="auth-error">{{ error }}</p>
+
+            <button type="submit" class="primary-btn" :disabled="loading">
+              {{ loading ? 'Connexion…' : 'Se connecter' }}
+            </button>
+          </form>
+
+          <div class="auth-divider"><span>ou</span></div>
+
+          <div class="social-grid">
+            <button type="button" class="social-btn social-google" @click="onGoogle">
+              <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Se connecter avec Google
+            </button>
           </div>
+        </template>
 
-          <div class="field">
-            <label for="signup-email">E-mail</label>
-            <input
-              id="signup-email"
-              v-model="email"
-              type="email"
-              placeholder="vous@exemple.com"
-              required
-            />
+        <!-- ── Mode mot de passe oublié ── -->
+        <template v-else>
+          <div class="forgot-wrap">
+            <!-- Succès -->
+            <div v-if="forgotSent" class="forgot-success">
+              <div class="forgot-success-icon">✉</div>
+              <h3>Email envoyé !</h3>
+              <p>Vérifie ta boîte mail — le lien est valable <strong>1 heure</strong>.</p>
+              <button class="back-link" @click="backToLogin">← Retour à la connexion</button>
+            </div>
+
+            <!-- Formulaire -->
+            <form v-else @submit.prevent="onForgot" class="auth-form">
+              <div class="forgot-header">
+                <h3 class="forgot-title">Mot de passe oublié</h3>
+                <p class="forgot-sub">Saisis ton email pour recevoir un lien de réinitialisation.</p>
+              </div>
+              <div class="field">
+                <label for="forgot-email">Email</label>
+                <input
+                  id="forgot-email"
+                  v-model="forgotEmail"
+                  type="email"
+                  placeholder="vous@exemple.com"
+                  required
+                />
+              </div>
+              <p v-if="forgotError" class="auth-error">{{ forgotError }}</p>
+              <button type="submit" class="primary-btn" :disabled="forgotLoading">
+                {{ forgotLoading ? 'Envoi…' : 'Envoyer le lien' }}
+              </button>
+              <button type="button" class="back-link" @click="backToLogin">← Retour à la connexion</button>
+            </form>
           </div>
+        </template>
+      </div>
+    </section>
 
-          <PasswordField
-            id="signup-password"
-            label="Mot de passe"
-            :show-strength="true"
-            v-model="password"
-          />
+    <section class="auth-visual" aria-hidden="true">
+      <div class="visual-badge">
+        <span class="badge-mark"></span>
+        <span>BambuCalc</span>
+      </div>
 
-          <!-- RGPD -->
-          <label class="gdpr-check">
-            <input type="checkbox" v-model="gdprAccepted" />
-            <span>
-              J'accepte la
-              <router-link to="/privacy" target="_blank" class="gdpr-link"
-                >politique de confidentialité</router-link
-              >
-              et le traitement de mes données personnelles conformément au RGPD.
-            </span>
-          </label>
+      <div class="visual-copy">
+        <h1>Imaginez vos impressions en 3D</h1>
+        <p>Un espace clair, rapide et premium pour piloter vos devis.</p>
+      </div>
 
-          <p v-if="error" class="auth-error">{{ error }}</p>
-
-          <button type="submit" class="primary-btn" :disabled="loading || !gdprAccepted">
-            {{ loading ? 'Création…' : 'Créer un compte' }}
-          </button>
-        </form>
-
-        <div class="auth-divider"><span>ou</span></div>
-
-        <div class="social-grid">
-          <button type="button" class="social-btn social-google" @click="onGoogle">
-            <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
-            </svg>
-            S'inscrire avec Google
-          </button>
-        </div>
+      <div class="visual-illustration">
+        <img src="/login-hero.svg" alt="Clé de connexion" />
       </div>
     </section>
   </div>
 </template>
 
 <script>
-import comp from './Signup.js'
-export default comp
+import { defineComponent } from 'vue'
+import { Home, Lock, UserPlus, UserX } from 'lucide-vue-next'
+import { login, loginWithGoogle, resetPasswordForEmail, checkIsAdmin } from '@/utils/auth'
+import { supabase } from '@/lib/supabase'
+
+export default defineComponent({
+  name: 'Login',
+  components: { Home, Lock, UserPlus, UserX },
+  data() {
+    return {
+      email: '',
+      password: '',
+      error: null,
+      loading: false,
+      forgotMode: false,
+      forgotEmail: '',
+      forgotSent: false,
+      forgotLoading: false,
+      forgotError: null,
+    }
+  },
+  methods: {
+    async onSubmit() {
+      this.error = null
+      this.loading = true
+      try {
+        await login({ email: this.email, password: this.password })
+        const isAdmin = await checkIsAdmin()
+        this.$router.push(isAdmin ? '/admin' : '/dashboard')
+      } catch (err) {
+        this.error = 'Email ou mot de passe incorrect.'
+      } finally {
+        this.loading = false
+      }
+    },
+    async onGoogle() {
+      try {
+        await loginWithGoogle()
+      } catch (err) {
+        this.error = 'Connexion Google impossible. Réessaie.'
+      }
+    },
+    async onForgot() {
+      this.forgotError = null
+      this.forgotLoading = true
+      try {
+        await resetPasswordForEmail(this.forgotEmail)
+        this.forgotSent = true
+      } catch (err) {
+        this.forgotError = 'Adresse introuvable ou erreur. Vérifie ton email.'
+      } finally {
+        this.forgotLoading = false
+      }
+    },
+    backToLogin() {
+      this.forgotMode = false
+      this.forgotSent = false
+      this.forgotEmail = ''
+      this.forgotError = null
+    },
+    async onGuest() {
+      try {
+        const { error } = await supabase.auth.signInAnonymously()
+        if (error) throw error
+        this.$router.push('/calculator')
+      } catch {
+        this.error = 'Impossible de démarrer en mode invité. Réessaie.'
+      }
+    },
+  },
+})
 </script>
 
 <style scoped>
@@ -159,7 +222,7 @@ export default comp
 .auth-page {
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.94fr);
+  grid-template-columns: minmax(420px, 0.94fr) minmax(0, 1fr);
   padding: 1rem;
   background-image: url('/hero-vagues.svg');
   background-repeat: no-repeat;
@@ -182,7 +245,7 @@ export default comp
 .auth-visual {
   position: relative;
   overflow: visible;
-  border-radius: 28px 0 0 28px;
+  border-radius: 0 28px 28px 0;
   padding: 2rem 2rem 1.75rem;
   display: flex;
   flex-direction: column;
@@ -200,7 +263,7 @@ export default comp
   background:
     radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.16), transparent 24%),
     radial-gradient(circle at 75% 70%, rgba(46, 154, 171, 0.1), transparent 28%);
-  border-radius: 28px 0 0 28px;
+  border-radius: 0 28px 28px 0;
   pointer-events: none;
 }
 
@@ -208,7 +271,7 @@ export default comp
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 28px 0 0 28px;
+  border-radius: 0 28px 28px 0;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
   pointer-events: none;
   z-index: 2;
@@ -337,9 +400,9 @@ export default comp
   position: relative;
   background: rgba(255, 255, 255, 0.62);
   backdrop-filter: blur(16px);
-  border-radius: 0 28px 28px 0;
+  border-radius: 28px 0 0 28px;
   padding: 3.25rem 3rem 2rem;
-  box-shadow: -8px 0 20px rgba(29, 18, 43, 0.08);
+  box-shadow: 8px 0 20px rgba(29, 18, 43, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -525,37 +588,12 @@ export default comp
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 10px 18px rgba(25, 108, 133, 0.2);
-  transition:
-    filter 0.2s ease,
-    opacity 0.2s ease;
+  transition: filter 0.2s ease, opacity 0.2s ease;
 }
 
 .primary-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
-}
-
-.gdpr-check {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  font-size: 0.78rem;
-  color: #4f6570;
-  line-height: 1.5;
-  cursor: pointer;
-}
-.gdpr-check input[type='checkbox'] {
-  width: 1rem;
-  height: 1rem;
-  margin-top: 0.15rem;
-  flex-shrink: 0;
-  accent-color: #2e9cab;
-  cursor: pointer;
-}
-.gdpr-link {
-  color: #2e9cab;
-  font-weight: 600;
-  text-decoration: underline;
 }
 
 .auth-divider {
@@ -631,9 +669,73 @@ export default comp
   background: #222;
 }
 
+/* ── Mot de passe oublié ── */
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.forgot-link {
+  background: none;
+  border: none;
+  color: #2e9cab;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.2s ease;
+}
+.forgot-link:hover { color: #1f7f97; text-decoration: underline; }
+
+.forgot-wrap { margin-top: 2rem; }
+
+.forgot-header { text-align: center; margin-bottom: 1.25rem; }
+.forgot-title { font-size: 1.5rem; font-weight: 800; color: #1b2f39; margin: 0 0 0.4rem; letter-spacing: -0.02em; }
+.forgot-sub   { font-size: 0.92rem; color: #4f6570; margin: 0; }
+
+.back-link {
+  background: none;
+  border: none;
+  color: #718096;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  font-family: inherit;
+  text-align: center;
+  width: 100%;
+  display: block;
+  transition: color 0.2s ease;
+  margin-top: 0.25rem;
+}
+.back-link:hover { color: #2e9cab; }
+
+.forgot-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1.5rem 0;
+}
+.forgot-success-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+.forgot-success h3 { font-size: 1.3rem; font-weight: 800; color: #1b2f39; margin: 0; }
+.forgot-success p  { font-size: 0.9rem; color: #4f6570; margin: 0; line-height: 1.5; }
+
 /* ===== Desktop only: hero 100dvh sans scroll ===== */
 @media (min-width: 1101px) {
-  /* 1. Fixer la hauteur à exactement 100dvh et couper le débordement */
+  /* 1. Fixer la hauteur exacte du viewport
+     - width: 100% force l'étirement dans le flex container (page-wrap a align-items: center)
+       → sans ça, le grid avec fr units se réduit à son min-content et l'app background #f0f4f8
+         apparaît sur les côtés (contour gris). Le padding: 1rem de base RESTE pour conserver
+         la respiration visible autour de la carte (comme Landing et Signup).
+     - height: 100dvh bloque la page au viewport, min-height: unset annule l'ancienne valeur
+     - overflow: hidden coupe tout débordement interne */
   .auth-page {
     width: 100%;
     height: 100dvh;
@@ -641,19 +743,19 @@ export default comp
     overflow: hidden;
   }
 
-  /* 2. Permettre aux colonnes du grid de se comprimer */
-  .auth-visual,
-  .auth-form-panel {
+  /* 2. Permettre aux colonnes du grid de se comprimer (min-height: auto → 0) */
+  .auth-form-panel,
+  .auth-visual {
     min-height: 0;
   }
 
-  /* 3. L'illustration prend l'espace restant au lieu de tenir min-height: 21rem */
+  /* 3. L'illustration prend l'espace restant au lieu de tenir min-height: 21rem figé */
   .visual-illustration {
     flex: 1;
     min-height: 0;
   }
 
-  /* 4. Réduire le titre pour gagner de la hauteur côté visuel */
+  /* 4. Réduire le margin du titre côté visuel */
   .visual-copy {
     margin-top: 1.5rem;
   }
@@ -663,9 +765,9 @@ export default comp
     padding: 2rem 2.5rem 1.5rem;
   }
 
-  /* 6. Réduire les espaces internes du formulaire */
+  /* 6. Réduire l'espacement interne du formulaire */
   .auth-form {
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
     gap: 0.75rem;
   }
 
@@ -770,7 +872,7 @@ export default comp
     margin-top: 0.5rem;
   }
 
-  /* Illustration compacte (en haut sur Signup via DOM order) */
+  /* Illustration très compacte (formulaire est en haut via DOM order) */
   .visual-illustration {
     min-height: 9rem;
     flex: unset;
@@ -811,7 +913,7 @@ export default comp
     gap: 0.4rem;
   }
 
-  /* Masquer l'illustration (en haut sur Signup) pour maximiser l'espace formulaire */
+  /* Le formulaire est en haut (DOM order Login) → masquer l'illustration en bas */
   .visual-illustration {
     display: none;
   }
@@ -822,25 +924,6 @@ export default comp
 
   .auth-card {
     padding: 1.5rem 1rem 1.25rem;
-  }
-
-  /* Empiler prénom + nom verticalement sur très petit écran */
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 2rem 1rem 1.5rem;
-  }
-
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .social-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

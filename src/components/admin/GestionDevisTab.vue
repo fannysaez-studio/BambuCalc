@@ -290,7 +290,7 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import { useCalculatorStore } from '@/stores/calculator'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
-import ToastMessage from '@/components/ToastMessage.vue'
+import ToastMessage from '@/components/ui/ToastMessage.vue'
 import {
   FileText, Pencil, Download, Send, Trash2, CheckCircle,
 } from 'lucide-vue-next'

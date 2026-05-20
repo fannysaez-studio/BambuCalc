@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import styles from '../styles/AdvancedSettings.module.css'
+import styles from '@/styles/AdvancedSettings.module.css'
 
 export default {
   name: 'ProductionSeries',

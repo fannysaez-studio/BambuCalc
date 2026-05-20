@@ -328,19 +328,19 @@ import {
   getAllProfilesAdmin,
   adminDeleteQuote,
   adminDeleteUser,
-} from '../utils/auth'
-import { supabase } from '../lib/supabase'
-import { generateQuotePDFDoc, pdfToBase64 } from '../utils/generateQuotePDF'
-import { useCalculatorStore } from '../stores/calculator'
-import ToastMessage from '../components/ToastMessage.vue'
-import CatalogueTab from '../components/admin/CatalogueTab.vue'
-import SettingsTab from '../components/admin/SettingsTab.vue'
-import GestionDevisTab from '../components/admin/GestionDevisTab.vue'
-import EmailsTab from '../components/admin/EmailsTab.vue'
-import ArchivesTab from '../components/admin/ArchivesTab.vue'
-import StatsTab from '../components/admin/StatsTab.vue'
-import ClientsTab from '../components/admin/ClientsTab.vue'
-import QuotesTab from '../components/admin/QuotesTab.vue'
+} from '@/utils/auth'
+import { supabase } from '@/lib/supabase'
+import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
+import { useCalculatorStore } from '@/stores/calculator'
+import ToastMessage from '@/components/ui/ToastMessage.vue'
+import CatalogueTab from '@/components/admin/CatalogueTab.vue'
+import SettingsTab from '@/components/admin/SettingsTab.vue'
+import GestionDevisTab from '@/components/admin/GestionDevisTab.vue'
+import EmailsTab from '@/components/admin/EmailsTab.vue'
+import ArchivesTab from '@/components/admin/ArchivesTab.vue'
+import StatsTab from '@/components/admin/StatsTab.vue'
+import ClientsTab from '@/components/admin/ClientsTab.vue'
+import QuotesTab from '@/components/admin/QuotesTab.vue'
 import {
   ShieldCheck,
   Users,

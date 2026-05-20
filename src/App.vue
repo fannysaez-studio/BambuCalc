@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import GlobalNav from './components/GlobalNav.vue'
-import CookieBanner from './components/CookieBanner.vue'
+import GlobalNav from '@/components/ui/GlobalNav.vue'
+import CookieBanner from '@/components/ui/CookieBanner.vue'
 import { supabase } from './lib/supabase'
 import { logout as authLogout } from './utils/auth'
 

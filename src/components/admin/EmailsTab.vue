@@ -198,7 +198,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
-import ToastMessage from '@/components/ToastMessage.vue'
+import ToastMessage from '@/components/ui/ToastMessage.vue'
 import { Settings, Mail, Bell, FileText, Send, CheckCircle } from 'lucide-vue-next'
 
 const props = defineProps({

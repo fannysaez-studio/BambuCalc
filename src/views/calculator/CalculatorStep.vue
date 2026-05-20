@@ -233,17 +233,17 @@
 </template>
 
 <script>
-import { useCalculatorStore } from '../stores/calculator'
-import { saveQuote as saveQuoteToDb, updateQuote, checkIsAdmin } from '../utils/auth'
-import { supabase } from '../lib/supabase'
-import ProjectDetails    from '../components/ProjectDetails.vue'
-import ProjectMatter     from '../components/ProjectMatter.vue'
-import ClientInfo        from '../components/ClientInfo.vue'
-import FilamentSection   from '../components/FilamentSection.vue'
-import PrintingTime      from '../components/PrintingTime.vue'
-import PricingSuggestions from '../components/PricingSuggestions.vue'
-import CostBreakdown     from '../components/CostBreakdown.vue'
-import ToastMessage      from '../components/ToastMessage.vue'
+import { useCalculatorStore } from '@/stores/calculator'
+import { saveQuote as saveQuoteToDb, updateQuote, checkIsAdmin } from '@/utils/auth'
+import { supabase } from '@/lib/supabase'
+import ProjectDetails    from '@/components/calculator/ProjectDetails.vue'
+import ProjectMatter     from '@/components/calculator/ProjectMatter.vue'
+import ClientInfo        from '@/components/calculator/ClientInfo.vue'
+import FilamentSection   from '@/components/calculator/FilamentSection.vue'
+import PrintingTime      from '@/components/calculator/PrintingTime.vue'
+import PricingSuggestions from '@/components/calculator/PricingSuggestions.vue'
+import CostBreakdown     from '@/components/calculator/CostBreakdown.vue'
+import ToastMessage      from '@/components/ui/ToastMessage.vue'
 import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle } from 'lucide-vue-next'
 
 export default {

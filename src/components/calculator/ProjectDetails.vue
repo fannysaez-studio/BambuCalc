@@ -233,7 +233,7 @@
 </template>
 
 <script>
-import formStyles from '../styles/Form.module.css'
+import formStyles from '@/styles/Form.module.css'
 
 export default {
   name: 'ProjectDetails',

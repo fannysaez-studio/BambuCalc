@@ -25,8 +25,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
-import CatalogueSection from '@/components/CatalogueSection.vue'
-import ToastMessage     from '@/components/ToastMessage.vue'
+import CatalogueSection from '@/components/calculator/CatalogueSection.vue'
+import ToastMessage     from '@/components/ui/ToastMessage.vue'
 
 // ── Emit vers AdminDashboard : met à jour le badge de l'onglet dans la nav ──
 const emit = defineEmits(['count-change'])
