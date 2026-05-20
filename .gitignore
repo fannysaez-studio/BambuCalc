@@ -40,3 +40,6 @@ __screenshots__/
 
 test-results/
 playwright-report/
+
+# Supabase CLI — fichiers temporaires locaux (project-ref, pooler-url, etc.)
+supabase/.temp/
