@@ -1,5 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build & Distribution
+dist/
+dist-ssr/
+*.timestamp-*-*.mjs
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,49 +15,43 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-.DS_Store
-dist
-dist-ssr
-coverage
-*.local
-
 # Environment variables — SECRETS !
 .env
 .env.local
 .env.*.local
 
-# Editor directories and files
+# IDEs & Editor settings (keep extensions.json)
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-*.tsbuildinfo
+# OS files
+.DS_Store
 
+# Cache & Build artifacts
 .eslintcache
+*.tsbuildinfo
+*.local
 
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
-
-# Vitest
-__screenshots__/
-
-# Vite
-*.timestamp-*-*.mjs
-
+# Test coverage & reports
+coverage/
 test-results/
 playwright-report/
 
-# Supabase CLI — fichiers temporaires locaux (project-ref, pooler-url, etc.)
+# Test artifacts
+/cypress/videos/
+/cypress/screenshots/
+__screenshots__/
+
+# Supabase CLI — temporary local files
 supabase/.temp/
 
-# Claude / Superpowers — fichiers générés par l'outil IA (brainstorm, state, pid)
+# Claude / Superpowers — AI-generated files
 .superpowers/
 docs/superpowers/
 
