@@ -1,1 +1,6 @@
 * text=auto eol=lf
+
+# Exclure les fichiers de données/infrastructure des stats GitHub
+*.sql linguist-detectable=false
+supabase/ linguist-detectable=false
+docs/superpowers/ linguist-detectable=false
