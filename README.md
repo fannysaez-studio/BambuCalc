@@ -145,103 +145,32 @@ L'app sera disponible à : **<http://localhost:5173>**
 ```
 BambuCalc/
 ├── src/
-│   ├── main.js                    # Point d'entrée
-│   ├── App.vue                    # Composant racine
-│   ├── components/
-│   │   ├── admin/                 # Tableau de bord admin
-│   │   │   ├── _AdminDashboardShell.vue
-│   │   │   ├── ArchivesTab.vue
-│   │   │   ├── CatalogueTab.vue
-│   │   │   ├── ClientsTab.vue
-│   │   │   ├── EmailsTab.vue
-│   │   │   ├── GestionDevisTab.vue
-│   │   │   ├── QuotesTab.vue
-│   │   │   ├── SettingsTab.vue
-│   │   │   └── StatsTab.vue
-│   │   ├── calculator/            # Modules calculateur
-│   │   │   ├── Calculator.vue
-│   │   │   ├── AdvancedSettings.vue
-│   │   │   ├── CatalogueSection.vue
-│   │   │   ├── ClientInfo.vue
-│   │   │   ├── CostBreakdown.vue
-│   │   │   ├── FilamentSection.vue
-│   │   │   ├── PricingSuggestions.vue
-│   │   │   ├── PrintingTime.vue
-│   │   │   ├── ProductionSeries.vue
-│   │   │   ├── ProjectDetails.vue
-│   │   │   └── ProjectMatter.vue
-│   │   └── ui/                    # Composants réutilisables
-│   │       ├── CookieBanner.vue
-│   │       ├── GlobalNav.vue
-│   │       ├── PasswordField.vue
-│   │       └── ToastMessage.vue
-│   ├── views/
-│   │   ├── Landing.vue            # Page d'accueil
-│   │   ├── NotFound.vue
-│   │   ├── PaymentView.vue
-│   │   ├── PrivacyPolicy.vue
-│   │   ├── admin/
-│   │   │   └── AdminDashboard.vue
-│   │   ├── auth/                  # Auth pages
-│   │   │   ├── Login.vue
-│   │   │   ├── Signup.vue
-│   │   │   └── ResetPassword.vue
-│   │   ├── calculator/
-│   │   │   └── CalculatorStep.vue
-│   │   └── dashboard/
-│   │       ├── Dashboard.vue
-│   │       └── UserProfile.vue
-│   ├── router/
-│   │   └── index.js               # Configuration routage
-│   ├── stores/
-│   │   └── calculator.js          # État global (Pinia)
-│   ├── utils/
-│   │   ├── auth.js                # Fonctions auth
-│   │   ├── generateQuotePDF.js    # PDF generation
-│   │   └── stripe.js              # Stripe helpers
-│   ├── config/
-│   │   └── company.js             # Config entreprise
-│   ├── lib/
-│   │   └── supabase.js            # Client Supabase
-│   └── styles/
-│       ├── global.css             # Styles globaux
-│       ├── variables.css          # CSS variables
-│       ├── Calculator.module.css
-│       ├── Form.module.css
-│       └── ...autres modules
-│
+│   ├── components/            # Composants Vue réutilisables
+│   │   ├── admin/             # Dashboard admin (8 onglets)
+│   │   ├── calculator/        # Modules calculateur (11 composants)
+│   │   └── ui/                # Composants globaux (NavBar, Toast, etc.)
+│   ├── views/                 # Pages principales (auth, calculator, dashboard)
+│   ├── router/                # Configuration Vue Router
+│   ├── stores/                # Store Pinia (gestion d'état)
+│   ├── utils/                 # Fonctions métier (auth, PDF, Stripe)
+│   ├── config/                # Configuration de l'app
+│   ├── lib/                   # Clients services (Supabase)
+│   └── styles/                # CSS globaux et modules
 ├── supabase/
-│   ├── migrations/                # Migrations BDD
-│   │   ├── 20260510000000_quotes_columns_v2.sql
-│   │   ├── 20260510000001_admin_setup.sql
-│   │   ├── 20260516000000_email_settings.sql
-│   │   └── ...
-│   └── functions/                 # Edge Functions
-│       ├── create-payment-intent/
-│       ├── send-quote-email/
-│       ├── send-welcome-email/
-│       └── stripe-webhook/
-│
-├── e2e/
-│   └── vue.spec.js                # Tests Playwright
-│
-├── docs/
-│   └── superpowers/
-│       ├── plans/                 # Plans de développement
-│       └── specs/                 # Spécifications design
-│
-├── public/                        # Assets statiques
-├── .env.example                   # Template variables
-├── .env.local                     # ⚠️ À créer (local only)
-├── eslint.config.js               # Configuration ESLint
-├── vite.config.js                 # Configuration Vite
-├── vitest.config.js               # Configuration tests unitaires
-├── playwright.config.js           # Configuration tests E2E
-├── jsconfig.json                  # Alias @ pour src/
-├── netlify.toml                   # Config déploiement Netlify
-├── package.json                   # Dépendances
-└── README.md                      # Ce fichier
+│   ├── migrations/            # Migrations BDD (5 fichiers)
+│   └── functions/             # Edge Functions TypeScript (4 functions)
+├── e2e/                       # Tests Playwright
+├── docs/                      # Documentation (plans, specs)
+├── public/                    # Assets statiques
+└── [config files]             # .gitignore, vite.config.js, package.json, etc.
 ```
+
+**Points clés** :
+
+- 📱 **src/** : Code source (Vue, Router, Store, Utils)
+- 🗄️ **supabase/** : BDD PostgreSQL + Edge Functions
+- ✅ **e2e/** : Tests d'intégration Playwright
+- 📚 **docs/** : Spécifications et plans de développement
 
 ---
 
