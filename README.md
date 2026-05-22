@@ -73,14 +73,14 @@ BambuCalc est une application web moderne pour :
 | **Resend**   | latest  | Emails transactionnels            |
 | **jsPDF**    | 4.2.1   | Génération PDF                    |
 
-### DevTools
+<!-- ### DevTools
 
 | Tech           | Version | Rôle               |
 | -------------- | ------- | ------------------ |
 | **Vitest**     | 4.1.4   | Tests unitaires    |
 | **Playwright** | 1.59.1  | Tests E2E          |
 | **ESLint**     | 10.2.1  | Linting JavaScript |
-| **Prettier**   | 3.8.3   | Formatage code     |
+| **Prettier**   | 3.8.3   | Formatage code     | -->
 
 ### Environnement
 
