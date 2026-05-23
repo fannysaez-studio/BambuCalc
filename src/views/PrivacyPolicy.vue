@@ -68,7 +68,7 @@
       <section>
         <h2>6. Sécurité</h2>
         <ul>
-          <li>Les mots de passe sont hashés avec <strong>bcrypt</strong> — ils ne sont jamais stockés en clair</li>
+          <li>Les mots de passe sont hashés par <strong>Supabase Auth</strong> (algorithme bcrypt côté serveur) — ils ne sont jamais stockés en clair ni accessibles</li>
           <li>Les communications sont chiffrées via <strong>HTTPS / TLS</strong></li>
           <li>Les accès à la base de données sont protégés par des politiques <strong>RLS (Row Level Security)</strong></li>
           <li>Chaque utilisateur ne peut accéder qu'à ses propres données</li>
@@ -110,6 +110,9 @@
 
       <div class="privacy-footer">
         <router-link to="/signup" class="back-btn">← Retour à l'inscription</router-link>
+        <p class="legal-link">
+          Voir aussi : <router-link to="/mentions-legales">Mentions légales</router-link>
+        </p>
       </div>
 
     </div>
@@ -228,6 +231,17 @@ a:hover { text-decoration: underline; }
   padding-top: 1.5rem;
   border-top: 1px solid #e2e8f0;
   text-align: center;
+}
+
+.legal-link {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #a0aec0;
+}
+
+.legal-link a {
+  color: #2e9cab;
+  text-decoration: underline;
 }
 
 @media (max-width: 640px) {

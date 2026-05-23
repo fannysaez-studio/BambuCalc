@@ -142,6 +142,12 @@
             S'inscrire avec Google
           </button>
         </div>
+
+        <p class="rgpd-notice">
+          Les informations collectées (nom, email) servent uniquement à gérer votre compte et vous
+          envoyer vos devis. Consultez notre
+          <router-link to="/privacy" target="_blank" class="rgpd-link">politique de confidentialité</router-link>.
+        </p>
       </div>
     </section>
   </div>
@@ -520,6 +526,25 @@ export default defineComponent({
   margin: 0.9rem 0 0;
   color: #4f6570;
   font-size: 0.98rem;
+}
+
+.auth-header {
+  margin-bottom: 1.5rem;
+}
+
+.rgpd-notice {
+  margin-top: 1.75rem !important;
+  padding-top: 1.25rem !important;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.82rem !important;
+  color: #7a9099 !important;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.rgpd-link {
+  color: #2e9cab;
+  text-decoration: underline;
 }
 
 .auth-form {

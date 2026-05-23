@@ -7,6 +7,7 @@ import Login from '@/views/auth/Login.vue'
 import Signup from '@/views/auth/Signup.vue'
 import ResetPassword from '@/views/auth/ResetPassword.vue'
 import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
+import MentionsLegales from '@/views/MentionsLegales.vue'
 import NotFound from '@/views/NotFound.vue'
 import UserProfile from '@/views/dashboard/UserProfile.vue'
 import { supabase } from '@/lib/supabase'
@@ -21,6 +22,7 @@ const routes = [
   { path: '/signup', name: 'signup', component: Signup },
   { path: '/reset-password', name: 'reset-password', component: ResetPassword },
   { path: '/privacy', name: 'privacy', component: PrivacyPolicy },
+  { path: '/mentions-legales', name: 'mentions-legales', component: MentionsLegales },
   { path: '/profile', name: 'profile', component: UserProfile, meta: { requiresAuth: true } },
   {
     path: '/pay/:quoteId',

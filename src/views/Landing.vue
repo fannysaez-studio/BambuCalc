@@ -68,6 +68,12 @@
           <router-link to="/signup" class="btn btn-primary">Créer un compte</router-link>
           <router-link to="/login" class="btn btn-secondary">Se connecter</router-link>
         </div>
+
+        <div class="landing-legal">
+          <router-link to="/mentions-legales">Mentions légales</router-link>
+          <span>·</span>
+          <router-link to="/privacy">Politique de confidentialité</router-link>
+        </div>
       </div>
     </section>
   </div>
@@ -427,6 +433,26 @@ export default {
   align-items: center;
   position: relative;
   z-index: 1;
+}
+
+.landing-legal {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #a0aec0;
+}
+
+.landing-legal a {
+  color: #7a9099;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.landing-legal a:hover {
+  color: #2e9cab;
 }
 
 .btn {
