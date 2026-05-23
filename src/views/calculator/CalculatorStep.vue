@@ -234,7 +234,8 @@
 
 <script>
 import { useCalculatorStore } from '@/stores/calculator'
-import { saveQuote as saveQuoteToDb, updateQuote, checkIsAdmin } from '@/utils/auth'
+import { saveQuote as saveQuoteToDb, updateQuote } from '@/utils/quotes'
+import { checkIsAdmin } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
 import ProjectDetails    from '@/components/calculator/ProjectDetails.vue'
 import ProjectMatter     from '@/components/calculator/ProjectMatter.vue'

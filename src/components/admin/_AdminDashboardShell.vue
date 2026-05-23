@@ -204,7 +204,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
-import { getAllQuotesAdmin, getAllProfilesAdmin } from '@/utils/auth'
+import { getAllQuotesAdmin, getAllProfilesAdmin } from '@/utils/quotes'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 
 // ── Composants enfants (décommenter au fur et à mesure du découpage) ──────────

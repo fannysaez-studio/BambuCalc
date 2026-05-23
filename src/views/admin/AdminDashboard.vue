@@ -328,7 +328,7 @@ import {
   getAllProfilesAdmin,
   adminDeleteQuote,
   adminDeleteUser,
-} from '@/utils/auth'
+} from '@/utils/quotes'
 import { supabase } from '@/lib/supabase'
 import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
 import { useCalculatorStore } from '@/stores/calculator'
