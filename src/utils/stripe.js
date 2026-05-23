@@ -35,45 +35,28 @@ export async function loadStripeConditionally() {
   const consent = localStorage.getItem(STORAGE_KEY)
 
   if (consent !== 'all') {
-    console.warn(
-      '[Stripe] Chargement bloqué — consentement absent ou refusé.',
-      'Valeur actuelle :', consent ?? 'null',
-      '— Demandez à l\'utilisateur d\'accepter les cookies.'
-    )
     return null
   }
 
-  // Réutiliser l'instance existante si déjà chargée (singleton)
-  if (stripeInstance) {
-    console.log('[Stripe] Instance existante réutilisée')
-    return stripeInstance
-  }
+  if (stripeInstance) return stripeInstance
 
   const publicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY
 
   if (!publicKey) {
-    console.error(
-      '[Stripe] VITE_STRIPE_PUBLIC_KEY manquante.',
-      'Ajoutez-la dans .env.local (dev) et dans l\'UI Netlify (prod).'
-    )
+    if (import.meta.env.DEV) {
+      console.error('[Stripe] VITE_STRIPE_PUBLIC_KEY manquante — ajoutez-la dans .env.local')
+    }
     return null
   }
 
   try {
-    // Import dynamique — Stripe.js n'est pas inclus dans le bundle principal
     const { loadStripe } = await import('@stripe/stripe-js')
     stripeInstance = await loadStripe(publicKey)
-
-    if (!stripeInstance) {
-      console.error('[Stripe] loadStripe() a retourné null — clé publique invalide ?')
-      return null
-    }
-
-    console.log('[Stripe] ✓ Instance chargée après consentement utilisateur')
-    return stripeInstance
-
+    return stripeInstance ?? null
   } catch (err) {
-    console.error('[Stripe] Erreur lors du chargement de @stripe/stripe-js :', err)
+    if (import.meta.env.DEV) {
+      console.error('[Stripe] Erreur de chargement :', err)
+    }
     return null
   }
 }

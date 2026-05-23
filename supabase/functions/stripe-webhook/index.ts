@@ -18,7 +18,7 @@
  *   - payment_intent.payment_failed → Marquer le devis comme 'failed'
  *   - charge.refunded            → Marquer le devis comme 'refunded'
  */
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import Stripe     from 'https://esm.sh/stripe@14.25.0?target=deno'
 
 // ── Initialisation ───────────────────────────────────────────────────────────

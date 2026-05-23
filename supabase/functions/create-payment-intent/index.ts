@@ -16,7 +16,7 @@
  *   - Le montant est recalculé depuis la BDD, pas depuis le front (anti-manipulation)
  *   - Le JWT est vérifié avant toute opération Stripe
  */
-import { serve }  from 'https://deno.land/std@0.177.0/http/server.ts'
+import { serve }  from 'https://deno.land/std@0.224.0/http/server.ts'
 import Stripe      from 'https://esm.sh/stripe@14.25.0?target=deno'
 import {
   handlePreflight,
