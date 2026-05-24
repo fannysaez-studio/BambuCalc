@@ -2,12 +2,11 @@
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { handlePreflight, jsonResponse, errorResponse } from '../_shared/cors.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
-const SUPABASE_URL   = Deno.env.get('SUPABASE_URL')   ?? ''
-const SERVICE_KEY    = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-// TODO: remettre fanny.saez.0486@gmail.com une fois le domaine bambucalc.fr vérifié sur Resend
-const ADMIN_EMAIL    = 'fannysaez.pro@gmail.com'
-const BRAND_COLOR    = '#2e9cab'
+const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? ''
+const SUPABASE_URL  = Deno.env.get('SUPABASE_URL')  ?? ''
+const SERVICE_KEY   = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+const ADMIN_EMAIL   = 'fannysaez.pro@gmail.com'
+const BRAND_COLOR   = '#2e9cab'
 
 // ── Utilitaires ───────────────────────────────────────────────────────────────
 
@@ -57,40 +56,37 @@ async function fetchEmailSettings() {
   }
 }
 
-// ── Envoi Resend avec log chirurgical ─────────────────────────────────────────
+// ── Envoi Brevo ───────────────────────────────────────────────────────────────
 
-async function sendViaResend(payload: object, label: string): Promise<void> {
+async function sendViaBrevo(payload: object, label: string): Promise<void> {
   const to      = (payload as any).to
-  const from    = (payload as any).from
   const subject = (payload as any).subject
-  const hasAtt  = Array.isArray((payload as any).attachments) && (payload as any).attachments.length > 0
+  const hasAtt  = Array.isArray((payload as any).attachment) && (payload as any).attachment.length > 0
 
-  console.log(`[Resend][${label}] ── DÉBUT ENVOI ──`)
-  console.log(`[Resend][${label}] from    : ${from}`)
-  console.log(`[Resend][${label}] to      : ${JSON.stringify(to)}`)
-  console.log(`[Resend][${label}] subject : ${subject}`)
-  console.log(`[Resend][${label}] PDF joint : ${hasAtt}`)
+  console.log(`[Brevo][${label}] ── DÉBUT ENVOI ──`)
+  console.log(`[Brevo][${label}] to        : ${JSON.stringify(to)}`)
+  console.log(`[Brevo][${label}] subject   : ${subject}`)
+  console.log(`[Brevo][${label}] PDF joint : ${hasAtt}`)
 
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method:  'POST',
     headers: {
-      Authorization:  `Bearer ${RESEND_API_KEY}`,
+      'api-key':      BREVO_API_KEY,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
   })
 
-  // Lire le corps brut AVANT toute autre opération
   const rawBody = await res.text()
 
-  console.log(`[Resend][${label}] Statut HTTP : ${res.status}`)
-  console.log(`[Resend][${label}] Body brut   : ${rawBody.slice(0, 500)}`)
+  console.log(`[Brevo][${label}] Statut HTTP : ${res.status}`)
+  console.log(`[Brevo][${label}] Body brut   : ${rawBody.slice(0, 500)}`)
 
   if (!res.ok) {
-    throw new Error(`Resend "${label}" échoué (HTTP ${res.status}): ${rawBody}`)
+    throw new Error(`Brevo "${label}" échoué (HTTP ${res.status}): ${rawBody}`)
   }
 
-  console.log(`[Resend][${label}] ✓ Email accepté par Resend`)
+  console.log(`[Brevo][${label}] ✓ Email accepté par Brevo`)
 }
 
 // ── Handler principal ─────────────────────────────────────────────────────────
@@ -104,13 +100,13 @@ serve(async (req) => {
   console.log('[INIT] méthode :', req.method)
 
   // ── LOG 2 : Présence des secrets ──────────────────────────────
-  console.log(`[SECRETS] RESEND_API_KEY présente : ${RESEND_API_KEY.length > 0 ? 'OUI' : 'NON ⚠️'} (longueur : ${RESEND_API_KEY.length})`)
+  console.log(`[SECRETS] BREVO_API_KEY présente  : ${BREVO_API_KEY.length > 0 ? 'OUI' : 'NON ⚠️'} (longueur : ${BREVO_API_KEY.length})`)
   console.log(`[SECRETS] SUPABASE_URL présente   : ${SUPABASE_URL.length > 0 ? 'OUI' : 'NON'}`)
   console.log(`[SECRETS] SERVICE_KEY présente    : ${SERVICE_KEY.length > 0 ? 'OUI' : 'NON'}`)
 
-  // Blocage immédiat si clé Resend absente
-  if (!RESEND_API_KEY) {
-    const msg = 'RESEND_API_KEY vide — ajoutez le secret dans le dashboard Supabase puis redéployez'
+  // Blocage immédiat si clé Brevo absente
+  if (!BREVO_API_KEY) {
+    const msg = 'BREVO_API_KEY vide — ajoutez le secret dans le dashboard Supabase puis redéployez'
     console.log('[ERREUR FATALE]', msg)
     return errorResponse(msg, 500)
   }
@@ -249,13 +245,12 @@ serve(async (req) => {
       console.log('[PDF] pièce jointe préparée :', attachments[0].filename)
     }
 
-    // ── Envoi email admin ─────────────────────────────────────────
-    // TODO: remplacer onboarding@resend.dev par noreply@bambucalc.fr une fois le domaine vérifié sur Resend
-    await sendViaResend({
-      from:    `${senderName} <onboarding@resend.dev>`,
-      to:      [ADMIN_EMAIL],
+    // ── Envoi notification admin ──────────────────────────────────
+    await sendViaBrevo({
+      sender:  { name: senderName, email: ADMIN_EMAIL },
+      to:      [{ email: ADMIN_EMAIL }],
       subject: `📋 Nouveau devis ${quote.quote_number ?? ''} — ${clientDisplay}`,
-      html:    adminHtml,
+      htmlContent: adminHtml,
     }, 'admin')
 
     // ── Envoi email client ────────────────────────────────────────
@@ -331,25 +326,24 @@ serve(async (req) => {
 </body>
 </html>`
 
-      await sendViaResend({
-        from:     `${senderName} <onboarding@resend.dev>`,
-        // TODO: remettre quote.client_email une fois le domaine bambucalc.fr vérifié sur Resend
-        to:       [ADMIN_EMAIL],
-        reply_to: replyTo,
+      await sendViaBrevo({
+        sender:  { name: senderName, email: ADMIN_EMAIL },
+        to:      [{ email: quote.client_email }],
+        replyTo: { email: replyTo },
         subject: customSubject
           .replace(/\[numéro\]/gi,     quote.quote_number ?? '')
           .replace(/\[senderName\]/gi, senderName)
           .replace(/\[projet\]/gi,     quote.project_name ?? '')
           .replace(/\[client\]/gi,     clientFirstName)
           .replace(/\[client_nom\]/gi, clientPolite),
-        html: clientHtml,
-        ...(attachments.length ? { attachments } : {}),
+        htmlContent: clientHtml,
+        ...(attachments.length ? { attachment: attachments.map(a => ({ name: a.filename, content: a.content })) } : {}),
       }, 'client')
     } else {
       console.log('[EMAIL] pas d\'adresse client — envoi client ignoré')
     }
 
-    console.log('[SUCCÈS] tous les emails ont été acceptés par Resend')
+    console.log('[SUCCÈS] tous les emails ont été acceptés par Brevo')
     console.log('═══════════════════════════════════════════════')
 
     return jsonResponse({ ok: true })

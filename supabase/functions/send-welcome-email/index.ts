@@ -2,8 +2,8 @@
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { handlePreflight, jsonResponse, errorResponse } from '../_shared/cors.ts'
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
-const ADMIN_EMAIL    = 'fanny.saez.0486@gmail.com'
+const BREVO_API_KEY = Deno.env.get('BREVO_API_KEY') ?? ''
+const ADMIN_EMAIL   = 'fannysaez.pro@gmail.com'
 const BRAND_COLOR    = '#2e9cab'
 
 serve(async (req) => {
@@ -133,15 +133,15 @@ serve(async (req) => {
 </body>
 </html>`
 
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 'api-key': BREVO_API_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: `BambuCalc <noreply@bambucalc.fr>`,
-        to: [email],
-        reply_to: ADMIN_EMAIL,
-        subject: `Bienvenue sur BambuCalc, ${firstNameOnly} ! 🖨️`,
-        html,
+        sender:      { name: 'BambuCalc', email: ADMIN_EMAIL },
+        to:          [{ email }],
+        replyTo:     { email: ADMIN_EMAIL },
+        subject:     `Bienvenue sur BambuCalc, ${firstNameOnly} ! 🖨️`,
+        htmlContent: html,
       }),
     })
 
