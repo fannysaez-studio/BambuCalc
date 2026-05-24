@@ -71,8 +71,11 @@
                     <button class="btn-edit" @click="editQuote(q)" title="Modifier">
                       <Pencil class="del-icon" />
                     </button>
-                    <button class="btn-pdf" @click="downloadPDF(q)" title="PDF">
+                    <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client">
                       <Download class="del-icon" />
+                    </button>
+                    <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)">
+                      <FileBarChart2 class="del-icon" />
                     </button>
                     <button v-if="sendableQuotes.some(s => s.id === q.id)"
                       class="btn-send-row"
@@ -136,7 +139,8 @@
               </select>
               <div class="mtcard-btns">
                 <button class="btn-edit" @click="editQuote(q)" title="Modifier"><Pencil class="del-icon" /></button>
-                <button class="btn-pdf" @click="downloadPDF(q)" title="PDF"><Download class="del-icon" /></button>
+                <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client"><Download class="del-icon" /></button>
+                <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)"><FileBarChart2 class="del-icon" /></button>
                 <button v-if="sendableQuotes.some(s => s.id === q.id)"
                   class="btn-send-row"
                   @click="selectedQuoteId = q.id; selectedQuote = q; managePage = 2"
@@ -182,7 +186,8 @@
               </select>
               <div class="mcard-actions">
                 <button class="btn-edit" @click="editQuote(q)" title="Modifier"><Pencil class="del-icon" /></button>
-                <button class="btn-pdf" @click="downloadPDF(q)" title="PDF"><Download class="del-icon" /></button>
+                <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client"><Download class="del-icon" /></button>
+                <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)"><FileBarChart2 class="del-icon" /></button>
                 <button v-if="sendableQuotes.some(s => s.id === q.id)"
                   class="btn-send-row"
                   @click="selectedQuoteId = q.id; selectedQuote = q; managePage = 2"
@@ -292,7 +297,7 @@ import { useCalculatorStore } from '@/stores/calculator'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import {
-  FileText, Pencil, Download, Send, Trash2, CheckCircle,
+  FileText, Pencil, Download, Send, Trash2, CheckCircle, FileBarChart2,
 } from 'lucide-vue-next'
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -439,7 +444,11 @@ function copyStripeLink(url) {
 }
 
 async function downloadPDF(q) {
-  await generateQuotePDF(q)
+  await generateQuotePDF(q, 'client')
+}
+
+async function downloadPDFInternal(q) {
+  await generateQuotePDF(q, 'internal')
 }
 
 function editQuote(q) {
@@ -637,7 +646,7 @@ function fmtDate(iso) {
 }
 
 /* ── Boutons d'action icône ── */
-.btn-edit, .btn-pdf, .btn-del, .btn-send-row {
+.btn-edit, .btn-pdf, .btn-pdf-int, .btn-del, .btn-send-row {
   width: 1.9rem; height: 1.9rem; border: none; background: none; border-radius: 8px;
   cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
   color: #cbd5e0; transition: background 0.15s ease, color 0.15s ease; font-family: inherit;
@@ -645,6 +654,7 @@ function fmtDate(iso) {
 .btn-del:disabled       { opacity: 0.25; cursor: not-allowed; }
 .btn-edit:hover         { background: #ebf0ff; color: #5a67d8; }
 .btn-pdf:hover          { background: #ebf8ff; color: #2e9cab; }
+.btn-pdf-int:hover      { background: #fef3c7; color: #d97706; }
 .btn-send-row:hover     { background: #e8f7f9; color: #2e9cab; }
 .btn-del:hover          { background: #fff5f5; color: #e53e3e; }
 .del-icon               { width: 0.9rem; height: 0.9rem; }
@@ -817,6 +827,7 @@ function fmtDate(iso) {
   .mtcard-btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
   .mtcard-btns .btn-edit,
   .mtcard-btns .btn-pdf,
+  .mtcard-btns .btn-pdf-int,
   .mtcard-btns .btn-send-row,
   .mtcard-btns .btn-del { width: 38px; height: 38px; border-radius: 10px; }
 }
@@ -847,6 +858,7 @@ function fmtDate(iso) {
   .mcard-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
   .mcard-actions .btn-edit,
   .mcard-actions .btn-pdf,
+  .mcard-actions .btn-pdf-int,
   .mcard-actions .btn-send-row,
   .mcard-actions .btn-del { width: 34px; height: 34px; }
   .manage-send-actions { flex-direction: column; }

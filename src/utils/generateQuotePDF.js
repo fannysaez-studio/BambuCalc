@@ -2,21 +2,21 @@ import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { company } from '../config/company'
 
-const TEAL   = [46, 156, 171]
-const DARK   = [27, 47, 57]
-const GREY   = [113, 128, 150]
-const LIGHT  = [240, 244, 248]
-const WHITE  = [255, 255, 255]
+const TEAL = [46, 156, 171]
+const DARK = [27, 47, 57]
+const GREY = [113, 128, 150]
+const LIGHT = [240, 244, 248]
+const WHITE = [255, 255, 255]
 
 const STATUS_MAP = {
-  pending:  { label: 'En attente', color: [214, 158, 46],  bg: [255, 247, 230] },
-  accepted: { label: 'Accepté',    color: [39,  174, 96],  bg: [230, 255, 240] },
-  refused:  { label: 'Refusé',     color: [229, 62,  62],  bg: [255, 230, 230] },
-  sent:     { label: 'Envoyé',     color: [66,  153, 225], bg: [230, 243, 255] },
+  pending: { label: 'En attente', color: [214, 158, 46], bg: [255, 247, 230] },
+  accepted: { label: 'Accepté', color: [39, 174, 96], bg: [230, 255, 240] },
+  refused: { label: 'Refusé', color: [229, 62, 62], bg: [255, 230, 230] },
+  sent: { label: 'Envoyé', color: [66, 153, 225], bg: [230, 243, 255] },
 }
 
-function statusInfo(status) {
-  return STATUS_MAP[status] || STATUS_MAP.pending
+function statusInfo(s) {
+  return STATUS_MAP[s] || STATUS_MAP.pending
 }
 
 function fmtEur(v) {
@@ -25,10 +25,14 @@ function fmtEur(v) {
 
 function fmtDate(iso) {
   if (!iso) return '—'
-  return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(iso))
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(iso))
 }
 
-function addValidityDate(quoteDate, days) {
+function validityDate(quoteDate, days) {
   if (!quoteDate || !days) return '—'
   const d = new Date(quoteDate)
   d.setDate(d.getDate() + Number(days))
@@ -36,34 +40,55 @@ function addValidityDate(quoteDate, days) {
 }
 
 function processingLabel(v) {
-  return { '24h': '24 heures', '2-3j': '2 à 3 jours ouvrés', '5-7j': '5 à 7 jours ouvrés',
-    '1-2s': '1 à 2 semaines', '2-4s': '2 à 4 semaines', 'custom': 'À convenir' }[v] || v || ''
+  return (
+    {
+      '24h': '24 heures',
+      '2-3j': '2 à 3 jours ouvrés',
+      '5-7j': '5 à 7 jours ouvrés',
+      '1-2s': '1 à 2 semaines',
+      '2-4s': '2 à 4 semaines',
+      custom: 'À convenir',
+    }[v] ||
+    v ||
+    ''
+  )
 }
 
 function deliveryLabel(v) {
-  return { pickup: 'Retrait en main propre', colissimo: 'Colissimo (2-3 j)',
-    chronopost: 'Chronopost (J+1)', mondial: 'Mondial Relay (3-5 j)', custom: 'À convenir' }[v] || v || ''
+  return (
+    {
+      pickup: 'Retrait en main propre',
+      colissimo: 'Colissimo (2-3 j)',
+      chronopost: 'Chronopost (J+1)',
+      mondial: 'Mondial Relay (3-5 j)',
+      custom: 'À convenir',
+    }[v] ||
+    v ||
+    ''
+  )
 }
 
-function paymentLabel(method) {
-  const map = {
-    virement: 'Virement bancaire',
-    cheque: 'Chèque',
-    cb: 'Carte bancaire',
-    especes: 'Espèces',
-    paypal: 'PayPal',
-  }
-  return map[method] || method || 'Virement bancaire'
+function paymentLabel(m) {
+  return (
+    {
+      virement: 'Virement bancaire',
+      cheque: 'Chèque',
+      cb: 'Carte bancaire',
+      especes: 'Espèces',
+      paypal: 'PayPal',
+    }[m] ||
+    m ||
+    'Virement bancaire'
+  )
 }
 
-// Charge une image distante et la retourne en data-URL (pour jsPDF addImage)
 async function loadImageDataUrl(url) {
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       const canvas = document.createElement('canvas')
-      canvas.width  = img.naturalWidth
+      canvas.width = img.naturalWidth
       canvas.height = img.naturalHeight
       const ctx = canvas.getContext('2d')
       ctx.fillStyle = '#ffffff'
@@ -76,251 +101,363 @@ async function loadImageDataUrl(url) {
   })
 }
 
-// ── Constructeur interne (retourne le doc jsPDF sans déclencher le download) ──
-async function _buildDoc(quote) {
-  // Pré-chargement de l'image de référence (si présente)
+async function _buildDoc(quote, mode = 'client') {
   let refImageData = null
   if (quote.reference_image_url) {
-    try { refImageData = await loadImageDataUrl(quote.reference_image_url) } catch { /* CORS ou réseau */ }
+    try {
+      refImageData = await loadImageDataUrl(quote.reference_image_url)
+    } catch {
+      /* CORS */
+    }
   }
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210
-  const margin = 14
-
-  // ── En-tête ──────────────────────────────────────────────
-  doc.setFillColor(...TEAL)
-  doc.rect(0, 0, W, 28, 'F')
-
-  doc.setTextColor(...WHITE)
-  doc.setFontSize(20)
-  doc.setFont('helvetica', 'bold')
-  doc.text('BambuCalc', margin, 12)
-
-  doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  doc.text('Impression 3D professionnelle', margin, 18)
-  if (company.website) doc.text(company.website, margin, 23)
-
-  doc.setFontSize(22)
-  doc.setFont('helvetica', 'bold')
-  doc.text('DEVIS', W - margin, 14, { align: 'right' })
-  doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  doc.text(quote.quote_number || '', W - margin, 20, { align: 'right' })
-
-  // ── Infos devis (bandeau gris) ────────────────────────────
-  doc.setFillColor(...LIGHT)
-  doc.rect(0, 28, W, 14, 'F')
-
-  doc.setTextColor(...GREY)
-  doc.setFontSize(8)
-  doc.setFont('helvetica', 'bold')
-
+  const margin = 16
   const st = statusInfo(quote.status)
-  const infoItems = [
-    ['Date d\'émission', fmtDate(quote.quote_date)],
-    ['Validité', addValidityDate(quote.quote_date, quote.quote_validity_days || 30)],
-    ['Durée validité', `${quote.quote_validity_days || 30} jours`],
-  ]
 
-  const colW = (W - margin * 2) / (infoItems.length + 1)
-  infoItems.forEach(([label, value], i) => {
-    const x = margin + i * colW
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...GREY)
-    doc.text(label.toUpperCase(), x, 34)
+  // ── EN-TÊTE ──────────────────────────────────────────────────
+  // Logo gauche
+  doc.setTextColor(...DARK)
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(22)
+  doc.text('BambuCalc', margin, 17)
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(8.5)
+  doc.setTextColor(...TEAL)
+  doc.text('App ~ Coût d\'impression 3D', margin, 23)
+
+  // DEVIS droite
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(26)
+  doc.setTextColor(...DARK)
+  doc.text('DEVIS', W - margin, 16, { align: 'right' })
+
+  // Infos devis (N°, Date, Validité)
+  const infoRightX = W - margin
+  const infoLabelX = W - margin - 38
+  const infoRows = [
+    [`N° Devis :`, quote.quote_number || '—'],
+    ['Date :', fmtDate(quote.quote_date)],
+    ['Validité :', `${quote.quote_validity_days || 30} jours`],
+  ]
+  infoRows.forEach(([label, value], i) => {
+    const iy = 22 + i * 5
     doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(...GREY)
+    doc.text(label, infoLabelX, iy)
+    doc.setFont('helvetica', 'bold')
     doc.setTextColor(...DARK)
-    doc.text(value, x, 39)
+    doc.text(value, infoRightX, iy, { align: 'right' })
   })
 
-  // Badge statut coloré
-  const badgeX = margin + infoItems.length * colW
-  const badgeW = colW - 2
-  doc.setFillColor(...st.bg)
-  doc.roundedRect(badgeX, 29, badgeW, 10, 3, 3, 'F')
-  doc.setDrawColor(...st.color)
+  // Ligne séparatrice teal
+  doc.setDrawColor(...TEAL)
   doc.setLineWidth(0.5)
-  doc.roundedRect(badgeX, 29, badgeW, 10, 3, 3, 'S')
+  doc.line(margin, 34, W - margin, 34)
+
+  // ── BADGE STATUT ─────────────────────────────────────────────
+  const badgeW = 28
+  const badgeX = W - margin - badgeW
+  doc.setFillColor(...st.bg)
+  doc.roundedRect(badgeX, 37, badgeW, 8, 2, 2, 'F')
+  doc.setDrawColor(...st.color)
+  doc.setLineWidth(0.4)
+  doc.roundedRect(badgeX, 37, badgeW, 8, 2, 2, 'S')
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(8)
+  doc.setFontSize(7.5)
   doc.setTextColor(...st.color)
-  doc.text('STATUT', badgeX + badgeW / 2, 33.5, { align: 'center' })
-  doc.setFontSize(9)
-  doc.text(st.label, badgeX + badgeW / 2, 37.5, { align: 'center' })
+  doc.text(st.label, badgeX + badgeW / 2, 42.2, { align: 'center' })
 
-  // ── Deux colonnes : Client | Prestataire ──────────────────
-  let y = 50
-  const colLeft  = margin
-  const colRight = W / 2 + 3
+  // ── CONTACTS ─────────────────────────────────────────────────
+  let y = 38
+  const midX = W / 2 + 2
 
-  // Titres colonnes
-  doc.setFillColor(...TEAL)
-  doc.roundedRect(colLeft,  y - 5, W / 2 - 5, 7, 2, 2, 'F')
-  doc.roundedRect(colRight, y - 5, W / 2 - 3, 7, 2, 2, 'F')
-  doc.setTextColor(...WHITE)
-  doc.setFontSize(8)
   doc.setFont('helvetica', 'bold')
-  doc.text('CLIENT', colLeft + 3, y)
-  doc.text('PRESTATAIRE', colRight + 3, y)
+  doc.setFontSize(7)
+  doc.setTextColor(...GREY)
+  doc.text('PRESTATAIRE', margin, y)
+  doc.text('DESTINATAIRE', midX, y)
 
-  y += 5
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...DARK)
-  doc.setFontSize(9)
+  y += 4.5
 
-  // Bloc client
-  const clientLines = []
-  const clientName = quote.client_name || [quote.client_first_name, quote.client_last_name].filter(Boolean).join(' ')
-  if (clientName) clientLines.push({ text: clientName, bold: true })
-  if (quote.client_contact_name) clientLines.push({ text: `Contact : ${quote.client_contact_name}` })
-  if (quote.client_address) clientLines.push({ text: quote.client_address })
-  const cityLine = [quote.client_postal_code, quote.client_city].filter(Boolean).join(' ')
-  if (cityLine) clientLines.push({ text: cityLine })
-  if (quote.client_country && quote.client_country !== 'France') clientLines.push({ text: quote.client_country })
-  if (quote.client_email) clientLines.push({ text: quote.client_email, color: TEAL })
-  if (quote.client_phone) clientLines.push({ text: quote.client_phone })
-  if (quote.client_siret) clientLines.push({ text: `SIRET : ${quote.client_siret}`, color: GREY })
-  if (quote.client_vat_number) clientLines.push({ text: `TVA : ${quote.client_vat_number}`, color: GREY })
-
-  // Bloc prestataire
   const providerLines = [
-    { text: company.name, bold: true },
-    { text: company.ownerName },
+    { text: company.name, bold: true, size: 10 },
     { text: company.address },
     { text: [company.postalCode, company.city].filter(Boolean).join(' ') },
     { text: company.email, color: TEAL },
     company.phone ? { text: company.phone } : null,
-    company.siret ? { text: `SIRET : ${company.siret}`, color: GREY } : null,
-    company.vatNumber ? { text: `TVA : ${company.vatNumber}`, color: GREY } : null,
+    company.siret ? { text: `SIRET : ${company.siret}`, color: GREY, size: 7.5 } : null,
+    company.vatNumber ? { text: `TVA : ${company.vatNumber}`, color: GREY, size: 7.5 } : null,
   ].filter(Boolean)
 
-  const maxLines = Math.max(clientLines.length, providerLines.length)
+  const clientName =
+    quote.client_name || [quote.client_first_name, quote.client_last_name].filter(Boolean).join(' ')
+  const clientLines = [
+    { text: clientName || '—', bold: true, size: 10 },
+    quote.client_contact_name ? { text: `Contact : ${quote.client_contact_name}` } : null,
+    quote.client_address ? { text: quote.client_address } : null,
+    [quote.client_postal_code, quote.client_city].filter(Boolean).length
+      ? { text: [quote.client_postal_code, quote.client_city].filter(Boolean).join(' ') }
+      : null,
+    quote.client_email ? { text: quote.client_email, color: TEAL } : null,
+    quote.client_phone ? { text: quote.client_phone } : null,
+    quote.client_siret ? { text: `SIRET : ${quote.client_siret}`, color: GREY, size: 7.5 } : null,
+  ].filter(Boolean)
 
+  const maxLines = Math.max(providerLines.length, clientLines.length)
   for (let i = 0; i < maxLines; i++) {
-    const cl = clientLines[i]
+    const ly = y + i * 4.6
     const pl = providerLines[i]
-    const lineY = y + 5 + i * 5
-
-    if (cl) {
-      doc.setFont('helvetica', cl.bold ? 'bold' : 'normal')
-      doc.setTextColor(...(cl.color || DARK))
-      doc.text(cl.text, colLeft, lineY)
-    }
+    const cl = clientLines[i]
     if (pl) {
       doc.setFont('helvetica', pl.bold ? 'bold' : 'normal')
+      doc.setFontSize(pl.size || 8.5)
       doc.setTextColor(...(pl.color || DARK))
-      doc.text(pl.text, colRight, lineY)
+      doc.text(pl.text, margin, ly)
+    }
+    if (cl) {
+      doc.setFont('helvetica', cl.bold ? 'bold' : 'normal')
+      doc.setFontSize(cl.size || 8.5)
+      doc.setTextColor(...(cl.color || DARK))
+      doc.text(cl.text, midX, ly)
     }
   }
 
-  // ── Objet du devis (bande simple 1 ligne) ────────────────
-  y = y + 5 + maxLines * 5 + 6
+  y = y + maxLines * 4.6 + 12
 
-  doc.setFillColor(...LIGHT)
-  doc.rect(margin, y, W - margin * 2, 10, 'F')
+  // Séparateur léger
+  doc.setDrawColor(226, 232, 240)
+  doc.setLineWidth(0.25)
+  doc.line(margin, y - 1, W - margin, y - 1)
+
+  // ── OBJET ────────────────────────────────────────────────────
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(9)
+  doc.setFontSize(8)
   doc.setTextColor(...GREY)
-  doc.text('OBJET :', margin + 3, y + 6.5)
+  doc.text('OBJET :', margin, y + 4)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...DARK)
-  doc.text(quote.project_name || '—', margin + 22, y + 6.5)
+  doc.text(quote.project_name || '—', margin + 20, y + 4)
+  y += 9
 
-  y += 14
-
-  // ── Tableau des prestations ───────────────────────────────
-  const taxRate     = quote.tax_rate ?? 20
+  // ── TABLEAU ───────────────────────────────────────────────────
+  const taxRate = quote.tax_rate ?? 20
   const unitPriceHT = (quote.cost_per_unit || 0) / (1 + taxRate / 100)
-  const totalHT     = unitPriceHT * (quote.quantity || 1)
-  const totalTVA    = (quote.total_cost || 0) - totalHT
-  const printerLabel = {
-    'p2s-combo': 'Bambu P2S Combo',
-    'p2s-mono':  'Bambu P2S Monocouleur',
-    'x1c':       'Bambu X1C',
-    'a1-mini':   'Bambu A1 Mini',
-    'a1':        'Bambu A1',
-  }[quote.printer_model] || quote.printer_model || '—'
+  const totalHT = unitPriceHT * (quote.quantity || 1)
+  const totalTVA = (quote.total_cost || 0) - totalHT
 
-  const desc = [
-    `Impression 3D — ${quote.project_name || '—'}`,
-    `Matière : ${quote.material || '—'} | Imprimante : ${printerLabel} | Buse : ${quote.nozzle_size || '—'} mm`,
-    `Profil : ${quote.print_profile || '—'} | Poids total : ${quote.weight || 0} g`,
-  ].join('\n')
+  const printerLabel =
+    {
+      'p2s-combo': 'Bambu P2S Combo',
+      'p2s-mono': 'Bambu P2S Monocouleur',
+      x1c: 'Bambu X1C',
+      'a1-mini': 'Bambu A1 Mini',
+      a1: 'Bambu A1',
+    }[quote.printer_model] ||
+    quote.printer_model ||
+    '—'
 
-  // Ligne image dans le tableau (si photo de référence)
-  const REF_IMG_MARKER = '__REF_IMG__'
-  const IMG_ROW_H = 46  // hauteur réservée pour la photo dans le tableau
-  const tableBody = [[
-    desc,
-    quote.quantity ?? 1,
-    fmtEur(unitPriceHT),
-    fmtEur((quote.cost_per_unit || 0) - unitPriceHT),
-    fmtEur(quote.cost_per_unit || 0),
-  ]]
-  if (refImageData) tableBody.push([REF_IMG_MARKER, '', '', '', ''])
+  const printTime =
+    quote.print_hours || quote.print_minutes
+      ? `${quote.print_hours || 0}h${String(quote.print_minutes || 0).padStart(2, '0')}`
+      : null
+
+  const specParts = [
+    `Matière : ${quote.material || '—'}`,
+    printTime ? `Durée impression : ${printTime}` : null,
+    quote.weight ? `Poids : ${quote.weight} g` : null,
+    quote.nozzle_size ? `Buse : ${quote.nozzle_size} mm` : null,
+    `Imprimante : ${printerLabel}`,
+  ].filter(Boolean)
+
+  // Titre + lignes specs séparées pour rendu manuel avec puces
+  const descTitle = `Impression 3D — ${quote.project_name || '—'}`
+  const descSpecs = specParts  // tableau de strings, sans indentation
+
+  // Pour autoTable : texte vide dans col 0 (rendu manuel dans didDrawCell)
+  const PHOTO_COL_W = 38
+  const IMG_W = PHOTO_COL_W - 6
+  const IMG_H = 28
+  // Hauteur cellule description = titre + specs avec espacement
+  const DESC_CELL_H = Math.max(4 + 6 + descSpecs.length * 5 + 4, refImageData ? IMG_H + 10 : 28)
+
+  const tableHead = refImageData
+    ? [['Désignation / Spécifications', 'Photo réf.', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']]
+    : [['Désignation / Spécifications', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']]
+
+  const tableBody = refImageData
+    ? [['', '', quote.quantity ?? 1, fmtEur(unitPriceHT), fmtEur(totalTVA), fmtEur(quote.total_cost || 0)]]
+    : [['', quote.quantity ?? 1, fmtEur(unitPriceHT), fmtEur(totalTVA), fmtEur(quote.total_cost || 0)]]
+
+  const colStyles = refImageData
+    ? {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: PHOTO_COL_W, halign: 'center' },
+        2: { cellWidth: 14, halign: 'center' },
+        3: { cellWidth: 27, halign: 'right' },
+        4: { cellWidth: 22, halign: 'right' },
+        5: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
+      }
+    : {
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 14, halign: 'center' },
+        2: { cellWidth: 27, halign: 'right' },
+        3: { cellWidth: 22, halign: 'right' },
+        4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
+      }
 
   autoTable(doc, {
     startY: y,
     margin: { left: margin, right: margin },
-    head: [['Description', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']],
+    head: tableHead,
     body: tableBody,
     styles: {
-      fontSize: 8.5,
-      cellPadding: 4,
+      fontSize: 8,
+      cellPadding: 3.5,
       textColor: DARK,
       lineColor: [226, 232, 240],
-      lineWidth: 0.3,
+      lineWidth: 0.25,
     },
-    headStyles: {
-      fillColor: TEAL,
-      textColor: WHITE,
-      fontStyle: 'bold',
-      fontSize: 8,
-    },
-    columnStyles: {
-      0: { cellWidth: 'auto' },
-      1: { cellWidth: 15, halign: 'center' },
-      2: { cellWidth: 28, halign: 'right' },
-      3: { cellWidth: 24, halign: 'right' },
-      4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
-    },
+    headStyles: { fillColor: TEAL, textColor: WHITE, fontStyle: 'bold', fontSize: 7.5 },
+    alternateRowStyles: { fillColor: [249, 250, 252] },
+    columnStyles: colStyles,
     didParseCell(data) {
-      if (!refImageData) return
-      const isImgRow = data.section === 'body' && data.row.index === 1
-      if (!isImgRow) return
-      // Réserver la hauteur pour l'image dans la cellule Description
+      if (data.section !== 'body' || data.row.index !== 0) return
+      // Cellule description : réserver la hauteur + vider le texte (rendu manuel)
       if (data.column.index === 0) {
-        data.cell.styles.minCellHeight = IMG_ROW_H
-        data.cell.text = []  // effacer le marqueur texte
-      } else {
-        data.cell.text = []  // cellules vides sur le reste de la ligne
+        data.cell.styles.minCellHeight = DESC_CELL_H
+        data.cell.text = []
+      }
+      // Cellule photo : réserver la hauteur
+      if (refImageData && data.column.index === 1) {
+        data.cell.styles.minCellHeight = DESC_CELL_H
+        data.cell.text = []
       }
     },
     didDrawCell(data) {
-      if (!refImageData) return
-      const isImgRow = data.section === 'body' && data.row.index === 1 && data.column.index === 0
-      if (!isImgRow) return
-      // Dimensions de la photo : max 55 × 40 mm, centrée verticalement dans la cellule
-      const pW = 55, pH = 40
-      const px = data.cell.x + data.cell.padding('left')
-      const py = data.cell.y + (data.cell.height - pH) / 2
-      doc.addImage(refImageData, 'JPEG', px, py, pW, pH, undefined, 'MEDIUM')
-      // Légende sous l'image
-      doc.setFontSize(6.5)
-      doc.setFont('helvetica', 'italic')
-      doc.setTextColor(160, 174, 192)
-      doc.text('Photo de référence client', px, py + pH + 3.5)
+      if (data.section !== 'body' || data.row.index !== 0) return
+
+      // ── Colonne photo ──────────────────────────────────────
+      if (refImageData && data.column.index === 1) {
+        const px = data.cell.x + (data.cell.width - IMG_W) / 2
+        const py = data.cell.y + (data.cell.height - IMG_H) / 2
+        doc.addImage(refImageData, 'JPEG', px, py, IMG_W, IMG_H, undefined, 'MEDIUM')
+        doc.setFontSize(6)
+        doc.setFont('helvetica', 'italic')
+        doc.setTextColor(160, 174, 192)
+        doc.text('Réf. client', px + IMG_W / 2, py + IMG_H + 3, { align: 'center' })
+        return
+      }
+
+      // ── Colonne description avec puces teal ────────────────
+      if (data.column.index !== 0) return
+      const pad = 3.5
+      const x0  = data.cell.x + pad
+      let   ly  = data.cell.y + pad + 4
+
+      // Titre gras
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(8.5)
+      doc.setTextColor(...DARK)
+      doc.text(descTitle, x0, ly)
+      ly += 6
+
+      // Specs avec puces teal
+      descSpecs.forEach((spec) => {
+        // Puce : petit cercle teal plein
+        doc.setFillColor(...TEAL)
+        doc.circle(x0 + 1, ly - 1.2, 0.75, 'F')
+        // Texte spec
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(7.5)
+        doc.setTextColor(...DARK)
+        doc.text(spec, x0 + 4, ly)
+        ly += 4.8
+      })
     },
   })
 
-  // ── Totaux + Conditions (layout 2 colonnes côte à côte) ────
-  const afterTable = doc.lastAutoTable.finalY + 4
-  const totalsX   = W - margin - 80
+  let afterTable = doc.lastAutoTable.finalY + 6
+
+  // ── DÉTAIL DES COÛTS (version interne uniquement) ────────────
+  if (mode === 'internal') {
+    const matCost = quote.material_cost || 0
+    const eqpCost = quote.equipment_cost || 0
+    const wrkCost = quote.work_cost || 0
+    const costBase = quote.subtotal_ht || matCost + eqpCost + wrkCost
+    const marge = quote.margin_percent || 40
+    const sellingHT = Math.round(costBase * (1 + marge / 100) * 100) / 100
+
+    const sectionH = 50
+    const boxW = (W - margin * 2 - 6) / 3
+    const secTop = afterTable
+
+    // Fond section
+    doc.setFillColor(...LIGHT)
+    doc.rect(margin, secTop, W - margin * 2, sectionH, 'F')
+
+    // Titre
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(7)
+    doc.setTextColor(...GREY)
+    doc.text('DÉTAIL DES COÛTS — USAGE INTERNE', margin + 3, secTop + 6)
+
+    // 3 cartes côte à côte
+    const cards = [
+      { title: 'Matériau', value: fmtEur(matCost), color: [39, 174, 96] },
+      { title: 'Équipement', value: fmtEur(eqpCost), color: [66, 153, 225] },
+      { title: "Main d'œuvre", value: fmtEur(wrkCost), color: [229, 62, 62] },
+    ]
+    const cardTop = secTop + 10
+    const cardH = 22
+
+    cards.forEach((card, i) => {
+      const cx = margin + i * (boxW + 3)
+      doc.setFillColor(255, 255, 255)
+      doc.roundedRect(cx, cardTop, boxW, cardH, 2, 2, 'F')
+      // Bande couleur en haut
+      doc.setFillColor(...card.color)
+      doc.roundedRect(cx, cardTop, boxW, 5, 2, 2, 'F')
+      doc.rect(cx, cardTop + 3, boxW, 2, 'F')
+      // Titre carte
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(7)
+      doc.setTextColor(...WHITE)
+      doc.text(card.title, cx + boxW / 2, cardTop + 3.8, { align: 'center' })
+      // Valeur
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(10)
+      doc.setTextColor(...DARK)
+      doc.text(card.value, cx + boxW / 2, cardTop + 16, { align: 'center' })
+    })
+
+    // Ligne marge / prix de vente
+    const margeY = cardTop + cardH + 5
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(...DARK)
+    const parts = [
+      `Coût de revient : ${fmtEur(costBase)}`,
+      `Marge +${marge}%`,
+      `Prix de vente HT : ${fmtEur(sellingHT)}`,
+    ]
+    const spacing = (W - margin * 2) / 3
+    parts.forEach((p, i) => {
+      const px = margin + spacing * i + spacing / 2
+      const arrow = i < parts.length - 1 ? ' ➜' : ''
+      doc.text(p + arrow, px, margeY, { align: 'center' })
+    })
+
+    afterTable = secTop + sectionH + 6
+  }
+
+  // ── TOTAUX + CONDITIONS ───────────────────────────────────────
+  const totalsX = W - margin - 80
   const condWidth = totalsX - margin - 6
 
-  // Lignes totaux
   const totals = [
     ['Sous-total HT', fmtEur(totalHT)],
     [`TVA (${taxRate}%)`, fmtEur(totalTVA)],
@@ -329,25 +466,22 @@ async function _buildDoc(quote) {
     const acompte = (quote.total_cost || 0) * (quote.deposit_percent / 100)
     totals.push([`Acompte (${quote.deposit_percent}%)`, fmtEur(acompte)])
   }
-  const totalsH = totals.length * 6 + 13  // lignes × 6 + boîte TTC
+  const totalsH = totals.length * 6 + 13
 
-  // Lignes conditions
-  const condLines = [
-    `Mode de paiement : ${paymentLabel(quote.payment_method)}`,
-  ]
+  const condLines = [`Mode de paiement : ${paymentLabel(quote.payment_method)}`]
   if (quote.processing_delay)
     condLines.push(`Délai de fabrication : ${processingLabel(quote.processing_delay)}`)
-  if (quote.delivery_delay)
-    condLines.push(`Livraison : ${deliveryLabel(quote.delivery_delay)}`)
+  if (quote.delivery_delay) condLines.push(`Livraison : ${deliveryLabel(quote.delivery_delay)}`)
   if (quote.deposit_percent > 0)
     condLines.push(`Acompte de ${quote.deposit_percent}% à la commande`)
-  condLines.push(`Devis valable jusqu'au ${addValidityDate(quote.quote_date, quote.quote_validity_days || 30)}`)
-  if (company.paymentIban)
-    condLines.push(`IBAN : ${company.paymentIban}`)
+  condLines.push(
+    `Devis valable jusqu'au ${validityDate(quote.quote_date, quote.quote_validity_days || 30)}`,
+  )
+  if (company.paymentIban) condLines.push(`IBAN : ${company.paymentIban}`)
 
   const condBandH = Math.max(totalsH, condLines.length * 5 + 8)
 
-  // Bloc CONDITIONS (colonne gauche)
+  // Bloc CONDITIONS (gauche)
   doc.setFillColor(...LIGHT)
   doc.rect(margin, afterTable, condWidth, condBandH, 'F')
   doc.setFontSize(7.5)
@@ -360,7 +494,7 @@ async function _buildDoc(quote) {
     doc.text(line, margin + 3, afterTable + 11 + i * 5)
   })
 
-  // Totaux (colonne droite)
+  // Totaux (droite)
   let ty = afterTable + 5
   doc.setFontSize(8.5)
   totals.forEach(([label, value]) => {
@@ -372,7 +506,7 @@ async function _buildDoc(quote) {
     ty += 6
   })
 
-  // Total TTC (en gras dans un rectangle)
+  // Total TTC
   doc.setFillColor(...TEAL)
   doc.roundedRect(totalsX - 3, ty - 4, W - margin - totalsX + 3, 9, 2, 2, 'F')
   doc.setFont('helvetica', 'bold')
@@ -381,63 +515,168 @@ async function _buildDoc(quote) {
   doc.text('Total TTC', totalsX, ty + 2)
   doc.text(fmtEur(quote.total_cost || 0), W - margin, ty + 2, { align: 'right' })
 
-  // ── Notes ─────────────────────────────────────────────────
-  const twoColBottomY = afterTable + condBandH + 8
-  let notesH = 0
+  // ── NOTES ─────────────────────────────────────────────────────
+  let curY = afterTable + condBandH + 8
   if (quote.quote_notes) {
     doc.setFontSize(7.5)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...GREY)
-    doc.text('NOTES', margin, twoColBottomY)
+    doc.text('NOTES', margin, curY)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(...DARK)
-    const lines = doc.splitTextToSize(quote.quote_notes, W - margin * 2)
-    doc.text(lines, margin, twoColBottomY + 5)
-    notesH = 8 + lines.length * 4
+    const noteLines = doc.splitTextToSize(quote.quote_notes, W - margin * 2)
+    doc.text(noteLines, margin, curY + 5)
+    curY += 8 + noteLines.length * 4
   }
 
-  // ── Zone signature ────────────────────────────────────────
-  const sigY = Math.max(twoColBottomY + notesH + 8, 252)
-  doc.setDrawColor(...[226, 232, 240])
+  curY += 4
+
+  // ── BLOC "COMMENT VALIDER CE DEVIS" ───────────────────────────
+  // Hauteur dynamique : titre (6) + cercle (8) + texte max 2 lignes (8) + padding (6)
+  const stepBgH = 28
+  doc.setFillColor(232, 247, 249)
+  doc.roundedRect(margin, curY, W - margin * 2, stepBgH, 3, 3, 'F')
+  doc.setDrawColor(...TEAL)
+  doc.setLineWidth(0.4)
+  doc.roundedRect(margin, curY, W - margin * 2, stepBgH, 3, 3, 'S')
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(6.5)
+  doc.setTextColor(...TEAL)
+  doc.text('POUR VALIDER CE DEVIS', margin + 4, curY + 5)
+
+  const stepW = (W - margin * 2) / 3
+  const acompteLabel = quote.deposit_percent > 0
+    ? `Versez l'acompte de ${quote.deposit_percent}%`
+    : 'Procédez au paiement'
+  const steps = [
+    { num: '1', text: 'Signez et datez ce document' },
+    { num: '2', text: `Renvoyez par email :\n${company.email}` },
+    { num: '3', text: acompteLabel },
+  ]
+  const circleY = curY + 13
+  steps.forEach((step, i) => {
+    const sx = margin + i * stepW + stepW / 2
+    // Cercle teal plein
+    doc.setFillColor(...TEAL)
+    doc.circle(sx, circleY, 3.2, 'F')
+    // Numéro blanc dans le cercle
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(7)
+    doc.setTextColor(...WHITE)
+    doc.text(step.num, sx, circleY + 1.2, { align: 'center' })
+    // Texte sous le cercle (dans la boîte)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(6.5)
+    doc.setTextColor(...DARK)
+    step.text.split('\n').forEach((l, li) => {
+      doc.text(l, sx, circleY + 7 + li * 3.8, { align: 'center' })
+    })
+  })
+  curY += stepBgH + 12
+
+  // ── COORDONNÉES BANCAIRES ─────────────────────────────────────
+  if (company.paymentIban) {
+    const ibanH = 16
+    doc.setFillColor(...LIGHT)
+    doc.rect(margin, curY, W - margin * 2, ibanH, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(7)
+    doc.setTextColor(...GREY)
+    doc.text('RÈGLEMENT PAR VIREMENT', margin + 3, curY + 5)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...DARK)
+    const ibanParts = [
+      `IBAN : ${company.paymentIban}`,
+      company.paymentBic  ? `BIC : ${company.paymentBic}`   : null,
+      company.paymentBank ? `Banque : ${company.paymentBank}` : null,
+    ].filter(Boolean).join('   ')
+    doc.text(ibanParts, margin + 3, curY + 12)
+    curY += ibanH + 6
+  }
+
+  // ── SÉPARATEUR avant signatures ───────────────────────────────
+  doc.setDrawColor(226, 232, 240)
+  doc.setLineWidth(0.25)
+  doc.line(margin, curY + 8, W - margin, curY + 8)
+
+  // ── SIGNATURES AMÉLIORÉES ─────────────────────────────────────
+  const sigY = curY + 18
+  const lineW = 72
+
+  doc.setDrawColor(226, 232, 240)
   doc.setLineWidth(0.3)
-  doc.line(margin, sigY, margin + 70, sigY)
-  doc.line(W - margin - 70, sigY, W - margin, sigY)
+  doc.line(margin, sigY, margin + lineW, sigY)
+  doc.line(W - margin - lineW, sigY, W - margin, sigY)
 
-  doc.setFontSize(7.5)
-  doc.setTextColor(...GREY)
-  doc.setFont('helvetica', 'normal')
-  doc.text('Signature client\n(Bon pour accord)', margin, sigY + 5)
-  doc.text('Signature prestataire', W - margin - 70, sigY + 5)
-
-  // ── Pied de page ──────────────────────────────────────────
+  // Textes signatures
   doc.setFontSize(7)
   doc.setTextColor(...GREY)
-  doc.text(
-    `BambuCalc — ${company.ownerName}${company.siret ? ' — SIRET : ' + company.siret : ''} — ${company.email}`,
-    W / 2, 290, { align: 'center' }
-  )
+  doc.setFont('helvetica', 'bold')
+  doc.text('Signature client', margin, sigY + 5)
+  doc.text('Signature prestataire', W - margin - lineW, sigY + 5)
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(6.5)
+  doc.text('Lu et approuvé', margin, sigY + 10)
+  doc.text('Lu et approuvé', W - margin - lineW, sigY + 10)
+
+  doc.setTextColor(...DARK)
+  doc.text('Date : ______________________', margin, sigY + 15)
+  doc.text('Date : ______________________', W - margin - lineW, sigY + 15)
+
+  // ── SÉPARATEUR avant mentions légales ─────────────────────────
+  doc.setDrawColor(...TEAL)
+  doc.setLineWidth(0.4)
+  doc.line(margin, 279, W - margin, 279)
+
+  // ── MENTIONS LÉGALES — fixées en bas de page ──────────────────
+  if (company.legalMention) {
+    doc.setFontSize(6.5)
+    doc.setTextColor(...GREY)
+    doc.setFont('helvetica', 'italic')
+    doc.text(company.legalMention, W / 2, 283, { align: 'center' })
+  }
+
+  // ── PIED DE PAGE — fixé en bas de page ────────────────────────
+  doc.setFontSize(7)
+  doc.setTextColor(...GREY)
+  doc.setFont('helvetica', 'normal')
+  const footerParts = [
+    company.name,
+    company.ownerName,
+    company.siret ? `SIRET : ${company.siret}` : null,
+    company.email,
+  ].filter(Boolean)
+  doc.text(footerParts.join(' — '), W / 2, 290, { align: 'center' })
+
+  if (mode === 'internal') {
+    doc.setFontSize(6.5)
+    doc.setTextColor(229, 62, 62)
+    doc.text('DOCUMENT INTERNE — NE PAS DIFFUSER AU CLIENT', W / 2, 294.5, { align: 'center' })
+  }
 
   return doc
 }
 
-// ── Export : déclenche le téléchargement navigateur ──
-export async function generateQuotePDF(quote) {
-  const doc = await _buildDoc(quote)
-  doc.save(`devis-${quote.quote_number || 'bambucalc'}.pdf`)
+// ── Exports publics ───────────────────────────────────────────────────────────
+
+export async function generateQuotePDF(quote, mode = 'client') {
+  const doc = await _buildDoc(quote, mode)
+  const suffix = mode === 'internal' ? '-INTERNE' : ''
+  doc.save(`devis-${quote.quote_number || 'bambucalc'}${suffix}.pdf`)
 }
 
-// ── Export : retourne le doc jsPDF brut (pour encodage Base64 avant envoi mail) ──
-export async function generateQuotePDFDoc(quote) {
-  return _buildDoc(quote)
+export async function generateQuotePDFDoc(quote, mode = 'client') {
+  return _buildDoc(quote, mode)
 }
 
-// ── Export : convertit un doc jsPDF en chaîne Base64 pure (compatible jsPDF v4) ──
-// jsPDF v4 a supprimé output('datauristring') — on passe par ArrayBuffer.
+// jsPDF v4 a supprimé output('datauristring') — passage par ArrayBuffer
 export function pdfToBase64(doc) {
   const buffer = doc.output('arraybuffer')
-  const bytes  = new Uint8Array(buffer)
-  const CHUNK  = 0x8000 // 32 768 octets — évite les stack overflow sur gros fichiers
-  let binary   = ''
+  const bytes = new Uint8Array(buffer)
+  const CHUNK = 0x8000
+  let binary = ''
   for (let i = 0; i < bytes.length; i += CHUNK) {
     binary += String.fromCharCode(...bytes.subarray(i, i + CHUNK))
   }

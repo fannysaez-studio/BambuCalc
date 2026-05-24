@@ -12,4 +12,7 @@ export const company = {
   vatNumber: '',
   website: 'bambucalc.fr',
   paymentIban: '',
+  paymentBic: '',
+  paymentBank: '',
+  legalMention: 'TVA non applicable, art. 293 B du CGI — Dispensé d\'immatriculation au RCS',
 }
