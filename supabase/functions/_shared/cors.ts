@@ -12,7 +12,7 @@
  */
 
 /** Domaine autorisé à appeler nos Edge Functions */
-const ALLOWED_ORIGIN = 'https://bambucalc.fr'
+const ALLOWED_ORIGIN = '*'
 
 /**
  * Headers CORS à inclure dans TOUTES les réponses (200 et 4xx).
