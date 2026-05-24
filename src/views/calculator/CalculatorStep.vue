@@ -86,6 +86,8 @@
               v-model:referenceImageUrl="store.referenceImageUrl"
               v-model:paymentMethod="store.paymentMethod"
               v-model:depositPercent="store.depositPercent"
+              v-model:processingDelay="store.processingDelay"
+              v-model:deliveryDelay="store.deliveryDelay"
               v-model:quoteNotes="store.quoteNotes"
             />
             <PrintingTime
@@ -102,8 +104,8 @@
             />
             <PricingSuggestions
               v-if="currentStep === 4"
-              :baseCost="store.calculatedCosts.totalCost"
-              :baseCostPerUnit="store.calculatedCosts.costPerUnit"
+              :baseCost="store.calculatedCosts.subtotal"
+              :baseCostPerUnit="store.calculatedCosts.subtotal / Math.max(1, store.quantity)"
               :seriesQuantity="store.quantity"
               :volumeDiscount="0"
               :taxRate="store.taxRate"
@@ -113,6 +115,7 @@
             <CostBreakdown
               v-if="currentStep === 5"
               :costs="store.calculatedCosts"
+              :sellingPrices="store.sellingPrices"
               :isAdmin="true"
             />
           </template>
@@ -398,8 +401,9 @@ export default {
     async saveQuote() {
       this.saving = true
       try {
-        const c = this.store.calculatedCosts
-        const s = this.store
+        const c  = this.store.calculatedCosts
+        const sp = this.store.sellingPrices
+        const s  = this.store
         const displayName = s.clientType === 'particulier'
           ? [s.clientCivility, s.clientFirstName, s.clientLastName].filter(Boolean).join(' ')
           : s.clientName
@@ -408,7 +412,9 @@ export default {
         const quoteNumber = editId ? s.quoteNumber : await this.generateSequentialQuoteNumber()
         if (!editId) s.quoteNumber = quoteNumber
 
-        let referenceImageUrl = ''
+        // En édition : conserve l'URL existante si aucun nouveau fichier n'est uploadé
+        // Les blob: URLs ne sont valides que dans la session courante → jamais sauvegarder en DB
+        let referenceImageUrl = (s.referenceImageUrl || '').startsWith('blob:') ? '' : (s.referenceImageUrl || '')
         if (s.referenceImage) {
           const ext  = s.referenceImage.name.split('.').pop()
           const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
@@ -417,13 +423,18 @@ export default {
           if (!uploadError) {
             const { data: urlData } = supabase.storage.from('quote-images').getPublicUrl(path)
             referenceImageUrl = urlData.publicUrl
+            // Mettre à jour le store avec l'URL Supabase (remplace le blob URL temporaire)
+            s.referenceImageUrl = referenceImageUrl
+            s.referenceImage = null
           }
         }
 
         const payload = {
           quote_number: quoteNumber, quote_date: s.quoteDate,
           quote_validity_days: s.quoteValidityDays,
-          payment_method: s.paymentMethod, deposit_percent: s.depositPercent, quote_notes: s.quoteNotes,
+          payment_method: s.paymentMethod, deposit_percent: s.depositPercent,
+          processing_delay: s.processingDelay, delivery_delay: s.deliveryDelay,
+          quote_notes: s.quoteNotes,
           client_type: s.clientType, client_civility: s.clientCivility,
           client_first_name: s.clientFirstName, client_last_name: s.clientLastName,
           client_name: displayName, client_contact_name: s.clientContactName,
@@ -443,7 +454,9 @@ export default {
           packaging_cost: s.packagingCost, tax_rate: s.taxRate,
           selected_pricing: s.selectedPricing, custom_margin: s.customMargin,
           material_cost: c.materialCost, equipment_cost: c.equipmentCost,
-          work_cost: c.workCost, total_cost: c.totalCost, cost_per_unit: c.costPerUnit,
+          work_cost: c.workCost, subtotal_ht: c.subtotal,
+          margin_percent: sp.margin,
+          total_cost: sp.totalTTC, cost_per_unit: sp.pricePerUnit,
           reference_image_url: referenceImageUrl || null,
         }
 

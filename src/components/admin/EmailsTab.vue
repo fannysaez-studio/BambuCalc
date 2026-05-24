@@ -398,7 +398,7 @@ async function sendTestEmail() {
       try {
         const quoteForPdf = selectedQuote.value
         if (quoteForPdf) {
-          const doc = generateQuotePDFDoc(quoteForPdf)
+          const doc = await generateQuotePDFDoc(quoteForPdf)
           pdfBase64   = pdfToBase64(doc)
           pdfFilename = `devis-${quoteForPdf.quote_number || 'bambucalc'}.pdf`
         }

@@ -292,8 +292,8 @@ export default {
     statusLabel(status) {
       return { pending: 'En attente', accepted: 'Accepté', refused: 'Refusé', sent: 'Envoyé' }[status] || 'En attente'
     },
-    downloadPDF(q) {
-      generateQuotePDF(q)
+    async downloadPDF(q) {
+      await generateQuotePDF(q)
     },
     confirmDelete(q) {
       this.deleteTarget = q

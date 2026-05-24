@@ -6,7 +6,7 @@ export const company = {
   postalCode: '63000',
   city: 'Clermont-Ferrand',
   country: 'France',
-  email: 'fanny.saez.0486@gmail.com',
+  email: 'fannysaez.pro@gmail.com',
   phone: '0661051505',
   siret: '',
   vatNumber: '',

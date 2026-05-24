@@ -74,6 +74,10 @@ export const useCalculatorStore = defineStore('calculator', {
     maintenanceRate: 0.10,
     hourlyRate: 20,
 
+    // Délais
+    processingDelay: '5-7j',
+    deliveryDelay:   'pickup',
+
     // Autres
     packagingCost: 0,
     taxRate: 20,
@@ -89,6 +93,33 @@ export const useCalculatorStore = defineStore('calculator', {
   }),
 
   getters: {
+    // Marge en % selon l'option choisie à l'étape 4
+    marginPercent(state) {
+      const presets = { ami: 15, standard: 40, pro: 65 }
+      return presets[state.selectedPricing] ?? Number(state.customMargin) ?? 40
+    },
+
+    // Prix de vente final (marge appliquée sur HT, TVA recalculée)
+    sellingPrices(state) {
+      const costs = this.calculatedCosts
+      const margin = this.marginPercent
+      const qty = Math.max(1, Number(state.quantity) || 1)
+      const taxRate = Number(state.taxRate) || 20
+      const r = (v) => Math.round(v * 100) / 100
+
+      const sellingHT  = costs.subtotal * (1 + margin / 100)
+      const sellingTax = sellingHT * (taxRate / 100)
+      const sellingTTC = sellingHT + sellingTax
+
+      return {
+        margin,
+        subtotalHT:   r(sellingHT),
+        tax:          r(sellingTax),
+        totalTTC:     r(sellingTTC),
+        pricePerUnit: r(sellingTTC / qty),
+      }
+    },
+
     // Nom affiché selon le type de client
     displayClientName(state) {
       if (state.clientType === 'particulier') {
@@ -142,7 +173,8 @@ export const useCalculatorStore = defineStore('calculator', {
       const workCost     = (workMinutes / 60) * (Number(state.hourlyRate) || 0)
 
       const packagingCost = Number(state.packagingCost) || 0
-      const subtotal      = materialCost + equipmentCost + workCost + packagingCost
+      const coeff         = this.projectCoeff
+      const subtotal      = (materialCost + equipmentCost + workCost + packagingCost) * coeff
       const tax           = (subtotal * (Number(state.taxRate) || 0)) / 100
       const totalCost     = subtotal + tax
       const qty           = Math.max(1, Number(state.quantity) || 1)
@@ -207,6 +239,8 @@ export const useCalculatorStore = defineStore('calculator', {
         printMinutes:      0,
         prepTime:          15,
         postTime:          0,
+        processingDelay:   '5-7j',
+        deliveryDelay:     'pickup',
         packagingCost:     0,
         selectedPricing:   'standard',
         customMargin:      50,

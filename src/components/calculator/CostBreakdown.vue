@@ -53,10 +53,12 @@
         </div>
       </div>
 
-      <!-- Colonne droite : récap + total (toujours visible) -->
+      <!-- Colonne droite : récap coût de revient + prix de vente -->
       <div class="col-right">
+
+        <!-- Coût de revient (admin) -->
         <div class="recap-card">
-          <div class="recap-title">Récapitulatif</div>
+          <div class="recap-title">Coût de revient</div>
 
           <div class="recap-line">
             <span>Sous-total HT</span>
@@ -69,15 +71,42 @@
 
           <div class="recap-sep" />
 
-          <div class="total-block">
-            <span class="total-label">Total TTC</span>
-            <span class="total-value">{{ fmt(costs.totalCost) }}</span>
+          <div class="recap-line recap-line--cost">
+            <span>Revient TTC</span>
+            <span>{{ fmt(costs.totalCost) }}</span>
           </div>
-
-          <div v-if="costs.quantity > 1" class="unit-line">
+          <div v-if="costs.quantity > 1" class="unit-line unit-line--muted">
             {{ costs.quantity }} unités · {{ fmt(costs.costPerUnit) }} / unité
           </div>
         </div>
+
+        <!-- Prix de vente (avec marge) -->
+        <div v-if="sellingPrices" class="recap-card recap-card--selling">
+          <div class="recap-title recap-title--teal">
+            Prix de vente · +{{ sellingPrices.margin }} %
+          </div>
+
+          <div class="recap-line">
+            <span>Sous-total HT</span>
+            <span>{{ fmt(sellingPrices.subtotalHT) }}</span>
+          </div>
+          <div class="recap-line">
+            <span>TVA (20 %)</span>
+            <span>{{ fmt(sellingPrices.tax) }}</span>
+          </div>
+
+          <div class="recap-sep" />
+
+          <div class="total-block">
+            <span class="total-label">Total TTC client</span>
+            <span class="total-value">{{ fmt(sellingPrices.totalTTC) }}</span>
+          </div>
+
+          <div v-if="costs.quantity > 1" class="unit-line">
+            {{ costs.quantity }} unités · {{ fmt(sellingPrices.pricePerUnit) }} / unité
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -100,6 +129,10 @@ export default {
         maintenance: 0, workCost: 0, packagingCost: 0,
         subtotal: 0, tax: 0, totalCost: 0, costPerUnit: 0, quantity: 1,
       }),
+    },
+    sellingPrices: {
+      type: Object,
+      default: null,
     },
   },
   data() {
@@ -198,6 +231,7 @@ export default {
 .col-right {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
 }
 
 .recap-card {
@@ -210,6 +244,11 @@ export default {
   gap: 0.35rem;
 }
 
+.recap-card--selling {
+  background: #f0fbfc;
+  border-color: #b2e8ef;
+}
+
 .recap-title {
   font-size: 0.65rem;
   font-weight: 700;
@@ -219,6 +258,8 @@ export default {
   margin-bottom: 0.15rem;
 }
 
+.recap-title--teal { color: #2e9cab; }
+
 .recap-line {
   display: flex;
   justify-content: space-between;
@@ -226,6 +267,12 @@ export default {
   color: #718096;
   font-weight: 600;
   padding: 0.15rem 0;
+}
+
+.recap-line--cost {
+  font-size: 0.84rem;
+  color: #4a5568;
+  font-weight: 700;
 }
 
 .recap-sep {
@@ -267,6 +314,8 @@ export default {
   text-align: center;
   margin-top: 0.4rem;
 }
+
+.unit-line--muted { margin-top: 0.2rem; }
 
 /* ── Waiting card (client) ── */
 .waiting-card {

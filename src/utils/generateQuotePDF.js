@@ -35,6 +35,16 @@ function addValidityDate(quoteDate, days) {
   return fmtDate(d.toISOString())
 }
 
+function processingLabel(v) {
+  return { '24h': '24 heures', '2-3j': '2 à 3 jours ouvrés', '5-7j': '5 à 7 jours ouvrés',
+    '1-2s': '1 à 2 semaines', '2-4s': '2 à 4 semaines', 'custom': 'À convenir' }[v] || v || ''
+}
+
+function deliveryLabel(v) {
+  return { pickup: 'Retrait en main propre', colissimo: 'Colissimo (2-3 j)',
+    chronopost: 'Chronopost (J+1)', mondial: 'Mondial Relay (3-5 j)', custom: 'À convenir' }[v] || v || ''
+}
+
 function paymentLabel(method) {
   const map = {
     virement: 'Virement bancaire',
@@ -46,8 +56,34 @@ function paymentLabel(method) {
   return map[method] || method || 'Virement bancaire'
 }
 
+// Charge une image distante et la retourne en data-URL (pour jsPDF addImage)
+async function loadImageDataUrl(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width  = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0)
+      resolve(canvas.toDataURL('image/jpeg', 0.85))
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 // ── Constructeur interne (retourne le doc jsPDF sans déclencher le download) ──
-function _buildDoc(quote) {
+async function _buildDoc(quote) {
+  // Pré-chargement de l'image de référence (si présente)
+  let refImageData = null
+  if (quote.reference_image_url) {
+    try { refImageData = await loadImageDataUrl(quote.reference_image_url) } catch { /* CORS ou réseau */ }
+  }
+
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210
   const margin = 14
@@ -179,32 +215,32 @@ function _buildDoc(quote) {
     }
   }
 
-  // ── Objet du devis ────────────────────────────────────────
-  y = y + 5 + maxLines * 5 + 8
+  // ── Objet du devis (bande simple 1 ligne) ────────────────
+  y = y + 5 + maxLines * 5 + 6
 
   doc.setFillColor(...LIGHT)
   doc.rect(margin, y, W - margin * 2, 10, 'F')
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(9)
   doc.setTextColor(...GREY)
-  doc.text('OBJET :', margin + 3, y + 4)
+  doc.text('OBJET :', margin + 3, y + 6.5)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...DARK)
-  doc.text(quote.project_name || '—', margin + 22, y + 4)
+  doc.text(quote.project_name || '—', margin + 22, y + 6.5)
+
+  y += 14
 
   // ── Tableau des prestations ───────────────────────────────
-  y += 15
-
-  const taxRate = quote.tax_rate ?? 20
+  const taxRate     = quote.tax_rate ?? 20
   const unitPriceHT = (quote.cost_per_unit || 0) / (1 + taxRate / 100)
   const totalHT     = unitPriceHT * (quote.quantity || 1)
   const totalTVA    = (quote.total_cost || 0) - totalHT
   const printerLabel = {
     'p2s-combo': 'Bambu P2S Combo',
-    'p2s-mono': 'Bambu P2S Monocouleur',
-    'x1c': 'Bambu X1C',
-    'a1-mini': 'Bambu A1 Mini',
-    'a1': 'Bambu A1',
+    'p2s-mono':  'Bambu P2S Monocouleur',
+    'x1c':       'Bambu X1C',
+    'a1-mini':   'Bambu A1 Mini',
+    'a1':        'Bambu A1',
   }[quote.printer_model] || quote.printer_model || '—'
 
   const desc = [
@@ -213,17 +249,23 @@ function _buildDoc(quote) {
     `Profil : ${quote.print_profile || '—'} | Poids total : ${quote.weight || 0} g`,
   ].join('\n')
 
+  // Ligne image dans le tableau (si photo de référence)
+  const REF_IMG_MARKER = '__REF_IMG__'
+  const IMG_ROW_H = 46  // hauteur réservée pour la photo dans le tableau
+  const tableBody = [[
+    desc,
+    quote.quantity ?? 1,
+    fmtEur(unitPriceHT),
+    fmtEur((quote.cost_per_unit || 0) - unitPriceHT),
+    fmtEur(quote.cost_per_unit || 0),
+  ]]
+  if (refImageData) tableBody.push([REF_IMG_MARKER, '', '', '', ''])
+
   autoTable(doc, {
     startY: y,
     margin: { left: margin, right: margin },
     head: [['Description', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']],
-    body: [[
-      desc,
-      quote.quantity ?? 1,
-      fmtEur(unitPriceHT),
-      fmtEur((quote.cost_per_unit || 0) - unitPriceHT),
-      fmtEur(quote.cost_per_unit || 0),
-    ]],
+    body: tableBody,
     styles: {
       fontSize: 8.5,
       cellPadding: 4,
@@ -244,22 +286,82 @@ function _buildDoc(quote) {
       3: { cellWidth: 24, halign: 'right' },
       4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
     },
+    didParseCell(data) {
+      if (!refImageData) return
+      const isImgRow = data.section === 'body' && data.row.index === 1
+      if (!isImgRow) return
+      // Réserver la hauteur pour l'image dans la cellule Description
+      if (data.column.index === 0) {
+        data.cell.styles.minCellHeight = IMG_ROW_H
+        data.cell.text = []  // effacer le marqueur texte
+      } else {
+        data.cell.text = []  // cellules vides sur le reste de la ligne
+      }
+    },
+    didDrawCell(data) {
+      if (!refImageData) return
+      const isImgRow = data.section === 'body' && data.row.index === 1 && data.column.index === 0
+      if (!isImgRow) return
+      // Dimensions de la photo : max 55 × 40 mm, centrée verticalement dans la cellule
+      const pW = 55, pH = 40
+      const px = data.cell.x + data.cell.padding('left')
+      const py = data.cell.y + (data.cell.height - pH) / 2
+      doc.addImage(refImageData, 'JPEG', px, py, pW, pH, undefined, 'MEDIUM')
+      // Légende sous l'image
+      doc.setFontSize(6.5)
+      doc.setFont('helvetica', 'italic')
+      doc.setTextColor(160, 174, 192)
+      doc.text('Photo de référence client', px, py + pH + 3.5)
+    },
   })
 
-  // ── Totaux ────────────────────────────────────────────────
-  const afterTable = doc.lastAutoTable.finalY + 6
-  const totalsX = W - margin - 80
+  // ── Totaux + Conditions (layout 2 colonnes côte à côte) ────
+  const afterTable = doc.lastAutoTable.finalY + 4
+  const totalsX   = W - margin - 80
+  const condWidth = totalsX - margin - 6
 
+  // Lignes totaux
   const totals = [
-    ['Sous-total HT', fmtEur(totalHT * (quote.quantity || 1))],
-    [`TVA (${taxRate}%)`, fmtEur(totalTVA * (quote.quantity || 1))],
+    ['Sous-total HT', fmtEur(totalHT)],
+    [`TVA (${taxRate}%)`, fmtEur(totalTVA)],
   ]
   if (quote.deposit_percent > 0) {
     const acompte = (quote.total_cost || 0) * (quote.deposit_percent / 100)
     totals.push([`Acompte (${quote.deposit_percent}%)`, fmtEur(acompte)])
   }
+  const totalsH = totals.length * 6 + 13  // lignes × 6 + boîte TTC
 
-  let ty = afterTable
+  // Lignes conditions
+  const condLines = [
+    `Mode de paiement : ${paymentLabel(quote.payment_method)}`,
+  ]
+  if (quote.processing_delay)
+    condLines.push(`Délai de fabrication : ${processingLabel(quote.processing_delay)}`)
+  if (quote.delivery_delay)
+    condLines.push(`Livraison : ${deliveryLabel(quote.delivery_delay)}`)
+  if (quote.deposit_percent > 0)
+    condLines.push(`Acompte de ${quote.deposit_percent}% à la commande`)
+  condLines.push(`Devis valable jusqu'au ${addValidityDate(quote.quote_date, quote.quote_validity_days || 30)}`)
+  if (company.paymentIban)
+    condLines.push(`IBAN : ${company.paymentIban}`)
+
+  const condBandH = Math.max(totalsH, condLines.length * 5 + 8)
+
+  // Bloc CONDITIONS (colonne gauche)
+  doc.setFillColor(...LIGHT)
+  doc.rect(margin, afterTable, condWidth, condBandH, 'F')
+  doc.setFontSize(7.5)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...GREY)
+  doc.text('CONDITIONS DE RÈGLEMENT', margin + 3, afterTable + 5)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...DARK)
+  condLines.forEach((line, i) => {
+    doc.text(line, margin + 3, afterTable + 11 + i * 5)
+  })
+
+  // Totaux (colonne droite)
+  let ty = afterTable + 5
   doc.setFontSize(8.5)
   totals.forEach(([label, value]) => {
     doc.setFont('helvetica', 'normal')
@@ -279,43 +381,23 @@ function _buildDoc(quote) {
   doc.text('Total TTC', totalsX, ty + 2)
   doc.text(fmtEur(quote.total_cost || 0), W - margin, ty + 2, { align: 'right' })
 
-  // ── Conditions ────────────────────────────────────────────
-  const condY = ty + 15
-  doc.setFillColor(...LIGHT)
-  doc.rect(margin, condY, W - margin * 2, 22, 'F')
-
-  doc.setFontSize(7.5)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...GREY)
-  doc.text('CONDITIONS DE RÈGLEMENT', margin + 3, condY + 5)
-
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...DARK)
-  doc.text(`Mode de paiement : ${paymentLabel(quote.payment_method)}`, margin + 3, condY + 11)
-  if (quote.deposit_percent > 0)
-    doc.text(`Acompte de ${quote.deposit_percent}% à la commande`, margin + 3, condY + 16)
-  doc.text(`Devis valable jusqu'au ${addValidityDate(quote.quote_date, quote.quote_validity_days || 30)}`, margin + 3, condY + (quote.deposit_percent > 0 ? 21 : 16))
-
-  if (company.paymentIban) {
-    doc.setTextColor(...GREY)
-    doc.text(`IBAN : ${company.paymentIban}`, W - margin, condY + 11, { align: 'right' })
-  }
-
   // ── Notes ─────────────────────────────────────────────────
+  const twoColBottomY = afterTable + condBandH + 8
+  let notesH = 0
   if (quote.quote_notes) {
-    const notesY = condY + 27
     doc.setFontSize(7.5)
     doc.setFont('helvetica', 'bold')
     doc.setTextColor(...GREY)
-    doc.text('NOTES', margin, notesY)
+    doc.text('NOTES', margin, twoColBottomY)
     doc.setFont('helvetica', 'normal')
     doc.setTextColor(...DARK)
     const lines = doc.splitTextToSize(quote.quote_notes, W - margin * 2)
-    doc.text(lines, margin, notesY + 5)
+    doc.text(lines, margin, twoColBottomY + 5)
+    notesH = 8 + lines.length * 4
   }
 
   // ── Zone signature ────────────────────────────────────────
-  const sigY = Math.max(condY + 54, 240)
+  const sigY = Math.max(twoColBottomY + notesH + 8, 252)
   doc.setDrawColor(...[226, 232, 240])
   doc.setLineWidth(0.3)
   doc.line(margin, sigY, margin + 70, sigY)
@@ -339,12 +421,13 @@ function _buildDoc(quote) {
 }
 
 // ── Export : déclenche le téléchargement navigateur ──
-export function generateQuotePDF(quote) {
-  _buildDoc(quote).save(`devis-${quote.quote_number || 'bambucalc'}.pdf`)
+export async function generateQuotePDF(quote) {
+  const doc = await _buildDoc(quote)
+  doc.save(`devis-${quote.quote_number || 'bambucalc'}.pdf`)
 }
 
 // ── Export : retourne le doc jsPDF brut (pour encodage Base64 avant envoi mail) ──
-export function generateQuotePDFDoc(quote) {
+export async function generateQuotePDFDoc(quote) {
   return _buildDoc(quote)
 }
 

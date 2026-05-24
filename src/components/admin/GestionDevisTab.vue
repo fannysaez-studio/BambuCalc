@@ -438,8 +438,8 @@ function copyStripeLink(url) {
     .catch(() => toast.value?.show('Impossible de copier.', 'error'))
 }
 
-function downloadPDF(q) {
-  generateQuotePDF(q)
+async function downloadPDF(q) {
+  await generateQuotePDF(q)
 }
 
 function editQuote(q) {
@@ -450,6 +450,8 @@ function editQuote(q) {
     quoteValidityDays: q.quote_validity_days ?? 30,
     paymentMethod:     q.payment_method      || 'virement',
     depositPercent:    q.deposit_percent     ?? 0,
+    processingDelay:   q.processing_delay    || '5-7j',
+    deliveryDelay:     q.delivery_delay      || 'pickup',
     quoteNotes:        q.quote_notes         || '',
     clientType:        q.client_type         || 'particulier',
     clientCivility:    q.client_civility     || 'M.',
@@ -486,7 +488,8 @@ function editQuote(q) {
     selectedPricing:   q.selected_pricing    || 'standard',
     customMargin:      q.custom_margin       ?? 50,
     referenceImage:    null,
-    referenceImageUrl: q.reference_image_url || '',
+    // Blob URLs (blob:http://...) viennent d'une session périmée — les ignorer
+    referenceImageUrl: (q.reference_image_url || '').startsWith('blob:') ? '' : (q.reference_image_url || ''),
   })
   router.push({ path: '/calculator/3', query: { editId: q.id } })
 }

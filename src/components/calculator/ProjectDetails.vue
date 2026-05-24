@@ -174,7 +174,20 @@
         @dragover.prevent
         @drop.prevent="handleDrop"
       >
-        <img v-if="referenceImageUrl" :src="referenceImageUrl" class="img-preview" alt="Aperçu" />
+        <template v-if="referenceImageUrl">
+          <img
+            :src="referenceImageUrl"
+            class="img-preview"
+            alt=""
+            v-show="!imgLoadError"
+            @error="imgLoadError = true"
+            @load="imgLoadError = false"
+          />
+          <div v-if="imgLoadError" class="img-placeholder img-placeholder--saved">
+            <span class="img-ph-icon">🖼️</span>
+            <span class="img-ph-text">Image enregistrée — cliquez pour en choisir une autre</span>
+          </div>
+        </template>
         <div v-else class="img-placeholder">
           <span class="img-ph-icon">📎</span>
           <span class="img-ph-text">Cliquez ou glissez une image (JPG, PNG, WEBP)</span>
@@ -221,11 +234,38 @@
       </div>
     </div>
 
+    <!-- Délais -->
+    <div class="grid-2">
+      <div :class="formStyles.formGroup">
+        <label :class="formStyles.label">Délai de fabrication</label>
+        <select :class="formStyles.select" :value="processingDelay"
+          @change="$emit('update:processingDelay', $event.target.value)">
+          <option value="24h">24 heures</option>
+          <option value="2-3j">2 à 3 jours ouvrés</option>
+          <option value="5-7j">5 à 7 jours ouvrés</option>
+          <option value="1-2s">1 à 2 semaines</option>
+          <option value="2-4s">2 à 4 semaines</option>
+          <option value="custom">À convenir</option>
+        </select>
+      </div>
+      <div :class="formStyles.formGroup">
+        <label :class="formStyles.label">Livraison / Retrait</label>
+        <select :class="formStyles.select" :value="deliveryDelay"
+          @change="$emit('update:deliveryDelay', $event.target.value)">
+          <option value="pickup">Retrait en main propre</option>
+          <option value="colissimo">Colissimo (2-3 j)</option>
+          <option value="chronopost">Chronopost (J+1)</option>
+          <option value="mondial">Mondial Relay (3-5 j)</option>
+          <option value="custom">À convenir</option>
+        </select>
+      </div>
+    </div>
+
     <div :class="formStyles.formGroup">
       <label :class="formStyles.label">Notes / Conditions particulières <span class="optional">optionnel</span></label>
       <textarea :class="formStyles.input" rows="2" :value="quoteNotes"
         @input="$emit('update:quoteNotes', $event.target.value)"
-        placeholder="Ex: Délai de livraison 5 jours ouvrés. Pièce imprimée en PLA+ blanc, sans post-traitement inclus."
+        placeholder="Ex: Pièce imprimée en PLA+ blanc, sans post-traitement inclus."
         style="resize: vertical; min-height: 52px;" />
     </div>
 
@@ -270,6 +310,8 @@ export default {
 
     paymentMethod:     { type: String,  default: 'virement' },
     depositPercent:    { type: Number,  default: 0 },
+    processingDelay:   { type: String,  default: '5-7j' },
+    deliveryDelay:     { type: String,  default: 'pickup' },
     quoteNotes:        { type: String,  default: '' },
   },
   emits: [
@@ -284,9 +326,17 @@ export default {
     'update:projectName', 'update:quantity',
     'update:printProfile', 'update:printerModel', 'update:nozzleSize',
     'update:referenceImage', 'update:referenceImageUrl',
-    'update:paymentMethod', 'update:depositPercent', 'update:quoteNotes',
+    'update:paymentMethod', 'update:depositPercent',
+    'update:processingDelay', 'update:deliveryDelay',
+    'update:quoteNotes',
   ],
-  data() { return { formStyles } },
+  data() { return { formStyles, imgLoadError: false } },
+  watch: {
+    referenceImageUrl(newVal) {
+      // Réinitialise l'état d'erreur dès que l'URL change (ex : passage en mode édition)
+      if (newVal) this.imgLoadError = false
+    },
+  },
   methods: {
     handleImageUpload(e) {
       const file = e.target.files[0]
@@ -402,6 +452,9 @@ export default {
 }
 .img-ph-icon { font-size: 1.4rem; }
 .img-ph-text { font-size: 0.75rem; color: #a0aec0; font-weight: 500; text-align: center; }
+
+.img-placeholder--saved { background: #f0fbfc; }
+.img-placeholder--saved .img-ph-text { color: #2e9cab; }
 
 .img-preview {
   width: 100%;

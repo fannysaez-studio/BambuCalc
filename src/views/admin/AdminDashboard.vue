@@ -536,7 +536,7 @@ async function sendQuote() {
       pdfFilename = null
     if (attachPdfAuto.value) {
       try {
-        const doc = generateQuotePDFDoc(sendTarget.value)
+        const doc = await generateQuotePDFDoc(sendTarget.value)
         pdfBase64 = pdfToBase64(doc)
         pdfFilename = `devis-${sendTarget.value.quote_number || 'bambucalc'}.pdf`
       } catch (pdfErr) {
