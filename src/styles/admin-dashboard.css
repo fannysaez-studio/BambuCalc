@@ -78,6 +78,20 @@
   gap: 0.75rem;
 }
 
+/* ── Bouton push (cloche) ── */
+.btn-push-toggle {
+  width: 2.4rem; height: 2.4rem; border-radius: 999px;
+  background: rgba(255,255,255,0.9); border: 1.5px solid #e2e8f0;
+  color: #a0aec0; cursor: pointer; font-family: inherit;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease; flex-shrink: 0;
+}
+.btn-push-toggle:hover:not(:disabled) { border-color: #2e9cab; color: #2e9cab; background: #e8f7f9; }
+.btn-push-toggle--active { background: #e8f7f9; border-color: #2e9cab; color: #2e9cab; }
+.btn-push-toggle--active:hover:not(:disabled) { background: #d0eff4; }
+.btn-push-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-push-icon { width: 1rem; height: 1rem; }
+
 .btn-new-quote {
   display: inline-flex;
   align-items: center;

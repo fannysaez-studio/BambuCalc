@@ -18,6 +18,16 @@
         </div>
       </div>
       <div class="admin-hero-actions">
+        <button
+          v-if="pushSupported"
+          :class="['btn-push-toggle', isSubscribed && 'btn-push-toggle--active']"
+          :title="isSubscribed ? 'Désactiver les notifications push' : 'Activer les notifications push'"
+          :disabled="pushLoading"
+          @click="isSubscribed ? unsubscribePush() : subscribePush()"
+        >
+          <BellOff v-if="isSubscribed" class="btn-push-icon" />
+          <Bell v-else class="btn-push-icon" />
+        </button>
         <button class="btn-new-quote" @click="startNewQuote">+ Nouveau devis</button>
         <router-link to="/dashboard" class="btn-back-dash">← Mon dashboard</router-link>
       </div>
@@ -332,6 +342,7 @@ import {
 import { supabase } from '@/lib/supabase'
 import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
 import { useCalculatorStore } from '@/stores/calculator'
+import { usePushNotifications } from '@/composables/usePushNotifications'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import CatalogueTab from '@/components/admin/CatalogueTab.vue'
 import SettingsTab from '@/components/admin/SettingsTab.vue'
@@ -355,11 +366,14 @@ import {
   Package,
   ChevronDown,
   Mail,
+  Bell,
+  BellOff,
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const calculatorStore = useCalculatorStore()
 const toast = ref(null)
+const { isSupported: pushSupported, isSubscribed, permission: pushPermission, loading: pushLoading, init: initPush, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
 
 const saved = JSON.parse(localStorage.getItem('bambu_email_settings') || '{}')
 const displayName = ref('')
@@ -442,6 +456,7 @@ onMounted(() => {
   }
   lockScrollFn()
   window.addEventListener('resize', lockScrollFn)
+  initPush()
 })
 onUnmounted(() => {
   document.body.style.overflowY = ''

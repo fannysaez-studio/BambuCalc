@@ -538,6 +538,11 @@ export default {
           savedQuote = await saveQuoteToDb(payload)
           this.$refs.toast.show(this.isAdmin ? 'Devis sauvegardé !' : 'Demande envoyée !', 'success')
           supabase.functions.invoke('send-quote-email', { body: { quote: savedQuote } }).catch(() => {})
+          supabase.functions.invoke('send-push', { body: {
+            title:   '🖨️ Nouveau devis reçu',
+            message: `${savedQuote.project_name || 'Pièce'} — ${savedQuote.client_name || 'Client'} · ${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(savedQuote.total_cost || 0)}`,
+            url:     '/admin',
+          }}).catch(() => {})
           setTimeout(() => s.resetForNewQuote(), 2000)
         }
         this.saveStatus = 'ok'

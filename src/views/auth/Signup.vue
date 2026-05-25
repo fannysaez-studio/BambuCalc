@@ -168,6 +168,19 @@ function sendWelcomeEmail(email, firstName, lastName) {
     .catch(() => {})
 }
 
+function notifyAdminNewClient(firstName, lastName, email) {
+  const name = [firstName, lastName].filter(Boolean).join(' ') || email
+  supabase.functions
+    .invoke('send-push', {
+      body: {
+        title:   '👤 Nouveau client inscrit',
+        message: `${name} — ${email}`,
+        url:     '/admin',
+      },
+    })
+    .catch(() => {})
+}
+
 export default defineComponent({
   name: 'Signup',
   components: { Home, Lock, UserPlus, UserX, PasswordField },
@@ -198,6 +211,7 @@ export default defineComponent({
           lastName: this.lastName,
         })
         sendWelcomeEmail(this.email, this.firstName, this.lastName)
+        notifyAdminNewClient(this.firstName, this.lastName, this.email)
         this.$router.push('/calculator')
       } catch (err) {
         this.error = err.message ?? 'Une erreur est survenue.'
