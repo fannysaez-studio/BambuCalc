@@ -67,6 +67,7 @@
 #   VITE_STRIPE_PUBLIC_KEY    → Clé publique Stripe (pk_live_...)
 #
 [context.production.environment]
-  VITE_SUPABASE_URL = "https://upwzdctedpazranppskz.supabase.co"
+  VITE_SUPABASE_URL    = "https://upwzdctedpazranppskz.supabase.co"
+  VITE_VAPID_PUBLIC_KEY = "BJAUXx87uxhSRLmADQZakueWzzJTbNKYrSBT77wd0hPl672AKtUZSxnWjI9JKLkV-BHfxjFsfaoXUkFWLECgmWY"
   # VITE_SUPABASE_ANON_KEY → UI Netlify uniquement
   # VITE_STRIPE_PUBLIC_KEY → UI Netlify uniquement
