@@ -817,38 +817,52 @@ export default defineComponent({
   }
 
   .auth-visual {
-    padding: 1.5rem 1.5rem 1rem;
+    justify-content: space-between;
+    min-height: 48vh;
+    padding: 2rem 2rem 1.5rem;
   }
 
   .visual-copy {
-    margin-top: 1.5rem;
-    max-width: 26rem;
-    margin-left: auto;
-    margin-right: auto;
+    margin-top: 0;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
   }
 
-  /* Illustration présente mais compacte */
+  .visual-copy p {
+    font-size: 1rem;
+    margin-top: 1.5rem;
+  }
+
   .visual-illustration {
-    min-height: 12rem;
-    flex: unset;
+    min-height: 0;
   }
 
   .visual-illustration img {
-    width: min(100%, 260px);
-    max-width: 260px;
+    width: min(100%, 280px);
+    max-width: 280px;
   }
 
   .auth-card {
-    padding: 4.5rem 2rem 1.75rem;
+    padding: 4.5rem 2.5rem 2rem;
+  }
+
+  .auth-header {
+    margin-bottom: 1rem;
+  }
+
+  .auth-header p {
+    margin-top: 0.85rem;
   }
 
   .auth-form {
-    margin-top: 1.75rem;
-    gap: 0.9rem;
+    margin-top: 1.5rem;
+    gap: 1rem;
+  }
+
+  .auth-divider {
+    margin: 1.25rem 0 1rem;
   }
 }
 
@@ -857,7 +871,7 @@ export default defineComponent({
   .auth-page {
     grid-template-columns: 1fr;
     padding: 0.5rem;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .auth-visual,
@@ -871,53 +885,86 @@ export default defineComponent({
   }
 
   .auth-visual {
+    width: 100%;
+    min-height: calc(100dvh - 1.5rem);
     padding: 1.1rem 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .visual-copy {
-    margin-top: 1rem;
+    margin-top: 0;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-size: clamp(1.4rem, 6vw, 1.9rem);
   }
 
   .visual-copy p {
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    margin-top: 3rem;
   }
 
-  /* Illustration compacte (en haut sur Signup via DOM order) */
   .visual-illustration {
-    min-height: 9rem;
-    flex: unset;
+    min-height: 0;
   }
 
   .visual-illustration img {
-    width: min(100%, 200px);
-    max-width: 200px;
+    width: min(100%, 320px);
+    max-width: 320px;
+  }
+
+  .auth-form-panel {
+    min-height: calc(100dvh - 1.5rem);
   }
 
   .auth-card {
     padding: 4.5rem 1.25rem 1.5rem;
+    justify-content: flex-start;
+  }
+
+  .auth-header {
+    margin-bottom: 1rem;
+  }
+
+  .auth-header h2 {
+    font-size: clamp(1.6rem, 6vw, 2rem);
+  }
+
+  .auth-header p {
+    margin-top: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .auth-form {
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
     gap: 0.85rem;
   }
 
+  .field-grid {
+    gap: 0.65rem;
+  }
+
   .field input {
-    min-height: 2.9rem;
-    padding: 0.72rem 0.95rem;
+    min-height: 2.6rem;
+    padding: 0.6rem 0.95rem;
   }
 
   .primary-btn {
-    min-height: 2.9rem;
+    min-height: 2.6rem;
+    margin-top: 0.5rem;
   }
 
   .auth-divider {
-    margin: 1rem 0 0.85rem;
+    margin: 1rem 0 0.75rem;
+  }
+
+  .rgpd-notice {
+    margin-top: 0.75rem !important;
+    padding-top: 0.75rem !important;
+    font-size: 0.68rem !important;
+    line-height: 1.45 !important;
   }
 }
 
@@ -928,11 +975,6 @@ export default defineComponent({
     gap: 0.4rem;
   }
 
-  /* Masquer l'illustration (en haut sur Signup) pour maximiser l'espace formulaire */
-  .visual-illustration {
-    display: none;
-  }
-
   .auth-visual {
     padding: 0.9rem 0.85rem 0.65rem;
   }
@@ -940,20 +982,11 @@ export default defineComponent({
   .auth-card {
     padding: 4.5rem 1rem 1.25rem;
   }
-
-  /* Empiler prénom + nom verticalement sur très petit écran */
-  .field-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 480px) {
   .auth-card {
     padding: 4.5rem 1rem 1.5rem;
-  }
-
-  .field-grid {
-    grid-template-columns: 1fr;
   }
 
   .social-grid {

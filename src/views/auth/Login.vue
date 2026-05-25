@@ -33,7 +33,7 @@
           </button>
         </div>
 
-        <div class="auth-header">
+        <div v-if="!forgotMode" class="auth-header">
           <h2>Connexion</h2>
           <p>Accédez à vos devis et à vos projets.</p>
         </div>
@@ -850,7 +850,12 @@ export default defineComponent({
 /* ===== Tablette : 769px – 1100px ===== */
 @media (max-width: 1100px) and (min-width: 769px) {
   .auth-page {
+    width: 100%;
     grid-template-columns: 1fr;
+    grid-template-rows: 44fr 56fr;
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
     padding: 0.75rem;
     gap: 0.75rem;
   }
@@ -860,49 +865,87 @@ export default defineComponent({
     border-radius: 20px;
   }
 
-  /* Afficher le visuel au-dessus du formulaire (cohérence avec Signup) */
-  .auth-visual {
-    order: -1;
-  }
-
   .auth-visual::before,
   .auth-visual::after {
     border-radius: 20px;
   }
 
+  .auth-visual,
+  .auth-form-panel {
+    min-height: 0;
+  }
+
   .auth-visual {
-    padding: 1.5rem 1.5rem 1rem;
+    order: -1;
+    justify-content: space-between;
+    padding: 2rem 2rem 1.5rem;
   }
 
   .visual-copy {
-    margin-top: 1.5rem;
-    max-width: 26rem;
-    margin-left: auto;
-    margin-right: auto;
+    margin-top: 0;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
   }
 
-  /* Illustration présente mais compacte */
+  .visual-copy p {
+    font-size: 1rem;
+    margin-top: 1.5rem;
+  }
+
   .visual-illustration {
-    min-height: 12rem;
-    flex: unset;
+    flex: 1;
+    min-height: 0;
   }
 
   .visual-illustration img {
-    width: min(100%, 260px);
-    max-width: 260px;
+    width: min(100%, 280px);
+    max-width: 280px;
   }
 
   .auth-card {
-    padding: 4.5rem 2rem 1.75rem;
+    padding: 3rem 2.5rem 1.5rem;
+    justify-content: flex-start;
   }
 
   .auth-form {
-    margin-top: 1.75rem;
-    gap: 0.9rem;
+    margin-top: 1.5rem;
+    gap: 0.85rem;
+  }
+
+  .auth-header p {
+    margin-top: 0.75rem;
+  }
+
+  .auth-divider {
+    margin: 0.85rem 0 0.75rem;
+  }
+
+  .forgot-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .forgot-wrap .auth-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .forgot-wrap .field {
+    margin-top: auto;
+    margin-bottom: 2rem;
+  }
+
+  .forgot-wrap .primary-btn {
+    margin-top: 0;
+  }
+
+  .forgot-wrap .back-link {
+    margin-top: auto;
   }
 }
 
@@ -911,7 +954,7 @@ export default defineComponent({
   .auth-page {
     grid-template-columns: 1fr;
     padding: 0.5rem;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .auth-visual,
@@ -919,9 +962,15 @@ export default defineComponent({
     border-radius: 18px;
   }
 
-  /* Afficher le visuel au-dessus du formulaire */
+  /* Visuel au-dessus du formulaire (DOM order inversé sur Login) */
   .auth-visual {
     order: -1;
+    width: 100%;
+    min-height: calc(100dvh - 1.5rem);
+    padding: 1.1rem 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .auth-visual::before,
@@ -929,54 +978,62 @@ export default defineComponent({
     border-radius: 18px;
   }
 
-  .auth-visual {
-    padding: 1.1rem 1rem 0.75rem;
-  }
-
   .visual-copy {
-    margin-top: 1rem;
+    margin-top: 0;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.5rem, 6vw, 2rem);
+    font-size: clamp(1.4rem, 6vw, 1.9rem);
   }
 
   .visual-copy p {
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
+    font-size: 0.88rem;
+    margin-top: 3rem;
   }
 
-  /* Illustration très compacte (formulaire est en haut via DOM order) */
   .visual-illustration {
-    min-height: 9rem;
-    flex: unset;
+    min-height: 0;
   }
 
   .visual-illustration img {
-    width: min(100%, 200px);
-    max-width: 200px;
+    width: min(100%, 320px);
+    max-width: 320px;
+  }
+
+  .auth-form-panel {
+    min-height: calc(100dvh - 1.5rem);
   }
 
   .auth-card {
     padding: 4.5rem 1.25rem 1.5rem;
+    justify-content: flex-start;
+  }
+
+  .auth-header h2 {
+    font-size: clamp(1.6rem, 6vw, 2rem);
+  }
+
+  .auth-header p {
+    margin-top: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .auth-form {
-    margin-top: 1.5rem;
-    gap: 0.85rem;
+    margin-top: 2rem;
+    gap: 1rem;
   }
 
   .field input {
-    min-height: 2.9rem;
-    padding: 0.72rem 0.95rem;
+    min-height: 2.75rem;
+    padding: 0.65rem 0.95rem;
   }
 
   .primary-btn {
-    min-height: 2.9rem;
+    min-height: 2.75rem;
   }
 
   .auth-divider {
-    margin: 1rem 0 0.85rem;
+    margin: 1.25rem 0 1rem;
   }
 }
 
@@ -985,11 +1042,6 @@ export default defineComponent({
   .auth-page {
     padding: 0.25rem;
     gap: 0.4rem;
-  }
-
-  /* Le formulaire est en haut (DOM order Login) → masquer l'illustration en bas */
-  .visual-illustration {
-    display: none;
   }
 
   .auth-visual {

@@ -6,6 +6,8 @@
 
 html, body {
   scrollbar-width: none;
+  /* Fond de base teal — évite le blanc quand le contenu dépasse 100dvh sur mobile */
+  background-color: #b1e5e2;
 }
 
 html::-webkit-scrollbar,

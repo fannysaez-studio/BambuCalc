@@ -496,7 +496,7 @@ export default {
   .landing-page {
     grid-template-columns: 1fr;
     padding: 0.5rem;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   .landing-visual,
@@ -509,66 +509,76 @@ export default {
     border-radius: 18px;
   }
 
+  /* Bloc teal : plein écran, contenu réparti badge↑ copy↕ illustration↓ */
   .landing-visual {
-    padding: 1.1rem 1rem 0.8rem;
-    min-height: auto;
+    width: 100%;
+    min-height: calc(100dvh - 1.5rem);
+    padding: 1.25rem 1.1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .visual-copy {
-    margin-top: 1rem;
+    margin-top: 0;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.35rem, 6.5vw, 1.8rem);
+    font-size: clamp(1.5rem, 7vw, 2rem);
   }
 
   .visual-copy p {
-    font-size: 0.88rem;
-    margin-top: 0.5rem;
+    font-size: 0.92rem;
+    margin-top: 3rem;
   }
 
-  /* Illustration très compacte */
+  /* Illustration : taille naturelle, poussée en bas par space-between */
   .visual-illustration {
-    min-height: 10rem;
-    flex: unset;
+    min-height: 0;
   }
 
   .visual-composition {
-    transform: translateX(8px) translateY(0) rotate(-6deg);
+    transform: translateX(6px) translateY(0) rotate(-5deg);
     gap: 0;
   }
 
   .visual-printer {
-    width: min(100%, 90px);
-    max-width: 90px;
-    transform: translateY(-8px);
+    width: min(100%, 150px);
+    max-width: 150px;
+    transform: translateY(-10px);
   }
 
   .visual-main {
-    width: min(100%, 135px);
-    max-width: 135px;
+    width: min(100%, 230px);
+    max-width: 230px;
     margin-left: -0.5rem;
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+  }
+
+  /* Bloc blanc : même min-height que le bloc teal */
+  .landing-panel {
+    min-height: calc(100dvh - 1.5rem);
   }
 
   .landing-card {
-    padding: 1.2rem 0.95rem 1rem;
+    padding: 1.75rem 1.25rem 1.75rem;
+    justify-content: flex-start;
   }
 
   .landing-card h2 {
-    font-size: clamp(1.3rem, 5.5vw, 1.6rem);
-    margin-top: 0.85rem;
+    font-size: clamp(1.35rem, 5.5vw, 1.7rem);
+    margin-top: 1.25rem;
   }
 
   .landing-description {
-    font-size: 0.78rem;
-    margin-top: 0.35rem;
+    font-size: 0.82rem;
+    margin-top: 0.85rem;
   }
 
   .landing-features {
     grid-template-columns: 1fr;
-    margin-top: 0.9rem;
-    gap: 0.45rem;
+    margin-top: 1.5rem;
+    gap: 0.75rem;
   }
 
   /* Feature cards : horizontales (icône à gauche, texte à droite) */
@@ -602,59 +612,31 @@ export default {
   .feature-title {
     grid-column: 2;
     grid-row: 1;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     align-self: end;
   }
 
   .feature-text {
     grid-column: 2;
     grid-row: 2;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     align-self: start;
   }
 
   .landing-cta {
     flex-direction: row;
-    margin-top: 1.1rem;
-    gap: 0.65rem;
+    margin-top: 1.75rem;
+    gap: 0.75rem;
   }
 
   .btn {
     flex: 1;
     text-align: center;
-    padding: 0.75rem 0.75rem;
-    font-size: 0.86rem;
+    padding: 0.8rem 0.75rem;
+    font-size: 0.88rem;
   }
 }
 
-/* ===== Mini-mobile : ≤ 420px ===== */
-@media (max-width: 420px) {
-  .landing-page {
-    padding: 0.25rem;
-    gap: 0.35rem;
-  }
-
-  .landing-visual {
-    padding: 0.9rem 0.85rem 0.6rem;
-  }
-
-  /* Masquer l'illustration pour maximiser l'espace du contenu */
-  .visual-illustration {
-    display: none;
-  }
-
-  /* CTAs empilés en colonne sur très petit écran */
-  .landing-cta {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .btn {
-    width: 100%;
-    padding: 0.85rem 1rem;
-    font-size: 0.9rem;
-  }
-}
 
 /* ===== Desktop only: hero 100dvh sans scroll ===== */
 @media (min-width: 1025px) {
@@ -695,101 +677,88 @@ export default {
     gap: 0.75rem;
   }
 
-  .landing-visual,
-  .landing-card {
-    border-radius: 20px;
-  }
-
-  .landing-visual::before,
-  .landing-card::before {
-    border-radius: 20px;
-  }
-
-  /* Visual compact mais présent, scroll autorisé si contenu déborde */
   .landing-visual {
-    padding: 1.4rem 1.25rem 1rem;
-    min-height: auto;
+    padding: 2rem 2rem 1.5rem;
+    justify-content: space-between;
+    min-height: 52vh;
   }
 
   .visual-copy {
-    margin-top: 1.5rem;
+    margin-top: 0;
   }
 
   .visual-copy h1 {
-    font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+  }
+
+  .visual-copy p {
+    font-size: 1rem;
+    margin-top: 3rem;
   }
 
   .visual-illustration {
-    min-height: 13rem;
-    flex: unset;
+    min-height: 0;
   }
 
   .visual-composition {
-    transform: translateX(18px) translateY(-4px) rotate(-8deg);
+    transform: translateX(20px) translateY(-4px) rotate(-8deg);
   }
 
   .visual-printer {
-    width: min(100%, 120px);
-    max-width: 120px;
+    width: min(100%, 160px);
+    max-width: 160px;
   }
 
   .visual-main {
-    width: min(100%, 185px);
-    max-width: 185px;
+    width: min(100%, 240px);
+    max-width: 240px;
   }
 
   .landing-card {
-    padding: 1.75rem 1.5rem 1.5rem;
+    padding: 2rem 2.25rem 2rem;
+    justify-content: flex-start;
   }
 
   .landing-card h2 {
-    font-size: clamp(1.55rem, 3vw, 2rem);
-    margin-top: 1rem;
+    font-size: clamp(1.6rem, 3.2vw, 2.1rem);
+    margin-top: 1.25rem;
   }
 
   .landing-description {
-    font-size: 0.82rem;
-    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    margin-top: 0.85rem;
   }
 
-  /* Grille 2×2 sur tablette */
   .landing-features {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.85rem;
+    gap: 1rem;
     margin-top: 1.5rem;
   }
 
   .feature-card {
     max-width: none;
     aspect-ratio: unset;
-    min-height: 110px;
-    padding: 1rem;
+    min-height: 120px;
+    padding: 1.1rem;
     flex-direction: column;
     align-items: center;
     text-align: center;
   }
 
   .feature-icon {
-    width: 1.4rem;
-    height: 1.4rem;
-    margin-bottom: 0.35rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-bottom: 0.4rem;
   }
 
-  .feature-title {
-    font-size: 0.74rem;
-  }
-
-  .feature-text {
-    font-size: 0.68rem;
-  }
+  .feature-title { font-size: 0.8rem; }
+  .feature-text  { font-size: 0.72rem; }
 
   .landing-cta {
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
     gap: 1rem;
   }
 
-  .btn {
-    padding: 0.82rem 1.4rem;
-  }
+  .btn { padding: 0.9rem 1.6rem; font-size: 0.95rem; }
 }
 </style>

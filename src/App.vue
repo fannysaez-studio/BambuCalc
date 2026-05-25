@@ -6,7 +6,7 @@
       :displayName="displayName"
       @logout="logout"
     />
-    <main class="page-wrap">
+    <main class="page-wrap" :class="{ 'page-wrap--fullscreen': isFullscreenRoute }">
       <router-view />
     </main>
     <CookieBanner />
@@ -24,6 +24,11 @@ export default {
   components: { GlobalNav, CookieBanner },
   data() {
     return { isAuth: false, displayName: '', isAdminUser: false }
+  },
+  computed: {
+    isFullscreenRoute() {
+      return ['landing', 'login', 'signup'].includes(this.$route?.name)
+    },
   },
   async created() {
     await this.checkAuth()
@@ -99,5 +104,11 @@ export default {
     padding-top: 1.25rem;
     padding-bottom: 88px;
   }
+}
+
+/* Pages plein-écran (Landing, Login, Signup) — supprime le padding de la nav flottante */
+.page-wrap--fullscreen {
+  padding: 0 !important;
+  justify-content: flex-start;
 }
 </style>
