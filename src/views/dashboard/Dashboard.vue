@@ -117,6 +117,7 @@
               <tr>
                 <th>N° Devis</th>
                 <th>Pièce</th>
+                <th class="th-photo">Photo</th>
                 <th>Client</th>
                 <th>Matière</th>
                 <th>Total TTC</th>
@@ -129,6 +130,10 @@
               <tr v-for="q in quotes" :key="q.id">
                 <td class="td-num">{{ q.quote_number || '—' }}</td>
                 <td class="td-name">{{ q.project_name || '—' }}</td>
+                <td class="td-photo">
+                  <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                  <span v-else class="ref-thumb-empty" title="Aucune photo"></span>
+                </td>
                 <td class="td-client">{{ q.client_name || '—' }}</td>
                 <td><span class="mat-tag">{{ q.material || '—' }}</span></td>
                 <td class="td-total">{{ fmtEur(q.total_cost) }}</td>
@@ -169,7 +174,10 @@
                 <p class="dqcard-name">{{ q.project_name || '—' }}</p>
                 <p class="dqcard-num">{{ q.quote_number || '—' }}</p>
               </div>
-              <span :class="['status-badge', 'status-' + (q.status || 'pending')]">{{ statusLabel(q.status) }}</span>
+              <div class="dqcard-top-right">
+                <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                <span :class="['status-badge', 'status-' + (q.status || 'pending')]">{{ statusLabel(q.status) }}</span>
+              </div>
             </div>
             <div class="dqcard-mid">
               <span class="dqcard-date">
@@ -233,6 +241,13 @@
       @close="previewingQuote = null"
     />
 
+    <Teleport to="body">
+      <div v-if="zoomedImageUrl" class="photo-lightbox" @click="zoomedImageUrl = null">
+        <img :src="zoomedImageUrl" class="photo-lightbox-img" @click.stop />
+        <button class="photo-lightbox-close" @click="zoomedImageUrl = null">✕</button>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
@@ -256,6 +271,7 @@ export default {
       deleteTarget: null,
       deleting: false,
       previewingQuote: null,
+      zoomedImageUrl: null,
       showLinkForm: false,
       linkEmail: '',
       linkPassword: '',
@@ -708,12 +724,42 @@ export default {
   vertical-align: middle;
 }
 
-.td-num    { font-family: 'Courier New', monospace; font-size: 0.75rem; color: #718096; }
+.td-num    { font-family: 'Courier New', monospace; font-size: 0.75rem; color: #718096; white-space: nowrap; }
 .td-name   { font-weight: 700; color: #1b2f39; }
-.td-client { color: #718096; }
+.td-client { color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 .td-center { text-align: center; }
 .td-total  { font-weight: 800; color: #2e9cab; white-space: nowrap; }
 .td-date   { color: #a0aec0; font-size: 0.78rem; white-space: nowrap; }
+.th-photo  { width: 52px; text-align: center; }
+.td-photo  { text-align: center; vertical-align: middle; padding: 0.3rem 0.4rem; }
+.ref-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  display: block;
+  margin: 0 auto;
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+}
+.ref-thumb:hover {
+  transform: scale(1.8);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  z-index: 10;
+  position: relative;
+  border-color: #2e9cab;
+}
+.ref-thumb-card { cursor: zoom-in; }
+.ref-thumb-empty {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: 0 auto;
+  border-radius: 6px;
+  background: #f0f4f8;
+  border: 1.5px dashed #cbd5e0;
+}
 .date-edited {
   display: inline-block;
   font-size: 0.58rem;
@@ -871,6 +917,28 @@ export default {
 .btn-confirm-del:hover:not(:disabled) { filter: brightness(1.06); }
 .btn-confirm-del:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* ── Lightbox photo ── */
+.photo-lightbox {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out;
+}
+.photo-lightbox-img {
+  max-width: 82vw; max-height: 82vh; object-fit: contain;
+  border-radius: 16px; box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+  border: 2px solid rgba(255,255,255,0.12); cursor: default;
+}
+.photo-lightbox-close {
+  position: absolute; top: 1.25rem; right: 1.5rem;
+  width: 2.4rem; height: 2.4rem; border-radius: 999px;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; font-size: 1rem; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.photo-lightbox-close:hover { background: rgba(255,255,255,0.25); }
+
 /* ── Transition modal ── */
 .modal-enter-active, .modal-leave-active { transition: opacity 0.2s ease; }
 .modal-enter-from, .modal-leave-to { opacity: 0; }
@@ -882,7 +950,7 @@ export default {
    ≥ 641px : tableau (dq-table-view visible, dq-cards-view caché)
    ≤ 640px : cartes (dq-cards-view visible, dq-table-view caché)
 ═══════════════════════════════════════════════════════════════════ */
-.dq-table-view { display: block; }
+.dq-table-view { display: block; overflow-x: auto; }
 .dq-cards-view { display: none; }
 
 /* Tablette portrait (641–760px) : masque Matière + Date dans le tableau */
@@ -930,6 +998,11 @@ export default {
     gap: 0.5rem;
   }
   .dqcard-left { flex: 1; min-width: 0; }
+  .dqcard-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem; flex-shrink: 0; }
+  .ref-thumb-card {
+    width: 42px; height: 42px; object-fit: cover;
+    border-radius: 8px; border: 1.5px solid #e2e8f0;
+  }
   .dqcard-name {
     font-size: 0.95rem;
     font-weight: 700;

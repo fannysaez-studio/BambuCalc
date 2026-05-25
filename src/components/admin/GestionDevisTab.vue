@@ -40,6 +40,7 @@
                 <tr>
                   <th>N° Devis</th>
                   <th>Pièce</th>
+                  <th class="th-photo">Photo</th>
                   <th>Client</th>
                   <th class="th-hide-sm">Matière</th>
                   <th>Total TTC</th>
@@ -53,6 +54,10 @@
                     :class="sendableQuotes.some(s => s.id === q.id) ? 'tr--sendable' : ''">
                   <td class="td-num">{{ q.quote_number || '—' }}</td>
                   <td class="td-name">{{ q.project_name || '—' }}</td>
+                  <td class="td-photo">
+                    <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                    <span v-else class="ref-thumb-empty"></span>
+                  </td>
                   <td class="td-client">{{ q.client_name || '—' }}</td>
                   <td class="td-hide-sm"><span class="mat-tag">{{ q.material || '—' }}</span></td>
                   <td class="td-total">{{ fmtEur(q.total_cost) }}</td>
@@ -119,7 +124,11 @@
             <div class="mtcard-body">
               <div class="mtcard-field">
                 <span class="mtcard-label">Pièce</span>
-                <span class="mtcard-value">{{ q.project_name || '—' }}</span>
+                <div class="mtcard-piece-with-photo">
+                  <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                  <span v-else class="ref-thumb-empty"></span>
+                  <span class="mtcard-value">{{ q.project_name || '—' }}</span>
+                </div>
               </div>
               <div class="mtcard-field">
                 <span class="mtcard-label">N° Devis</span>
@@ -182,8 +191,14 @@
               </span>
             </div>
             <div class="mcard-meta">
-              <p class="mcard-piece">{{ q.project_name || '—' }}</p>
-              <p class="mcard-sub">N° {{ q.quote_number || '—' }} · {{ q.material || '—' }}</p>
+              <div class="mcard-meta-row">
+                <div>
+                  <p class="mcard-piece">{{ q.project_name || '—' }}</p>
+                  <p class="mcard-sub">N° {{ q.quote_number || '—' }} · {{ q.material || '—' }}</p>
+                </div>
+                <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                <span v-else class="ref-thumb-empty ref-thumb-card-empty"></span>
+              </div>
             </div>
             <div class="mcard-row">
               <span class="mcard-date">
@@ -311,6 +326,13 @@
       @close="previewingQuote = null"
     />
 
+    <Teleport to="body">
+      <div v-if="zoomedImageUrl" class="photo-lightbox" @click="zoomedImageUrl = null">
+        <img :src="zoomedImageUrl" class="photo-lightbox-img" @click.stop />
+        <button class="photo-lightbox-close" @click="zoomedImageUrl = null">✕</button>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
@@ -353,6 +375,7 @@ const selectedQuoteId = ref('')
 const selectedQuote   = ref(null)
 const previewingQuote = ref(null)
 const previewMode     = ref('client')
+const zoomedImageUrl  = ref(null)
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 const quoteInfoByUser = computed(() => {
@@ -650,14 +673,54 @@ function wasEdited(q) {
 .data-table tbody tr:last-child { border-bottom: none; }
 .data-table tbody tr:hover { background: #f8f7ff; }
 .data-table td { padding: 0.75rem 0.85rem; color: #2d3748; font-weight: 600; vertical-align: middle; }
-.td-num    { font-family: 'Courier New', monospace; font-size: 0.75rem; color: #718096; }
+.td-num    { font-family: 'Courier New', monospace; font-size: 0.75rem; color: #718096; white-space: nowrap; }
 .td-name   { font-weight: 700; color: #1b2f39; }
-.td-client { color: #718096; }
+.td-client { color: #718096; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 .td-total  { font-weight: 800; color: #2e9cab; white-space: nowrap; }
 .td-date   { color: #a0aec0; font-size: 0.78rem; white-space: nowrap; }
 .td-actions { text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 0.2rem; }
 .th-hide-sm, .td-hide-sm { }
 .th-hide-md, .td-hide-md { }
+
+/* ── Photo de référence ── */
+.th-photo { width: 52px; text-align: center; }
+.td-photo  { text-align: center; width: 52px; }
+.ref-thumb {
+  width: 36px; height: 36px; object-fit: cover;
+  border-radius: 8px; border: 1.5px solid #e2e8f0;
+  display: block; cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+}
+.ref-thumb:hover {
+  transform: scale(1.8); box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  z-index: 10; position: relative; border-color: #2e9cab;
+}
+.ref-thumb-empty {
+  display: block; width: 28px; height: 28px;
+  border-radius: 6px; background: #f0f4f8; border: 1.5px dashed #cbd5e0;
+}
+
+/* ── Lightbox photo ── */
+.photo-lightbox {
+  position: fixed; inset: 0; z-index: 2000;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out;
+}
+.photo-lightbox-img {
+  max-width: 82vw; max-height: 82vh; object-fit: contain;
+  border-radius: 16px; box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+  border: 2px solid rgba(255,255,255,0.12); cursor: default;
+}
+.photo-lightbox-close {
+  position: absolute; top: 1.25rem; right: 1.5rem;
+  width: 2.4rem; height: 2.4rem; border-radius: 999px;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; font-size: 1rem; cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.photo-lightbox-close:hover { background: rgba(255,255,255,0.25); }
 
 /* ── Ligne sendable ── */
 .tr--sendable       { background: #f0fff8; }
@@ -885,6 +948,7 @@ function wasEdited(q) {
   .mtcard-btns .btn-pdf-int,
   .mtcard-btns .btn-send-row,
   .mtcard-btns .btn-del { width: 38px; height: 38px; border-radius: 10px; }
+  .mtcard-piece-with-photo { display: flex; align-items: center; gap: 0.5rem; }
 }
 
 /* ══ Mobile ≤640px : cartes verticales ══ */
@@ -920,6 +984,9 @@ function wasEdited(q) {
   .mcard-actions .btn-del { width: 34px; height: 34px; }
   .manage-send-actions { flex-direction: column; }
   .th-hide-sm, .td-hide-sm { display: none; }
+  .mcard-meta-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+  .ref-thumb-card { width: 42px; height: 42px; object-fit: cover; border-radius: 8px; border: 1.5px solid #e2e8f0; flex-shrink: 0; }
+  .ref-thumb-card-empty { width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; }
 }
 
 @media (max-width: 760px) {
