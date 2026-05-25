@@ -811,6 +811,11 @@ export default defineComponent({
     border-radius: 20px;
   }
 
+  .auth-visual::before,
+  .auth-visual::after {
+    border-radius: 20px;
+  }
+
   .auth-visual {
     padding: 1.5rem 1.5rem 1rem;
   }
@@ -838,7 +843,7 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 2.25rem 2rem 1.75rem;
+    padding: 4.5rem 2rem 1.75rem;
   }
 
   .auth-form {
@@ -857,6 +862,11 @@ export default defineComponent({
 
   .auth-visual,
   .auth-card {
+    border-radius: 18px;
+  }
+
+  .auth-visual::before,
+  .auth-visual::after {
     border-radius: 18px;
   }
 
@@ -889,7 +899,7 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 1.75rem 1.25rem 1.5rem;
+    padding: 4.5rem 1.25rem 1.5rem;
   }
 
   .auth-form {
@@ -928,7 +938,7 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 1.5rem 1rem 1.25rem;
+    padding: 4.5rem 1rem 1.25rem;
   }
 
   /* Empiler prénom + nom verticalement sur très petit écran */
@@ -939,7 +949,7 @@ export default defineComponent({
 
 @media (max-width: 480px) {
   .auth-card {
-    padding: 2rem 1rem 1.5rem;
+    padding: 4.5rem 1rem 1.5rem;
   }
 
   .field-grid {

@@ -504,6 +504,11 @@ export default {
     border-radius: 18px;
   }
 
+  .landing-visual::before,
+  .landing-card::before {
+    border-radius: 18px;
+  }
+
   .landing-visual {
     padding: 1.1rem 1rem 0.8rem;
     min-height: auto;
@@ -692,6 +697,11 @@ export default {
 
   .landing-visual,
   .landing-card {
+    border-radius: 20px;
+  }
+
+  .landing-visual::before,
+  .landing-card::before {
     border-radius: 20px;
   }
 

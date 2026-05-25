@@ -860,6 +860,16 @@ export default defineComponent({
     border-radius: 20px;
   }
 
+  /* Afficher le visuel au-dessus du formulaire (cohérence avec Signup) */
+  .auth-visual {
+    order: -1;
+  }
+
+  .auth-visual::before,
+  .auth-visual::after {
+    border-radius: 20px;
+  }
+
   .auth-visual {
     padding: 1.5rem 1.5rem 1rem;
   }
@@ -887,7 +897,7 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 2.25rem 2rem 1.75rem;
+    padding: 4.5rem 2rem 1.75rem;
   }
 
   .auth-form {
@@ -906,6 +916,16 @@ export default defineComponent({
 
   .auth-visual,
   .auth-card {
+    border-radius: 18px;
+  }
+
+  /* Afficher le visuel au-dessus du formulaire */
+  .auth-visual {
+    order: -1;
+  }
+
+  .auth-visual::before,
+  .auth-visual::after {
     border-radius: 18px;
   }
 
@@ -938,7 +958,7 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 1.75rem 1.25rem 1.5rem;
+    padding: 4.5rem 1.25rem 1.5rem;
   }
 
   .auth-form {
@@ -977,7 +997,7 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 1.5rem 1rem 1.25rem;
+    padding: 4.5rem 1rem 1.25rem;
   }
 }
 </style>
