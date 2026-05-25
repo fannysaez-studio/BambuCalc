@@ -212,6 +212,15 @@
             Suivant →
           </button>
           <button
+            v-if="currentStep === steps.length && isAdmin"
+            class="btn-preview-devis"
+            @click="showPreview = true"
+            title="Aperçu du devis"
+          >
+            <Eye class="btn-preview-icon" />
+            <span>Aperçu</span>
+          </button>
+          <button
             v-if="currentStep === steps.length"
             :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
             :disabled="saving"
@@ -231,6 +240,11 @@
     </div>
 
     <ToastMessage ref="toast" />
+    <QuotePreviewModal
+      v-if="showPreview"
+      :quote="previewQuote"
+      @close="showPreview = false"
+    />
 
   </div>
 </template>
@@ -248,14 +262,16 @@ import PrintingTime      from '@/components/calculator/PrintingTime.vue'
 import PricingSuggestions from '@/components/calculator/PricingSuggestions.vue'
 import CostBreakdown     from '@/components/calculator/CostBreakdown.vue'
 import ToastMessage      from '@/components/ui/ToastMessage.vue'
-import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle } from 'lucide-vue-next'
+import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye } from 'lucide-vue-next'
+import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 
 export default {
   name: 'CalculatorStep',
   components: {
     ProjectDetails, ProjectMatter, ClientInfo, FilamentSection,
     PrintingTime, PricingSuggestions, CostBreakdown, ToastMessage,
-    Layers, Package, Clock, Tag, BarChart3, User, CheckCircle,
+    QuotePreviewModal,
+    Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye,
   },
   setup() {
     return { store: useCalculatorStore() }
@@ -279,6 +295,7 @@ export default {
       isAdmin: false,
       saving: false,
       saveStatus: null,
+      showPreview: false,
       quantityPresets: [
         { value: 1,   label: '1 — Unique' },
         { value: 5,   label: '5' },
@@ -301,6 +318,57 @@ export default {
         carteVisite: 'Carte de visite 3D', standQR: 'Stand / QR Code', autre: 'Autre',
       }
       return labels[this.store.projectSeriesType] || 'Projet'
+    },
+
+    previewQuote() {
+      const s  = this.store
+      const c  = s.calculatedCosts
+      const sp = s.sellingPrices
+      const displayName = s.clientType === 'particulier'
+        ? [s.clientCivility, s.clientFirstName, s.clientLastName].filter(Boolean).join(' ')
+        : s.clientName
+      return {
+        quote_number:       s.quoteNumber,
+        quote_date:         s.quoteDate,
+        quote_validity_days: s.quoteValidityDays,
+        status:             'pending',
+        client_name:        displayName,
+        client_contact_name: s.clientContactName,
+        client_first_name:  s.clientFirstName,
+        client_last_name:   s.clientLastName,
+        client_civility:    s.clientCivility,
+        client_email:       s.clientEmail,
+        client_phone:       s.clientPhone,
+        client_address:     s.clientAddress,
+        client_postal_code: s.clientPostalCode,
+        client_city:        s.clientCity,
+        client_country:     s.clientCountry,
+        client_siret:       s.clientSiret,
+        client_vat_number:  s.clientVatNumber,
+        project_name:       s.projectName,
+        quantity:           s.quantity,
+        project_type:       s.projectType,
+        printer_model:      s.printerModel,
+        nozzle_size:        s.nozzleSize,
+        material:           s.material,
+        weight:             s.weight,
+        print_hours:        s.printHours,
+        print_minutes:      s.printMinutes,
+        tax_rate:           s.taxRate,
+        payment_method:     s.paymentMethod,
+        deposit_percent:    s.depositPercent,
+        processing_delay:   s.processingDelay,
+        delivery_delay:     s.deliveryDelay,
+        quote_notes:        s.quoteNotes,
+        material_cost:      c.materialCost,
+        equipment_cost:     c.equipmentCost,
+        work_cost:          c.workCost,
+        subtotal_ht:        c.subtotal,
+        margin_percent:     sp.margin,
+        total_cost:         sp.totalTTC,
+        cost_per_unit:      sp.pricePerUnit,
+        reference_image_url: s.referenceImageUrl || null,
+      }
     },
 
     steps() {
@@ -719,6 +787,25 @@ export default {
 }
 
 .btn-next:hover { filter: brightness(1.07); transform: translateY(-1px); }
+
+.btn-preview-devis {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 1rem;
+  border: 1.5px solid #2e9cab;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  color: #2e9cab;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+.btn-preview-devis:hover { background: #e8f7f9; transform: translateY(-1px); }
+.btn-preview-icon { width: 0.9rem; height: 0.9rem; }
 
 .btn-save {
   padding: 0.55rem 1.35rem;

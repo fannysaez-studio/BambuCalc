@@ -66,13 +66,22 @@
                       <option value="refused">Refusé</option>
                     </select>
                   </td>
-                  <td class="td-date td-hide-md">{{ fmtDate(q.created_at) }}</td>
+                  <td class="td-date td-hide-md">
+                    {{ fmtDate(q.updated_at || q.created_at) }}
+                    <span v-if="wasEdited(q)" class="badge-edited" title="Devis modifié">modifié</span>
+                  </td>
                   <td class="td-actions">
                     <button class="btn-edit" @click="editQuote(q)" title="Modifier">
                       <Pencil class="del-icon" />
                     </button>
+                    <button class="btn-preview" @click="openPreview(q, 'client')" title="Aperçu client">
+                      <Eye class="del-icon" />
+                    </button>
                     <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client">
                       <Download class="del-icon" />
+                    </button>
+                    <button class="btn-preview-int" @click="openPreview(q, 'internal')" title="Aperçu interne (coûts)">
+                      <Eye class="del-icon" />
                     </button>
                     <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)">
                       <FileBarChart2 class="del-icon" />
@@ -123,7 +132,10 @@
                 </div>
                 <div class="mtcard-field">
                   <span class="mtcard-label">Date</span>
-                  <span class="mtcard-value">{{ fmtDate(q.created_at) }}</span>
+                  <span class="mtcard-value">
+                    {{ fmtDate(q.updated_at || q.created_at) }}
+                    <span v-if="wasEdited(q)" class="badge-edited">modifié</span>
+                  </span>
                 </div>
               </div>
               <div class="mtcard-total">{{ fmtEur(q.total_cost) }}</div>
@@ -139,7 +151,9 @@
               </select>
               <div class="mtcard-btns">
                 <button class="btn-edit" @click="editQuote(q)" title="Modifier"><Pencil class="del-icon" /></button>
+                <button class="btn-preview" @click="openPreview(q, 'client')" title="Aperçu client"><Eye class="del-icon" /></button>
                 <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client"><Download class="del-icon" /></button>
+                <button class="btn-preview-int" @click="openPreview(q, 'internal')" title="Aperçu interne (coûts)"><Eye class="del-icon" /></button>
                 <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)"><FileBarChart2 class="del-icon" /></button>
                 <button v-if="sendableQuotes.some(s => s.id === q.id)"
                   class="btn-send-row"
@@ -172,7 +186,10 @@
               <p class="mcard-sub">N° {{ q.quote_number || '—' }} · {{ q.material || '—' }}</p>
             </div>
             <div class="mcard-row">
-              <span class="mcard-date">{{ fmtDate(q.created_at) }}</span>
+              <span class="mcard-date">
+                {{ fmtDate(q.updated_at || q.created_at) }}
+                <span v-if="wasEdited(q)" class="badge-edited">modifié</span>
+              </span>
               <span class="mcard-total">{{ fmtEur(q.total_cost) }}</span>
             </div>
             <div class="mcard-bottom">
@@ -186,7 +203,9 @@
               </select>
               <div class="mcard-actions">
                 <button class="btn-edit" @click="editQuote(q)" title="Modifier"><Pencil class="del-icon" /></button>
+                <button class="btn-preview" @click="openPreview(q, 'client')" title="Aperçu client"><Eye class="del-icon" /></button>
                 <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client"><Download class="del-icon" /></button>
+                <button class="btn-preview-int" @click="openPreview(q, 'internal')" title="Aperçu interne (coûts)"><Eye class="del-icon" /></button>
                 <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)"><FileBarChart2 class="del-icon" /></button>
                 <button v-if="sendableQuotes.some(s => s.id === q.id)"
                   class="btn-send-row"
@@ -285,6 +304,12 @@
     </div>
 
     <ToastMessage ref="toast" />
+    <QuotePreviewModal
+      v-if="previewingQuote"
+      :quote="previewingQuote"
+      :mode="previewMode"
+      @close="previewingQuote = null"
+    />
 
   </div>
 </template>
@@ -296,8 +321,9 @@ import { supabase } from '@/lib/supabase'
 import { useCalculatorStore } from '@/stores/calculator'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
+import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import {
-  FileText, Pencil, Download, Send, Trash2, CheckCircle, FileBarChart2,
+  FileText, Pencil, Download, Send, Trash2, CheckCircle, FileBarChart2, Eye,
 } from 'lucide-vue-next'
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -325,6 +351,8 @@ const quotesPerPage   = 10
 const filterUserId    = ref('')
 const selectedQuoteId = ref('')
 const selectedQuote   = ref(null)
+const previewingQuote = ref(null)
+const previewMode     = ref('client')
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 const quoteInfoByUser = computed(() => {
@@ -451,6 +479,11 @@ async function downloadPDFInternal(q) {
   await generateQuotePDF(q, 'internal')
 }
 
+function openPreview(q, mode = 'client') {
+  previewMode.value     = mode
+  previewingQuote.value = q
+}
+
 function editQuote(q) {
   calculatorStore.$patch({
     editingQuoteId:    q.id,
@@ -538,6 +571,10 @@ function fmtEur(v) {
 function fmtDate(iso) {
   if (!iso) return '—'
   return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+}
+function wasEdited(q) {
+  if (!q.updated_at || !q.created_at) return false
+  return Math.abs(new Date(q.updated_at) - new Date(q.created_at)) > 60_000
 }
 </script>
 
@@ -646,18 +683,34 @@ function fmtDate(iso) {
 }
 
 /* ── Boutons d'action icône ── */
-.btn-edit, .btn-pdf, .btn-pdf-int, .btn-del, .btn-send-row {
+.btn-edit, .btn-preview, .btn-preview-int, .btn-pdf, .btn-pdf-int, .btn-del, .btn-send-row {
   width: 1.9rem; height: 1.9rem; border: none; background: none; border-radius: 8px;
   cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
   color: #cbd5e0; transition: background 0.15s ease, color 0.15s ease; font-family: inherit;
 }
 .btn-del:disabled       { opacity: 0.25; cursor: not-allowed; }
 .btn-edit:hover         { background: #ebf0ff; color: #5a67d8; }
+.btn-preview:hover      { background: #e8f7f9; color: #2e9cab; }
+.btn-preview-int:hover  { background: #fef3c7; color: #d97706; }
 .btn-pdf:hover          { background: #ebf8ff; color: #2e9cab; }
 .btn-pdf-int:hover      { background: #fef3c7; color: #d97706; }
 .btn-send-row:hover     { background: #e8f7f9; color: #2e9cab; }
 .btn-del:hover          { background: #fff5f5; color: #e53e3e; }
 .del-icon               { width: 0.9rem; height: 0.9rem; }
+
+.badge-edited {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: #e8f7f9;
+  color: #2e9cab;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
 
 /* ── Pagination ── */
 .pagination {
@@ -826,6 +879,8 @@ function fmtDate(iso) {
   .mtcard-status-sel { flex: 1; font-size: 0.82rem; }
   .mtcard-btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
   .mtcard-btns .btn-edit,
+  .mtcard-btns .btn-preview,
+  .mtcard-btns .btn-preview-int,
   .mtcard-btns .btn-pdf,
   .mtcard-btns .btn-pdf-int,
   .mtcard-btns .btn-send-row,
@@ -857,6 +912,8 @@ function fmtDate(iso) {
   .mcard-status-sel { flex: 1; font-size: 0.78rem; }
   .mcard-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
   .mcard-actions .btn-edit,
+  .mcard-actions .btn-preview,
+  .mcard-actions .btn-preview-int,
   .mcard-actions .btn-pdf,
   .mcard-actions .btn-pdf-int,
   .mcard-actions .btn-send-row,

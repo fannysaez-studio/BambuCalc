@@ -133,7 +133,10 @@
                 <td><span class="mat-tag">{{ q.material || '—' }}</span></td>
                 <td class="td-total">{{ fmtEur(q.total_cost) }}</td>
                 <td><span :class="['status-badge', 'status-' + (q.status || 'pending')]">{{ statusLabel(q.status) }}</span></td>
-                <td class="td-date">{{ fmtDate(q.created_at) }}</td>
+                <td class="td-date">
+                  {{ fmtDate(q.updated_at || q.created_at) }}
+                  <span v-if="wasEdited(q)" class="date-edited" title="Devis modifié par le prestataire">modifié</span>
+                </td>
                 <td class="td-actions">
                   <router-link
                     v-if="q.payment_status !== 'paid'"
@@ -143,6 +146,9 @@
                   >
                     <CreditCard class="del-icon" />
                   </router-link>
+                  <button class="btn-preview" @click="previewingQuote = q" title="Aperçu du devis">
+                    <Eye class="del-icon" />
+                  </button>
                   <button class="btn-pdf" @click="downloadPDF(q)" title="Télécharger le devis PDF">
                     <Download class="del-icon" />
                   </button>
@@ -166,7 +172,10 @@
               <span :class="['status-badge', 'status-' + (q.status || 'pending')]">{{ statusLabel(q.status) }}</span>
             </div>
             <div class="dqcard-mid">
-              <span class="dqcard-date">{{ fmtDate(q.created_at) }}</span>
+              <span class="dqcard-date">
+                {{ fmtDate(q.updated_at || q.created_at) }}
+                <span v-if="wasEdited(q)" class="date-edited">modifié</span>
+              </span>
               <span class="dqcard-total">{{ fmtEur(q.total_cost) }}</span>
             </div>
             <div class="dqcard-foot">
@@ -178,6 +187,9 @@
               >
                 <CreditCard class="del-icon" />
               </router-link>
+              <button class="btn-preview dqcard-btn" @click="previewingQuote = q" title="Aperçu du devis">
+                <Eye class="del-icon" />
+              </button>
               <button class="btn-pdf dqcard-btn" @click="downloadPDF(q)" title="Télécharger PDF">
                 <Download class="del-icon" />
               </button>
@@ -215,6 +227,11 @@
     </Teleport>
 
     <ToastMessage ref="toast" />
+    <QuotePreviewModal
+      v-if="previewingQuote"
+      :quote="previewingQuote"
+      @close="previewingQuote = null"
+    />
 
   </div>
 </template>
@@ -224,11 +241,12 @@ import { supabase } from '@/lib/supabase'
 import { getQuotes } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
-import { User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard } from 'lucide-vue-next'
+import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
+import { User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
 
 export default {
   name: 'Dashboard',
-  components: { ToastMessage, User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard },
+  components: { ToastMessage, QuotePreviewModal, User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard, Eye },
   data() {
     return {
       displayName: '',
@@ -237,6 +255,7 @@ export default {
       loading: true,
       deleteTarget: null,
       deleting: false,
+      previewingQuote: null,
       showLinkForm: false,
       linkEmail: '',
       linkPassword: '',
@@ -336,6 +355,10 @@ export default {
     fmtDate(iso) {
       if (!iso) return '—'
       return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+    },
+    wasEdited(q) {
+      if (!q.updated_at || !q.created_at) return false
+      return Math.abs(new Date(q.updated_at) - new Date(q.created_at)) > 60_000
     },
   },
 }
@@ -691,6 +714,19 @@ export default {
 .td-center { text-align: center; }
 .td-total  { font-weight: 800; color: #2e9cab; white-space: nowrap; }
 .td-date   { color: #a0aec0; font-size: 0.78rem; white-space: nowrap; }
+.date-edited {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: #e8f7f9;
+  color: #2e9cab;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+}
 .td-actions{ text-align: right; }
 
 .mat-tag {
@@ -716,8 +752,8 @@ export default {
 .status-refused  { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
 .status-sent     { background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; }
 
-/* ── Bouton supprimer ── */
-.btn-pdf, .btn-del {
+/* ── Boutons d'action ── */
+.btn-preview, .btn-pdf, .btn-del {
   width: 1.9rem;
   height: 1.9rem;
   border: none;
@@ -731,8 +767,9 @@ export default {
   transition: background 0.15s ease, color 0.15s ease;
   font-family: inherit;
 }
-.btn-pdf:hover { background: #ebf8ff; color: #2e9cab; }
-.btn-del:hover { background: #fff5f5; color: #e53e3e; }
+.btn-preview:hover { background: #e8f7f9; color: #2e9cab; }
+.btn-pdf:hover     { background: #ebf8ff; color: #2e9cab; }
+.btn-del:hover     { background: #fff5f5; color: #e53e3e; }
 .del-icon { width: 0.9rem; height: 0.9rem; }
 .td-actions { text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 0.2rem; }
 
