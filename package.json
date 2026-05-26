@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.6.0",
-    "@supabase/supabase-js": "^2.106.1",
+    "@supabase/supabase-js": "^2.106.2",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-vue-next": "^1.0.0",
@@ -39,7 +39,7 @@
     "globals": "^17.6.0",
     "jsdom": "^29.1.1",
     "npm-run-all2": "^9.0.1",
-    "oxlint": "^1.66.0",
+    "oxlint": "^1.67.0",
     "prettier": "3.8.3",
     "supabase": "^2.101.0",
     "vite": "^8.0.14",
