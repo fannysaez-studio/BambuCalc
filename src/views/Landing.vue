@@ -16,11 +16,7 @@
 
       <div class="visual-illustration">
         <div class="visual-composition">
-          <img
-            src="/bambu lab P2S Combo.webp"
-            alt="Bambu Lab P2S Combo"
-            class="visual-printer"
-          />
+          <img src="/bambu lab P2S Combo.webp" alt="Bambu Lab P2S Combo" class="visual-printer" />
           <img
             src="/bambuLab Filament.webp"
             alt="Illustration organique turquoise"
@@ -334,7 +330,7 @@ export default {
 }
 
 .landing-kicker {
-  margin: 0.3rem 0 0;
+  margin: -0.7rem 0 0;
   color: #4f7886;
   font-size: 0.78rem;
   font-weight: 700;
@@ -347,7 +343,7 @@ export default {
 
 .landing-card h2 {
   margin: 1.5rem 0 0; /* réduit de 3rem */
-  font-size: clamp(1.5rem, 1.8vw, 1.85rem); /* réduit */
+  font-size: clamp(0.35rem, 4.5vw, 1.85rem);
   line-height: 1.05;
   color: #1b2f39;
   letter-spacing: -0.03em;
@@ -372,7 +368,7 @@ export default {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 148px));
   justify-content: center;
-  gap: 1.25rem;
+  gap: 0.35rem;
   position: relative;
   z-index: 1;
 }
@@ -425,9 +421,9 @@ export default {
 }
 
 .landing-cta {
-  margin-top: 3.8rem; /* réduit de 3.6rem */
+  margin-top: 3.75rem; /* réduit de 3.6rem */
   display: flex;
-  gap: 1.25rem;
+  gap: 0.75rem;
   justify-content: center;
   flex-wrap: wrap;
   align-items: center;
@@ -561,36 +557,36 @@ export default {
   }
 
   .landing-card {
-    padding: 1.75rem 1.25rem 1.75rem;
+    padding: 2.25rem 1.4rem 2.25rem;
     justify-content: flex-start;
   }
 
   .landing-card h2 {
     font-size: clamp(1.35rem, 5.5vw, 1.7rem);
-    margin-top: 1.25rem;
+    margin-top: 1.5rem;
   }
 
   .landing-description {
-    font-size: 0.82rem;
-    margin-top: 0.85rem;
+    font-size: 0.8rem;
+    /* margin-top: 1rem; */
   }
 
   .landing-features {
     grid-template-columns: 1fr;
-    margin-top: 1.5rem;
-    gap: 0.75rem;
+    margin-top: 1.75rem;
+    gap: 1rem;
   }
 
   /* Feature cards : horizontales (icône à gauche, texte à droite) */
   .feature-card {
     display: grid;
-    grid-template-columns: 2.4rem 1fr;
+    grid-template-columns: 2.6rem 1fr;
     grid-template-rows: auto auto;
-    column-gap: 0.75rem;
-    row-gap: 0.08rem;
+    column-gap: 0.9rem;
+    row-gap: 0.15rem;
     align-items: center;
     text-align: left;
-    padding: 0.65rem 0.9rem;
+    padding: 0.9rem 1.1rem;
     min-height: 0;
     aspect-ratio: unset;
     max-width: none;
@@ -599,11 +595,11 @@ export default {
   .feature-icon {
     grid-column: 1;
     grid-row: 1 / 3;
-    width: 2.4rem;
-    height: 2.4rem;
-    padding: 0.45rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0.5rem;
     background: rgba(46, 154, 171, 0.12);
-    border-radius: 0.6rem;
+    border-radius: 0.65rem;
     margin-bottom: 0;
     align-self: center;
     justify-self: center;
@@ -612,31 +608,31 @@ export default {
   .feature-title {
     grid-column: 2;
     grid-row: 1;
-    font-size: 0.84rem;
+    font-size: 0.88rem;
     align-self: end;
   }
 
   .feature-text {
     grid-column: 2;
     grid-row: 2;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
     align-self: start;
   }
 
   .landing-cta {
     flex-direction: row;
-    margin-top: 1.75rem;
-    gap: 0.75rem;
+    margin-top: 2rem;
+    gap: 1.75rem;
   }
 
   .btn {
     flex: 1;
     text-align: center;
-    padding: 0.8rem 0.75rem;
-    font-size: 0.88rem;
+    padding: 0.9rem 0.75rem;
+    font-size: 0.9rem;
   }
 }
-
 
 /* ===== Desktop only: hero 100dvh sans scroll ===== */
 @media (min-width: 1025px) {
@@ -725,8 +721,8 @@ export default {
   }
 
   .landing-description {
-    font-size: 0.9rem;
-    margin-top: 0.85rem;
+    font-size: 1.85rem;
+    margin-top: 0.82rem;
   }
 
   .landing-features {
@@ -751,14 +747,21 @@ export default {
     margin-bottom: 0.4rem;
   }
 
-  .feature-title { font-size: 0.8rem; }
-  .feature-text  { font-size: 0.72rem; }
+  .feature-title {
+    font-size: 0.8rem;
+  }
+  .feature-text {
+    font-size: 0.72rem;
+  }
 
   .landing-cta {
     margin-top: 1.75rem;
     gap: 1rem;
   }
 
-  .btn { padding: 0.9rem 1.6rem; font-size: 0.95rem; }
+  .btn {
+    padding: 0.8rem 0.75rem;
+    font-size: 0.88rem;
+  }
 }
 </style>

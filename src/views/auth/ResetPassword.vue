@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Lock } from 'lucide-vue-next'
+import { Lock, CheckCircle } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
 
@@ -73,7 +73,9 @@ async function onSubmit() {
 
       <!-- Succès -->
       <div v-if="success" class="state-block">
-        <div class="state-check">✓</div>
+        <div class="state-check">
+          <CheckCircle class="state-check-icon" />
+        </div>
         <h2>Mot de passe mis à jour !</h2>
         <p>Redirection vers la connexion…</p>
       </div>
@@ -206,9 +208,20 @@ async function onSubmit() {
   padding: 1rem 0;
 }
 .state-check {
-  font-size: 2.5rem;
-  color: #2e9cab;
-  font-weight: 800;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(135deg, #3fb2bf, #2e9cab);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(46, 154, 171, 0.28);
+}
+.state-check-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
 }
 .state-block h2 { font-size: 1.3rem; font-weight: 800; color: #1b2f39; margin: 0; }
 .state-block p  { font-size: 0.88rem; color: #718096; margin: 0; }

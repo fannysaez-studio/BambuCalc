@@ -80,7 +80,7 @@
 
           <div v-if="success" class="form-success">
             <div class="success-top">
-              <span class="success-icon">✓</span>
+              <span class="success-icon"><Check class="success-check-icon" /></span>
               <div>
                 <strong>Message envoyé !</strong>
                 <p>On revient vers vous très vite.</p>
@@ -167,12 +167,12 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { Home, MessageSquare, HelpCircle, Mail, MapPin, Clock } from 'lucide-vue-next'
+import { Home, MessageSquare, HelpCircle, Mail, MapPin, Clock, Check } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 export default defineComponent({
   name: 'Contact',
-  components: { Home, MessageSquare, HelpCircle, Mail, MapPin, Clock },
+  components: { Home, MessageSquare, HelpCircle, Mail, MapPin, Clock, Check },
   data() {
     return {
       tab: 'form',
@@ -726,18 +726,20 @@ a.contact-info-item:hover .ci-icon {
 }
 
 .success-icon {
-  font-size: 1.6rem;
-  font-weight: 800;
   flex-shrink: 0;
   width: 2.8rem;
   height: 2.8rem;
   background: linear-gradient(135deg, #3fb2bf, #2e9cab);
-  color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 16px rgba(46, 154, 171, 0.3);
+}
+.success-check-icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: #fff;
 }
 
 .form-success strong {

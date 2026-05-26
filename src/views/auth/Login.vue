@@ -107,7 +107,9 @@
           <div class="forgot-wrap">
             <!-- Succès -->
             <div v-if="forgotSent" class="forgot-success">
-              <div class="forgot-success-icon">✉</div>
+              <div class="forgot-success-icon">
+                <Mail class="forgot-success-icon-svg" />
+              </div>
               <h3>Email envoyé !</h3>
               <p>Vérifie ta boîte mail — le lien est valable <strong>1 heure</strong>.</p>
               <button class="back-link" @click="backToLogin">← Retour à la connexion</button>
@@ -164,13 +166,13 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { Home, Lock, UserPlus, UserX } from 'lucide-vue-next'
+import { Home, Lock, UserPlus, UserX, Mail } from 'lucide-vue-next'
 import { login, loginWithGoogle, resetPasswordForEmail, checkIsAdmin } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
 
 export default defineComponent({
   name: 'Login',
-  components: { Home, Lock, UserPlus, UserX },
+  components: { Home, Lock, UserPlus, UserX, Mail },
   data() {
     return {
       email: '',
@@ -765,8 +767,20 @@ export default defineComponent({
   padding: 1.5rem 0;
 }
 .forgot-success-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(135deg, #3fb2bf, #2e9cab);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.5rem;
+  box-shadow: 0 8px 24px rgba(46, 154, 171, 0.28);
+}
+.forgot-success-icon-svg {
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
 }
 .forgot-success h3 {
   font-size: 1.3rem;
