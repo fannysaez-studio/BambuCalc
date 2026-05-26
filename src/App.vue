@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     isFullscreenRoute() {
-      return ['landing', 'login', 'signup'].includes(this.$route?.name)
+      return ['landing', 'login', 'signup', 'contact', 'not-found'].includes(this.$route?.name)
     },
   },
   async created() {
@@ -77,6 +77,12 @@ export default {
 .app {
   min-height: 100vh;
   background: #f0f4f8;
+}
+
+@media (max-width: 768px) {
+  .app {
+    background: #ffffff;
+  }
 }
 
 /* Nav island = 20px bottom + ~56px pill + 16px marge = 92px à réserver */

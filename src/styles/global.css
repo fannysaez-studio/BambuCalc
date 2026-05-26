@@ -6,8 +6,15 @@
 
 html, body {
   scrollbar-width: none;
-  /* Fond de base teal — évite le blanc quand le contenu dépasse 100dvh sur mobile */
   background-color: #b1e5e2;
+}
+
+/* Sur mobile, le fond blanc évite que le gap (padding 0.5rem + border-radius)
+   entre les blocs et le bord de l'écran apparaisse en teal ou gris */
+@media (max-width: 768px) {
+  html, body {
+    background-color: #ffffff;
+  }
 }
 
 html::-webkit-scrollbar,
