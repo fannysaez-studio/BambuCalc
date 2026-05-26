@@ -1008,7 +1008,7 @@ a.contact-info-item:hover .ci-icon {
   }
   .contact-card {
     flex: 1;
-    padding: 4rem 1.1rem 3rem;
+    padding: 4rem 1.1rem 5rem;
     justify-content: flex-start;
     overflow-y: visible;
   }
@@ -1022,6 +1022,13 @@ a.contact-info-item:hover .ci-icon {
   .contact-header p {
     font-size: 0.88rem;
     margin-top: 0.5rem;
+  }
+  /* Textarea réduit sur mobile pour dégager le bouton de la barre nav */
+  .field textarea {
+    height: 4.5rem;
+    min-height: 4rem;
+    max-height: 8rem;
+    resize: vertical;
   }
 }
 

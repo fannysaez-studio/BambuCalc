@@ -157,8 +157,8 @@
                   <button class="btn-pdf" @click="downloadPDF(q)" title="Télécharger le devis PDF">
                     <Download class="del-icon" />
                   </button>
-                  <button class="btn-del" @click="confirmDelete(q)" title="Supprimer">
-                    <Trash2 class="del-icon" />
+                  <button class="btn-archive" @click="confirmArchive(q)" title="Archiver">
+                    <Archive class="del-icon" />
                   </button>
                 </td>
               </tr>
@@ -201,8 +201,8 @@
               <button class="btn-pdf dqcard-btn" @click="downloadPDF(q)" title="Télécharger PDF">
                 <Download class="del-icon" />
               </button>
-              <button class="btn-del dqcard-btn" @click="confirmDelete(q)" title="Supprimer">
-                <Trash2 class="del-icon" />
+              <button class="btn-archive dqcard-btn" @click="confirmArchive(q)" title="Archiver">
+                <Archive class="del-icon" />
               </button>
             </div>
           </div>
@@ -210,23 +210,92 @@
       </template>
     </div>
 
-    <!-- Modal confirmation suppression -->
+    <!-- ── Section Archives ── -->
+    <div v-if="archivedCount > 0" class="archives-block">
+      <button class="btn-archives-toggle" @click="toggleArchives">
+        <Archive :size="14" />
+        <span>{{ showArchives ? 'Masquer les archives' : `Archives — ${archivedCount} devis` }}</span>
+        <ChevronDown :size="14" :class="['chevron', { 'chevron--open': showArchives }]" />
+      </button>
+
+      <div v-if="showArchives" class="archives-content">
+        <div v-if="loadingArchives" class="empty-state">
+          <div class="spinner" /><p>Chargement…</p>
+        </div>
+        <template v-else>
+          <div v-for="(yearGroup, year) in archivedByYear" :key="year" class="archive-year-block">
+            <div class="archive-year-label">{{ year }}</div>
+
+            <!-- Tableau (≥641px) -->
+            <div class="dq-table-view">
+              <table class="quotes-table quotes-table--dim">
+                <tbody>
+                  <tr v-for="q in yearGroup" :key="q.id">
+                    <td class="td-num">{{ q.quote_number || '—' }}</td>
+                    <td class="td-name">{{ q.project_name || '—' }}</td>
+                    <td class="td-total">{{ fmtEur(q.total_cost) }}</td>
+                    <td class="td-date">{{ fmtDate(q.updated_at || q.created_at) }}</td>
+                    <td class="td-actions">
+                      <button class="btn-preview" @click="previewingQuote = q" title="Aperçu">
+                        <Eye class="del-icon" />
+                      </button>
+                      <button class="btn-pdf" @click="downloadPDF(q)" title="Télécharger PDF">
+                        <Download class="del-icon" />
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Cartes (≤640px) -->
+            <div class="dq-cards-view">
+              <div v-for="q in yearGroup" :key="q.id" class="dqcard dqcard--dim">
+                <div class="dqcard-top">
+                  <div class="dqcard-left">
+                    <p class="dqcard-name">{{ q.project_name || '—' }}</p>
+                    <p class="dqcard-num">{{ q.quote_number || '—' }}</p>
+                  </div>
+                  <div class="dqcard-top-right">
+                    <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" />
+                  </div>
+                </div>
+                <div class="dqcard-mid">
+                  <span class="dqcard-date">{{ fmtDate(q.updated_at || q.created_at) }}</span>
+                  <span class="dqcard-total">{{ fmtEur(q.total_cost) }}</span>
+                </div>
+                <div class="dqcard-foot">
+                  <button class="btn-preview dqcard-btn" @click="previewingQuote = q" title="Aperçu">
+                    <Eye class="del-icon" />
+                  </button>
+                  <button class="btn-pdf dqcard-btn" @click="downloadPDF(q)" title="Télécharger PDF">
+                    <Download class="del-icon" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Modal confirmation archivage -->
     <Teleport to="body">
       <Transition name="modal">
-        <div v-if="deleteTarget" class="modal-overlay" @click.self="deleteTarget = null">
+        <div v-if="archiveTarget" class="modal-overlay" @click.self="archiveTarget = null">
           <div class="modal-box">
-            <div class="modal-icon-wrap">
-              <Trash2 class="modal-icon" />
+            <div class="modal-icon-wrap modal-icon-wrap--archive">
+              <Archive class="modal-icon modal-icon--archive" />
             </div>
-            <h3 class="modal-title">Supprimer ce devis ?</h3>
+            <h3 class="modal-title">Archiver ce devis ?</h3>
             <p class="modal-sub">
-              <strong>{{ deleteTarget.quote_number }}</strong> — {{ deleteTarget.project_name }}<br />
-              Cette action est irréversible.
+              <strong>{{ archiveTarget.quote_number }}</strong> — {{ archiveTarget.project_name }}<br />
+              Le devis sera conservé dans vos archives.
             </p>
             <div class="modal-actions">
-              <button class="btn-cancel" @click="deleteTarget = null">Annuler</button>
-              <button class="btn-confirm-del" :disabled="deleting" @click="doDelete">
-                {{ deleting ? 'Suppression…' : 'Supprimer' }}
+              <button class="btn-cancel" @click="archiveTarget = null">Annuler</button>
+              <button class="btn-confirm-archive" :disabled="archiving" @click="doArchive">
+                {{ archiving ? 'Archivage…' : 'Archiver' }}
               </button>
             </div>
           </div>
@@ -253,23 +322,27 @@
 
 <script>
 import { supabase } from '@/lib/supabase'
-import { getQuotes } from '@/utils/quotes'
+import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
-import { User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
+import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
 
 export default {
   name: 'Dashboard',
-  components: { ToastMessage, QuotePreviewModal, User, Plus, FileText, TrendingUp, Package, Wallet, Trash2, Download, UserX, CreditCard, Eye },
+  components: { ToastMessage, QuotePreviewModal, User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye },
   data() {
     return {
       displayName: '',
       isAnonymous: false,
       quotes: [],
       loading: true,
-      deleteTarget: null,
-      deleting: false,
+      archiveTarget: null,
+      archiving: false,
+      archivedQuotes: [],
+      archivedCount: 0,
+      showArchives: false,
+      loadingArchives: false,
       previewingQuote: null,
       zoomedImageUrl: null,
       showLinkForm: false,
@@ -295,6 +368,15 @@ export default {
       this.quotes.forEach(q => { if (q.material) counts[q.material] = (counts[q.material] || 0) + 1 })
       return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
     },
+    archivedByYear() {
+      const grouped = {}
+      for (const q of this.archivedQuotes) {
+        const year = new Date(q.created_at).getFullYear()
+        if (!grouped[year]) grouped[year] = []
+        grouped[year].push(q)
+      }
+      return Object.fromEntries(Object.entries(grouped).sort((a, b) => b[0] - a[0]))
+    },
   },
   async created() {
     const { data } = await supabase.auth.getUser()
@@ -315,8 +397,12 @@ export default {
     async loadQuotes() {
       this.loading = true
       try {
-        const result = await getQuotes()
+        const [result, { count }] = await Promise.all([
+          getQuotes(),
+          supabase.from('quotes').select('*', { count: 'exact', head: true }).eq('archived', true),
+        ])
         this.quotes = result ?? []
+        this.archivedCount = count ?? 0
       } catch (e) {
         console.error('[Dashboard] loadQuotes error:', e)
         this.$refs.toast?.show(`Erreur : ${e?.message || JSON.stringify(e)}`, 'error')
@@ -330,21 +416,35 @@ export default {
     async downloadPDF(q) {
       await generateQuotePDF(q)
     },
-    confirmDelete(q) {
-      this.deleteTarget = q
+    confirmArchive(q) {
+      this.archiveTarget = q
     },
-    async doDelete() {
-      this.deleting = true
+    async doArchive() {
+      this.archiving = true
       try {
-        const { error } = await supabase.from('quotes').delete().eq('id', this.deleteTarget.id)
-        if (error) throw error
-        this.quotes = this.quotes.filter(q => q.id !== this.deleteTarget.id)
-        this.$refs.toast.show('Devis supprimé.', 'success', 2500)
-        this.deleteTarget = null
+        await archiveQuote(this.archiveTarget.id)
+        this.quotes = this.quotes.filter(q => q.id !== this.archiveTarget.id)
+        this.archivedCount++
+        if (this.showArchives) this.archivedQuotes = await getArchivedQuotes()
+        this.$refs.toast.show('Devis archivé.', 'success', 2500)
+        this.archiveTarget = null
       } catch {
-        this.$refs.toast.show('Erreur lors de la suppression.', 'error')
+        this.$refs.toast.show('Erreur lors de l\'archivage.', 'error')
       } finally {
-        this.deleting = false
+        this.archiving = false
+      }
+    },
+    async toggleArchives() {
+      this.showArchives = !this.showArchives
+      if (this.showArchives && this.archivedQuotes.length === 0) {
+        this.loadingArchives = true
+        try {
+          this.archivedQuotes = await getArchivedQuotes()
+        } catch {
+          this.$refs.toast.show('Erreur chargement archives.', 'error')
+        } finally {
+          this.loadingArchives = false
+        }
       }
     },
     async linkAccount() {
@@ -799,7 +899,7 @@ export default {
 .status-sent     { background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; }
 
 /* ── Boutons d'action ── */
-.btn-preview, .btn-pdf, .btn-del {
+.btn-preview, .btn-pdf, .btn-archive {
   width: 1.9rem;
   height: 1.9rem;
   border: none;
@@ -813,9 +913,9 @@ export default {
   transition: background 0.15s ease, color 0.15s ease;
   font-family: inherit;
 }
-.btn-preview:hover { background: #e8f7f9; color: #2e9cab; }
-.btn-pdf:hover     { background: #ebf8ff; color: #2e9cab; }
-.btn-del:hover     { background: #fff5f5; color: #e53e3e; }
+.btn-preview:hover  { background: #e8f7f9; color: #2e9cab; }
+.btn-pdf:hover      { background: #ebf8ff; color: #2e9cab; }
+.btn-archive:hover  { background: #fffbeb; color: #d97706; }
 .del-icon { width: 0.9rem; height: 0.9rem; }
 .td-actions { text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 0.2rem; }
 
@@ -900,22 +1000,72 @@ export default {
 }
 .btn-cancel:hover { border-color: #cbd5e0; }
 
-.btn-confirm-del {
+.modal-icon-wrap--archive { background: #fffbeb !important; }
+.modal-icon--archive { color: #d97706 !important; }
+
+.btn-confirm-archive {
   flex: 1;
   padding: 0.6rem;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(180deg, #fc8181 0%, #e53e3e 100%);
+  background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
   color: #fff;
   font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
-  box-shadow: 0 4px 12px rgba(229,62,62,0.3);
+  box-shadow: 0 4px 12px rgba(217,119,6,0.3);
   transition: filter 0.15s ease;
 }
-.btn-confirm-del:hover:not(:disabled) { filter: brightness(1.06); }
-.btn-confirm-del:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-confirm-archive:hover:not(:disabled) { filter: brightness(1.06); }
+.btn-confirm-archive:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Archives ── */
+.archives-block {
+  margin-top: 1rem;
+}
+.btn-archives-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1.25rem;
+  border: 1.5px dashed #cbd5e0;
+  border-radius: 14px;
+  background: #f7f9fc;
+  color: #718096;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.btn-archives-toggle:hover { border-color: #d97706; color: #d97706; background: #fffbeb; }
+.chevron { transition: transform 0.25s ease; flex-shrink: 0; margin-left: auto; }
+.chevron--open { transform: rotate(180deg); }
+
+.archives-content {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0 0 14px 14px;
+  border-top: none;
+  overflow: hidden;
+}
+.archive-year-block { border-bottom: 1px solid #f0f4f8; }
+.archive-year-block:last-child { border-bottom: none; }
+.archive-year-label {
+  padding: 0.55rem 1.25rem 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #a0aec0;
+  background: #f7f9fc;
+  border-bottom: 1px solid #f0f4f8;
+}
+.quotes-table--dim tbody tr { opacity: 0.72; }
+.quotes-table--dim tbody tr:hover { opacity: 1; background: #fffbeb; }
+.dqcard--dim { opacity: 0.72; }
 
 /* ── Lightbox photo ── */
 .photo-lightbox {
@@ -953,6 +1103,11 @@ export default {
 .dq-table-view { display: block; overflow-x: auto; }
 .dq-cards-view { display: none; }
 
+/* Tablette : padding bas pour la nav island */
+@media (max-width: 900px) and (min-width: 641px) {
+  .dash-page { padding-bottom: 5rem; }
+}
+
 /* Tablette portrait (641–760px) : masque Matière + Date dans le tableau */
 @media (min-width: 641px) and (max-width: 760px) {
   .quotes-table thead th:nth-child(4),
@@ -963,12 +1118,15 @@ export default {
 
 /* Mobile (≤ 640px) : cartes à la place du tableau */
 @media (max-width: 640px) {
-  .dash-page { padding: 0.75rem 0.75rem 2rem; }
+  .dash-page {
+    padding: 0.75rem 0.75rem 5rem;
+    min-height: 100dvh;
+  }
   .stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
   .dash-greeting { font-size: 1.1rem; }
   .dash-hero { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
   .dash-hero-actions { width: 100%; justify-content: flex-end; }
-  .anon-banner { flex-wrap: wrap; gap: 0.5rem; }
+  .anon-banner { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
   .btn-link-toggle { width: 100%; }
 
   /* Bascule tableau → cartes */
@@ -1033,5 +1191,8 @@ export default {
   /* Ligne 3 : boutons d'action */
   .dqcard-foot { display: flex; gap: 0.5rem; justify-content: flex-end; }
   .dqcard-btn  { width: 38px !important; height: 38px !important; border-radius: 10px !important; }
+  .dqcard--dim { opacity: 0.75; }
+  .archives-block { margin-top: 0.75rem; }
+  .btn-archives-toggle { padding: 0.7rem 1rem; font-size: 0.78rem; }
 }
 </style>

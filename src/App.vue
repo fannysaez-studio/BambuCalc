@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     isFullscreenRoute() {
-      return ['landing', 'login', 'signup', 'contact', 'not-found'].includes(this.$route?.name)
+      return ['landing', 'login', 'signup', 'contact', 'not-found', 'privacy', 'mentions-legales', 'dashboard', 'profile', 'admin', 'payment'].includes(this.$route?.name)
     },
   },
   async created() {
@@ -100,7 +100,7 @@ export default {
 @media (max-width: 900px) {
   .page-wrap {
     justify-content: flex-start;
-    padding-bottom: 88px;
+    padding-bottom: 72px;
   }
 }
 

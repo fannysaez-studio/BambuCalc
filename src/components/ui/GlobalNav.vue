@@ -1,4 +1,5 @@
 <template>
+  <!-- Desktop / tablette : floating pill -->
   <Transition name="nav-slide">
     <nav v-if="showNav" class="nav-island">
 
@@ -9,6 +10,15 @@
         data-tip="Accueil"
       >
         <Home :size="18" />
+      </router-link>
+
+      <router-link
+        to="/contact"
+        class="nav-item"
+        :class="{ 'nav-item--on': isActive(['/contact']) }"
+        data-tip="Contact"
+      >
+        <Mail :size="17" />
       </router-link>
 
       <router-link
@@ -53,14 +63,75 @@
 
     </nav>
   </Transition>
+
+  <!-- Mobile : bottom tab bar -->
+  <nav v-if="showNav" class="nav-bar">
+
+    <router-link
+      to="/calculator/1"
+      class="nav-bar-item"
+      :class="{ 'nav-bar-item--on': isActive(['/calculator']) }"
+    >
+      <Home :size="21" />
+      <span>Accueil</span>
+    </router-link>
+
+    <router-link
+      to="/contact"
+      class="nav-bar-item"
+      :class="{ 'nav-bar-item--on': isActive(['/contact']) }"
+    >
+      <Mail :size="21" />
+      <span>Contact</span>
+    </router-link>
+
+    <router-link
+      v-if="isAdminUser"
+      to="/admin"
+      class="nav-bar-item"
+      :class="{ 'nav-bar-item--on': isActive(['/admin']) }"
+    >
+      <ShieldCheck :size="21" />
+      <span>Admin</span>
+    </router-link>
+
+    <router-link
+      v-if="isAuth"
+      to="/dashboard"
+      class="nav-bar-item"
+      :class="{ 'nav-bar-item--on': isActive(['/dashboard', '/profile']) }"
+    >
+      <User :size="21" />
+      <span>Profil</span>
+    </router-link>
+
+    <router-link
+      v-if="!isAuth"
+      to="/login"
+      class="nav-bar-item"
+    >
+      <LogIn :size="21" />
+      <span>Connexion</span>
+    </router-link>
+
+    <button
+      v-if="isAuth"
+      class="nav-bar-item nav-bar-item--logout"
+      @click="handleLogout"
+    >
+      <LogOut :size="21" />
+      <span>Déco.</span>
+    </button>
+
+  </nav>
 </template>
 
 <script>
-import { Home, ShieldCheck, User, LogIn, LogOut } from 'lucide-vue-next'
+import { Home, ShieldCheck, User, LogIn, LogOut, Mail } from 'lucide-vue-next'
 
 export default {
   name: 'GlobalNav',
-  components: { Home, ShieldCheck, User, LogIn, LogOut },
+  components: { Home, ShieldCheck, User, LogIn, LogOut, Mail },
   props: {
     isAuth:      { type: Boolean, default: false },
     isAdminUser: { type: Boolean, default: false },
@@ -69,7 +140,7 @@ export default {
   emits: ['logout'],
   computed: {
     showNav() {
-      return !['landing', 'login', 'signup', 'calculator-step'].includes(this.$route.name)
+      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales'].includes(this.$route.name)
     },
   },
   methods: {
@@ -81,8 +152,7 @@ export default {
 
 <style scoped>
 /* ═══════════════════════════════════════════════════════════════
-   NAV — pill ultra-minimal centré en bas
-   Icônes seules, pas de labels. Active = teal + dot.
+   DESKTOP / TABLETTE — pill flottante centree en bas
 ═══════════════════════════════════════════════════════════════ */
 
 .nav-island {
@@ -113,7 +183,7 @@ export default {
   transform: translateX(-50%) translateY(60px); opacity: 0;
 }
 
-/* ─── Item ─── */
+/* ─── Item pill ─── */
 .nav-item {
   position: relative;
   width: 36px;
@@ -153,7 +223,6 @@ export default {
 }
 .nav-item:hover[data-tip]::before { opacity: 1; }
 
-/* Hover inactif */
 .nav-item:not(.nav-item--on):hover {
   color: #2e9cab;
   background: rgba(46, 156, 171, 0.10);
@@ -166,12 +235,10 @@ export default {
   transform: translateY(-2px);
 }
 
-/* ─── Actif ─── */
 .nav-item--on {
   color: #2e9cab;
 }
 
-/* Dot sous l'item actif */
 .nav-item--on::after {
   content: '';
   position: absolute;
@@ -184,7 +251,6 @@ export default {
   background: #2e9cab;
 }
 
-/* Séparateur */
 .nav-sep {
   width: 1px;
   height: 16px;
@@ -193,14 +259,80 @@ export default {
   flex-shrink: 0;
 }
 
-/* Mobile */
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE — bottom tab bar (style iOS)
+═══════════════════════════════════════════════════════════════ */
+
+.nav-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: 62px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: content-box;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.07);
+  align-items: stretch;
+}
+
+.nav-bar-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #94a3b8;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  padding: 0 0.25rem;
+  transition: color 0.18s ease, background 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.nav-bar-item span {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.nav-bar-item:hover { color: #2e9cab; }
+.nav-bar-item--on   { color: #2e9cab; }
+
+/* Barre active sous l'icône */
+.nav-bar-item--on::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 2.5px;
+  border-radius: 0 0 3px 3px;
+  background: #2e9cab;
+}
+
+.nav-bar-item--logout:hover { color: #dc2626; }
+
+/* ── Responsive ── */
 @media (max-width: 640px) {
-  .nav-island { bottom: 16px; padding: 7px 9px; gap: 3px; }
-  .nav-item   { width: 40px; height: 40px; }
+  /* Cache la pill, affiche la barre */
+  .nav-island { display: none !important; }
+  .nav-bar    { display: flex; }
 }
 
 @media (max-width: 380px) {
-  .nav-island { bottom: 14px; padding: 6px 8px; }
-  .nav-item   { width: 38px; height: 38px; }
+  .nav-bar-item span { font-size: 0.5rem; }
 }
 </style>

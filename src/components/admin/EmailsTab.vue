@@ -177,11 +177,6 @@
       <div class="email-step-footer">
         <button class="btn-email-prev" @click="emailStep = 2">← Rédaction</button>
         <div class="email-step-actions">
-          <button class="btn-test-email" @click="sendTestEmail" :disabled="testEmailSending">
-            <span v-if="testEmailSent">✓ Envoyé !</span>
-            <span v-else-if="testEmailSending">Envoi…</span>
-            <span v-else>Email de test</span>
-          </button>
           <button class="btn-send-inline" @click="emit('open-send-modal', selectedQuote)" :disabled="!selectedQuote">
             <Send class="btn-send-icon-sm" />
             {{ selectedQuote ? 'Envoyer ' + selectedQuote.quote_number : 'Envoyer' }}
@@ -226,8 +221,6 @@ const globalAttachment   = ref(null)
 const emailSettingsId    = ref(null)
 const emailSaving        = ref(false)
 const emailSaved         = ref(false)
-const testEmailSending   = ref(false)
-const testEmailSent      = ref(false)
 
 // ── Quote selection ───────────────────────────────────────────────────────────
 const selectedQuoteId = ref('')
@@ -375,51 +368,6 @@ async function saveQuote() {
   if (error) { toast.value?.show(`Erreur : ${error.message}`, 'error'); return }
   selectedQuote.value.status = 'Prêt'
   toast.value?.show(`Devis ${selectedQuote.value.quote_number} marqué comme "Prêt".`, 'success', 3000)
-}
-
-// ── Test email ────────────────────────────────────────────────────────────────
-async function sendTestEmail() {
-  testEmailSending.value = true
-  try {
-    const { data: authData } = await supabase.auth.getUser()
-    const adminEmail = authData?.user?.email || ''
-    if (!adminEmail) throw new Error('Email admin introuvable — vérifiez votre session.')
-
-    const testQuote = {
-      quote_number: 'DEV-TEST-0000', project_name: 'Pièce de test',
-      material: 'PLA+', quantity: 1, total_cost: 42.50,
-      client_email: adminEmail, client_name: 'Admin',
-      client_first_name: 'Admin', client_civility: 'M.',
-      payment_method: 'virement', deposit_percent: 0,
-    }
-
-    let pdfBase64 = null, pdfFilename = null
-    if (attachPdfAuto.value) {
-      try {
-        const quoteForPdf = selectedQuote.value
-        if (quoteForPdf) {
-          const doc = await generateQuotePDFDoc(quoteForPdf)
-          pdfBase64   = pdfToBase64(doc)
-          pdfFilename = `devis-${quoteForPdf.quote_number || 'bambucalc'}.pdf`
-        }
-      } catch (pdfErr) {
-        console.warn('[sendTestEmail] PDF failed, sending without attachment:', pdfErr)
-      }
-    }
-
-    const { error } = await supabase.functions.invoke('send-quote-email', {
-      body: { quote: testQuote, pdfBase64: pdfBase64 ?? null, filename: pdfFilename ?? null },
-    })
-    if (error) throw new Error(error.message || JSON.stringify(error))
-
-    testEmailSent.value = true
-    setTimeout(() => { testEmailSent.value = false }, 4000)
-    toast.value?.show(`Mail de test envoyé à ${adminEmail}`, 'success', 4000)
-  } catch (err) {
-    toast.value?.show(`Erreur : ${err.message || 'edge function indisponible'}`, 'error')
-  } finally {
-    testEmailSending.value = false
-  }
 }
 
 // ── Attachment ────────────────────────────────────────────────────────────────
@@ -678,19 +626,6 @@ onMounted(async () => {
 }
 .btn-email-prev:hover { background: #f7f9fc; border-color: #cbd5e0; color: #4a5568; }
 
-.btn-test-email {
-  display: inline-flex; align-items: center;
-  padding: 0.52rem 1.25rem; border: 1.5px solid #2e9cab; border-radius: 999px;
-  background: transparent; color: #2e9cab;
-  font-size: 0.85rem; font-weight: 700;
-  cursor: pointer; font-family: inherit; transition: all 0.2s ease;
-}
-.btn-test-email:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3fb2bf 0%, #2e9cab 100%);
-  color: #fff; border-color: transparent;
-  box-shadow: 0 4px 12px rgba(46,156,171,0.28);
-}
-.btn-test-email:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .btn-send-inline {
   display: inline-flex; align-items: center; gap: 0.4rem;
@@ -723,6 +658,6 @@ onMounted(async () => {
   .email-step-actions { width: 100%; justify-content: flex-end; }
 }
 @media (max-width: 540px) {
-  .btn-save-email, .btn-test-email { flex: 1; justify-content: center; }
+  .btn-save-email { flex: 1; justify-content: center; }
 }
 </style>

@@ -321,6 +321,7 @@ a:hover {
     background: #fff;
   }
   .legal-visual {
+    background: #fff;
     padding: 2rem 1.25rem 1.75rem;
     gap: 0.9rem;
   }
@@ -331,13 +332,14 @@ a:hover {
     margin-top: 0.5rem;
   }
   .legal-content {
-    padding: 1.75rem 1.25rem 5rem;
+    padding: 1.75rem 1.25rem 2rem;
   }
 }
 
 /* ── Tablette ── */
 @media (max-width: 1024px) and (min-width: 769px) {
   .legal-visual {
+    background: #fff;
     padding: 2.5rem 2rem;
   }
   .legal-content {

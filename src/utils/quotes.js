@@ -28,9 +28,28 @@ export async function getQuotes() {
   const { data, error } = await supabase
     .from('quotes')
     .select('*')
+    .or('archived.is.null,archived.eq.false')
     .order('created_at', { ascending: false })
   if (error) throw error
   return data
+}
+
+export async function getArchivedQuotes() {
+  const { data, error } = await supabase
+    .from('quotes')
+    .select('*')
+    .eq('archived', true)
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function archiveQuote(id) {
+  const { error } = await supabase
+    .from('quotes')
+    .update({ archived: true })
+    .eq('id', id)
+  if (error) throw error
 }
 
 // ── Opérations admin ──────────────────────────────────────────────────────────

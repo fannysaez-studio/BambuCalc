@@ -732,9 +732,9 @@ function fmtDate(iso) {
 @media (min-width: 641px) and (max-width: 1024px) {
   .pp-page {
     height: auto;
-    min-height: calc(100dvh - 4.5rem);
+    min-height: 100dvh;
     overflow: visible;
-    padding: 0.75rem;
+    padding: 0.75rem 0.75rem 5rem;
     align-items: flex-start;
   }
   .pp-master { height: auto; border-radius: 16px; }
@@ -783,9 +783,9 @@ function fmtDate(iso) {
   /* ─ Layout page ─ */
   .pp-page {
     height: auto;
-    min-height: calc(100dvh - 4.5rem);
+    min-height: 100dvh;
     overflow: visible;
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 5rem;
     align-items: flex-start;
   }
   .pp-master { height: auto; border-radius: 16px; }

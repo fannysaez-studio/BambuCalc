@@ -601,6 +601,7 @@ onBeforeUnmount(() => {
 
 /* ── Mobile ──────────────────────────────────────────────────────────────── */
 @media (max-width: 540px) {
+  .pay-page { min-height: 100dvh; padding-bottom: 5rem; }
   .pay-card { padding: 2rem 1.25rem; border-radius: 16px; }
   .pay-title { font-size: 1.1rem; }
 }

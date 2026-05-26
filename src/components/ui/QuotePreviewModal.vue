@@ -80,14 +80,15 @@
           </div>
 
           <!-- ═══ TABLEAU ═══ -->
+          <div class="d-table-wrap">
           <table class="d-table">
             <thead>
               <tr>
                 <th class="th-desc">Désignation / Spécifications</th>
                 <th v-if="q.reference_image_url" class="th-photo">Photo réf.</th>
                 <th class="th-num">Qté</th>
-                <th class="th-num">PU HT</th>
-                <th class="th-num">TVA {{ taxRate }}%</th>
+                <th class="th-num th-hide-mobile">PU HT</th>
+                <th class="th-num th-hide-mobile">TVA {{ taxRate }}%</th>
                 <th class="th-num th-ttc">Total TTC</th>
               </tr>
             </thead>
@@ -104,12 +105,13 @@
                   <div class="d-ref-lbl">Réf. client</div>
                 </td>
                 <td class="td-c">{{ q.quantity ?? 1 }}</td>
-                <td class="td-r">{{ fmtEur(unitPriceHT) }}</td>
-                <td class="td-r">{{ fmtEur(totalTVA) }}</td>
+                <td class="td-r td-hide-mobile">{{ fmtEur(unitPriceHT) }}</td>
+                <td class="td-r td-hide-mobile">{{ fmtEur(totalTVA) }}</td>
                 <td class="td-r td-bold">{{ fmtEur(q.total_cost || 0) }}</td>
               </tr>
             </tbody>
           </table>
+          </div>
 
           <!-- ═══ DÉTAIL DES COÛTS — mode interne uniquement ═══ -->
           <div v-if="mode === 'internal'" class="d-internal">
@@ -811,14 +813,63 @@ export default {
 
 /* ── Responsive ── */
 @media (max-width: 640px) {
-  .preview-overlay { padding: 0.5rem; }
-  .preview-modal { max-height: 96dvh; border-radius: 14px; }
-  .doc { padding: 1.25rem 1rem; }
+  .preview-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .preview-modal {
+    max-height: 96dvh;
+    border-radius: 18px 18px 0 0;
+    width: 100%;
+  }
+
+  /* Header — une seule ligne, sans overflow */
+  .preview-bar {
+    padding: 0.65rem 0.9rem;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+  .preview-bar-left {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    gap: 0.45rem;
+  }
+  .bar-title {
+    font-size: 0.78rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .bar-num    { display: none; }
+  .bar-badge-int { display: none; }
+
+  /* Document */
+  .doc { padding: 1.1rem 0.85rem; }
   .d-contacts { grid-template-columns: 1fr; gap: 0.75rem; }
   .d-bottom { grid-template-columns: 1fr; }
   .d-vsteps { grid-template-columns: 1fr; }
-  .d-sigs { grid-template-columns: 1fr; gap: 1rem; }
-  .d-footer { flex-direction: column; gap: 0.25rem; }
+  /* Signatures : 2 colonnes côte à côte */
+  .d-sigs { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  /* Footer centré */
+  .d-footer {
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+  }
   .btn-dl span { display: none; }
+
+  /* Tableau — masque PU HT et TVA (visibles dans Totaux) */
+  .preview-scroll { padding: 0.85rem; }
+  .th-hide-mobile, .td-hide-mobile { display: none !important; }
+  .d-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .d-table { min-width: 0; width: 100%; font-size: 0.7rem; }
+  .td-desc { min-width: 130px; }
+  .th-num { width: 50px; }
+  .d-table th, .d-table td { padding: 0.38rem 0.45rem; }
 }
 </style>

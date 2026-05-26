@@ -871,7 +871,7 @@ export default {
 @media (max-width: 640px) {
   /* ── Page ── */
   .step-page {
-    padding: 0.75rem 0.85rem 0.65rem;
+    padding: 0.75rem 0.85rem 5rem;
     gap: 0.45rem;
     justify-content: flex-start;
   }
@@ -906,7 +906,7 @@ export default {
 
   /* ── Carte ── */
   .step-card {
-    max-height: calc(100dvh - 152px);
+    max-height: calc(100dvh - 214px);
     border-radius: 16px;
   }
 
@@ -963,7 +963,7 @@ export default {
 }
 
 @media (max-width: 380px) {
-  .step-page  { padding: 0.6rem 0.7rem 0.55rem; }
+  .step-page  { padding: 0.6rem 0.7rem 5rem; }
   .stepper    { padding: 0.55rem 0.7rem; }
   .step-dot   { width: 1.6rem; height: 1.6rem; }
 }

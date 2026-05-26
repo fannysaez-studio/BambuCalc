@@ -1318,30 +1318,6 @@
   margin-top: 1rem;
 }
 
-.btn-test-email {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.52rem 1.25rem;
-  border: 1.5px solid #2e9cab;
-  border-radius: 999px;
-  background: transparent;
-  color: #2e9cab;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s ease;
-}
-.btn-test-email:hover:not(:disabled) {
-  background: linear-gradient(135deg, #3fb2bf 0%, #2e9cab 100%);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: 0 4px 12px rgba(46, 156, 171, 0.28);
-}
-.btn-test-email:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 .btn-save-email {
   display: inline-flex;
@@ -3353,12 +3329,13 @@
   }
   .admin-page {
     height: auto;
-    min-height: calc(100dvh - 4.5rem);
+    min-height: 100dvh;
     overflow: visible;
-    padding-bottom: 3rem;
+    padding-bottom: 5rem;
   }
   .panel-card {
-    flex: none;
+    flex: 1;
+    min-height: 18rem;
     overflow: visible;
   }
   .table-wrap {
@@ -3578,7 +3555,7 @@
 }
 @media (max-width: 540px) {
   .admin-page {
-    padding: 1rem 0.75rem 2rem;
+    padding: 1rem 0.75rem 5rem;
   }
   .admin-banner {
     height: 3.5rem;
@@ -3615,8 +3592,7 @@
   .td-hide-sm {
     display: none;
   }
-  .btn-save-email,
-  .btn-test-email {
+  .btn-save-email {
     flex: 1;
     justify-content: center;
   }
@@ -3638,6 +3614,18 @@
   }
   .tabs-bar {
     display: none;
+  }
+  /* Dropdown fixé au-dessus de la bottom bar — scroll interne garanti */
+  .burger-menu {
+    position: fixed;
+    top: auto;
+    bottom: calc(62px + 0.5rem);
+    left: 0.75rem;
+    right: 0.75rem;
+    max-height: 55vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 200;
   }
   .mat-hide-sm {
     display: none;
