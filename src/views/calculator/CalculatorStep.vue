@@ -869,60 +869,102 @@ export default {
    RESPONSIVE MOBILE (< 640px)
 ══════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-  .step-page { flex-direction: column; }
+  /* ── Page ── */
+  .step-page {
+    padding: 0.75rem 0.85rem 0.65rem;
+    gap: 0.45rem;
+    justify-content: flex-start;
+  }
 
-  .sidebar {
-    width: 100%;
-    min-width: 0;
-    flex-direction: row;
-    align-items: center;
-    padding: 0.6rem 1rem;
-    border-right: none;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+  /* ── Stepper ── */
+  .stepper {
+    padding: 0.6rem 0.85rem;
+  }
+
+  /* Masque toutes les labels sauf l'étape active */
+  .step-label { display: none; }
+  .label-active {
+    display: block;
+    font-size: 0.65rem;
+    white-space: normal;
+    line-height: 1.2;
+    max-width: 74px;
+    text-align: center;
+  }
+
+  .step-dot {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  /* ── Zone contenu ── */
+  .content-area {
+    flex: 1;
+    min-height: 0;
+    gap: 0.5rem;
+  }
+
+  /* ── Carte ── */
+  .step-card {
+    max-height: calc(100dvh - 152px);
+    border-radius: 16px;
+  }
+
+  .step-card-header {
+    padding: 0.7rem 1rem;
+    gap: 0.6rem;
+  }
+
+  .step-card-icon-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .step-card-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .step-card-title { font-size: 0.9rem; }
+  .step-card-desc  { font-size: 0.7rem; }
+
+  /* ── Navigation bas ── */
+  .step-nav {
+    padding: 0;
+    gap: 0.5rem;
+  }
+
+  .step-nav-right {
+    flex: 1;
+  }
+
+  .btn-back {
+    padding: 0.62rem 1rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
   }
 
-  .sidebar::before, .sidebar::after { display: none; }
-
-  .sidebar-brand { padding: 0; border-bottom: none; flex-shrink: 0; }
-  .brand-sub, .brand-text { display: none; }
-  .sidebar-logo-wrap { width: 28px; height: 28px; border-radius: 8px; }
-
-  .sidebar-steps {
+  .btn-next,
+  .btn-save {
     flex: 1;
-    flex-direction: row;
-    padding: 0 0.75rem;
-    gap: 0;
+    padding: 0.62rem 1rem;
+    font-size: 0.88rem;
+    display: flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
+    text-align: center;
   }
 
-  .steps-track { display: none; }
-
-  .step-item {
-    flex-direction: column;
-    gap: 0.2rem;
-    padding: 0.3rem 0.4rem;
-    flex: 1;
-    align-items: center;
-    border-radius: 8px;
+  .btn-preview-devis {
+    padding: 0.62rem 0.85rem;
+    font-size: 0.82rem;
   }
+}
 
-  .step-label-wrap { display: none; }
-  .active-pulse { display: none; }
-
-  .step-dot {
-    width: 26px;
-    height: 26px;
-  }
-
-  .sidebar-footer { display: none; }
-
-  .content-area { padding: 0.75rem 0.75rem 0.65rem; gap: 0.5rem; }
-  .step-card { max-height: calc(100dvh - 120px); border-radius: 16px; }
-  .step-card-header { padding: 0.7rem 1rem; gap: 0.65rem; }
-  .step-card-title { font-size: 0.92rem; }
-  .step-nav { padding: 0; }
+@media (max-width: 380px) {
+  .step-page  { padding: 0.6rem 0.7rem 0.55rem; }
+  .stepper    { padding: 0.55rem 0.7rem; }
+  .step-dot   { width: 1.6rem; height: 1.6rem; }
 }
 </style>

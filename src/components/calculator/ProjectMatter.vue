@@ -245,6 +245,10 @@ export default {
 <style scoped>
 .sep { height: 1px; background: #f0f4f8; margin: 0.75rem 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.5rem; }
+
+@media (max-width: 480px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
 .input-unit-wrap { display: flex; align-items: center; gap: 0.5rem; }
 .input-unit-wrap input { flex: 1; }
 .unit { font-size: 0.82rem; font-weight: 700; color: #4a5568; white-space: nowrap; }

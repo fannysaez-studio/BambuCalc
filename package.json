@@ -33,7 +33,7 @@
     "@vue/test-utils": "^2.4.10",
     "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-oxlint": "^1.66.0",
+    "eslint-plugin-oxlint": "^1.67.0",
     "eslint-plugin-playwright": "^2.10.4",
     "eslint-plugin-vue": "^10.9.1",
     "globals": "^17.6.0",

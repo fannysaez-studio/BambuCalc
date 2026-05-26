@@ -69,7 +69,7 @@ export default {
   emits: ['logout'],
   computed: {
     showNav() {
-      return !['landing', 'login', 'signup'].includes(this.$route.name)
+      return !['landing', 'login', 'signup', 'calculator-step'].includes(this.$route.name)
     },
   },
   methods: {

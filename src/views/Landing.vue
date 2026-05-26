@@ -330,7 +330,7 @@ export default {
 }
 
 .landing-kicker {
-  margin: -0.7rem 0 0;
+  margin: 1rem 0 0;
   color: #4f7886;
   font-size: 0.78rem;
   font-weight: 700;
@@ -432,7 +432,7 @@ export default {
 }
 
 .landing-legal {
-  margin-top: 1.5rem;
+  margin-top: 2.5rem;
   display: flex;
   gap: 0.6rem;
   justify-content: center;
@@ -661,7 +661,7 @@ export default {
   }
 
   .landing-cta {
-    margin-top: 1.5rem;
+    margin-top: 3.5rem;
   }
 }
 
