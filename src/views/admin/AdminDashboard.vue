@@ -28,8 +28,14 @@
           <BellOff v-if="isSubscribed" class="btn-push-icon" />
           <Bell v-else class="btn-push-icon" />
         </button>
-        <button class="btn-new-quote" @click="startNewQuote">+ Nouveau devis</button>
-        <router-link to="/dashboard" class="btn-back-dash">← Mon dashboard</router-link>
+        <button class="btn-new-quote" @click="startNewQuote" title="Nouveau devis">
+          <Plus class="btn-cta-icon" />
+          <span class="btn-cta-text">Nouveau devis</span>
+        </button>
+        <router-link to="/dashboard" class="btn-back-dash" title="Mon dashboard">
+          <LayoutDashboard class="btn-cta-icon" />
+          <span class="btn-cta-text">Mon dashboard</span>
+        </router-link>
       </div>
     </div>
 
@@ -207,7 +213,7 @@
       v-if="activeTab === 'archives'"
       :quotes="quotes"
       :loading="loading"
-      @delete-quote="confirmDeleteQuote($event)"
+      @restore-quote="confirmRestoreQuote($event)"
       @count-change="archiveCount = $event"
     />
 
@@ -338,6 +344,7 @@ import {
   getAllProfilesAdmin,
   adminDeleteQuote,
   adminDeleteUser,
+  adminUnarchiveQuote,
 } from '@/utils/quotes'
 import { supabase } from '@/lib/supabase'
 import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
@@ -368,6 +375,8 @@ import {
   Mail,
   Bell,
   BellOff,
+  Plus,
+  LayoutDashboard,
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -484,6 +493,17 @@ function onGoToQuotes(userId) {
 }
 function confirmDeleteQuote(q) {
   deleteTarget.value = { type: 'quote', data: q }
+}
+async function confirmRestoreQuote(q) {
+  try {
+    await adminUnarchiveQuote(q.id)
+    // Mettre à jour la liste locale : archived → false
+    const idx = quotes.value.findIndex(x => x.id === q.id)
+    if (idx !== -1) quotes.value[idx] = { ...quotes.value[idx], archived: false }
+    toast.value?.show('Devis restauré dans la liste active.', 'success', 2800)
+  } catch {
+    toast.value?.show('Erreur lors de la restauration.', 'error')
+  }
 }
 function confirmDeleteUser(p) {
   deleteTarget.value = { type: 'user', data: p }

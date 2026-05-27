@@ -48,9 +48,9 @@
         <router-link to="/profile" class="btn-profile" title="Mon profil">
           <User class="btn-profile-icon" />
         </router-link>
-        <router-link to="/calculator/1" class="btn-new">
+        <router-link to="/calculator/1" class="btn-new" title="Nouveau devis">
           <Plus class="btn-new-icon" />
-          Nouveau devis
+          <span class="btn-new-text">Nouveau devis</span>
         </router-link>
       </div>
     </div>
@@ -1119,13 +1119,35 @@ export default {
 /* Mobile (≤ 640px) : cartes à la place du tableau */
 @media (max-width: 640px) {
   .dash-page {
-    padding: 0.75rem 0.75rem 5rem;
+    padding: 1.5rem 1rem 5rem;
     min-height: 100dvh;
   }
-  .stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  .dash-greeting { font-size: 1.1rem; }
-  .dash-hero { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-  .dash-hero-actions { width: 100%; justify-content: flex-end; }
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+    margin-bottom: 1.25rem;
+  }
+  .stat-card { padding: 0.9rem 0.85rem; gap: 0.6rem; }
+  .dash-hero { margin-bottom: 1.25rem; }
+  .dash-greeting { font-size: 1.05rem; }
+  /* Hero reste sur une ligne */
+  .dash-hero {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .dash-hero-left { flex: 1; min-width: 0; }
+  .dash-hero-actions { width: auto; flex-shrink: 0; gap: 0.4rem; }
+  /* btn-new → icône ronde */
+  .btn-new-text { display: none; }
+  .btn-new {
+    width: 2.4rem; height: 2.4rem;
+    padding: 0; border-radius: 50%; gap: 0;
+    justify-content: center;
+  }
+  .btn-new-icon { width: 1.05rem; height: 1.05rem; }
   .anon-banner { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
   .btn-link-toggle { width: 100%; }
 

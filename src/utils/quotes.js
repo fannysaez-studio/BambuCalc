@@ -83,6 +83,11 @@ export async function adminDeleteQuote(id) {
   if (error) throw error
 }
 
+export async function adminUnarchiveQuote(id) {
+  const { error } = await supabase.from('quotes').update({ archived: false }).eq('id', id)
+  if (error) throw error
+}
+
 export async function adminDeleteUser(userId) {
   const { error } = await supabase.rpc('admin_delete_user', { target_user_id: userId })
   if (error) throw error
