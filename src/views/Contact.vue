@@ -21,9 +21,12 @@
       </div>
 
       <div class="contact-info-list">
-        <a class="contact-info-item" href="mailto:fannysaez.pro@gmail.com" title="Envoyer un email">
-          <Mail class="ci-icon" />
-          <strong>Email</strong>
+        <a class="contact-info-item" href="#" target="_blank" rel="noopener" title="Prendre un rendez-vous">
+          <Calendar class="ci-icon" />
+          <div>
+            <strong>Rendez-vous</strong>
+            <span>Prendre un appel</span>
+          </div>
         </a>
         <div class="contact-info-item">
           <MapPin class="ci-icon" />
@@ -39,6 +42,19 @@
             <span>Sous 24h</span>
           </div>
         </div>
+        <a
+          class="contact-info-item"
+          href="https://www.linkedin.com/in/fannysaez/"
+          target="_blank"
+          rel="noopener"
+          title="LinkedIn"
+        >
+          <Linkedin class="ci-icon" />
+          <div>
+            <strong>LinkedIn</strong>
+            <span>Mon profil</span>
+          </div>
+        </a>
       </div>
     </section>
 
@@ -49,26 +65,22 @@
           <Home class="contact-home-icon" aria-hidden="true" />
         </router-link>
 
-        <!-- Onglets -->
-        <div class="tab-switcher">
+        <!-- Navigation tabs — icônes rondes top-right (style signup) -->
+        <div class="contact-tab-icons">
           <button
-            class="tab-btn"
-            :class="{ active: tab === 'form' }"
+            class="contact-tab-icon"
+            :class="{ 'contact-tab-icon--active': tab === 'form' }"
             @click="tab = 'form'"
             type="button"
-          >
-            <MessageSquare class="tab-icon" />
-            Message
-          </button>
+            title="Message"
+          ><MessageSquare class="ctab-icon" /></button>
           <button
-            class="tab-btn"
-            :class="{ active: tab === 'faq' }"
+            class="contact-tab-icon"
+            :class="{ 'contact-tab-icon--active': tab === 'faq' }"
             @click="tab = 'faq'"
             type="button"
-          >
-            <HelpCircle class="tab-icon" />
-            FAQ
-          </button>
+            title="FAQ"
+          ><HelpCircle class="ctab-icon" /></button>
         </div>
 
         <!-- Onglet Formulaire -->
@@ -95,25 +107,28 @@
           </div>
 
           <form v-else @submit.prevent="onSubmit" class="contact-form">
-            <div class="field">
-              <label for="c-name">Nom</label>
-              <input
-                id="c-name"
-                v-model="form.name"
-                type="text"
-                placeholder="Jean Dupont"
-                required
-              />
-            </div>
-            <div class="field">
-              <label for="c-email">E-mail</label>
-              <input
-                id="c-email"
-                v-model="form.email"
-                type="email"
-                placeholder="vous@exemple.com"
-                required
-              />
+            <!-- Nom + Email côte à côte -->
+            <div class="fields-row">
+              <div class="field">
+                <label for="c-name">Nom</label>
+                <input
+                  id="c-name"
+                  v-model="form.name"
+                  type="text"
+                  placeholder="Jean Dupont"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="c-email">E-mail</label>
+                <input
+                  id="c-email"
+                  v-model="form.email"
+                  type="email"
+                  placeholder="vous@exemple.com"
+                  required
+                />
+              </div>
             </div>
             <div class="field">
               <label for="c-message">Message</label>
@@ -167,12 +182,12 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { Home, MessageSquare, HelpCircle, Mail, MapPin, Clock, Check } from 'lucide-vue-next'
+import { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 export default defineComponent({
   name: 'Contact',
-  components: { Home, MessageSquare, HelpCircle, Mail, MapPin, Clock, Check },
+  components: { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin },
   data() {
     return {
       tab: 'form',
@@ -529,45 +544,49 @@ a.contact-info-item:hover .ci-icon {
   overflow-y: auto;
 }
 
-/* Onglets */
-.tab-switcher {
+/* ── Navigation tabs — icônes rondes top-right ── */
+.contact-tab-icons {
+  position: absolute;
+  top: 1.05rem;
+  right: 1.05rem;
   display: flex;
   gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 999px;
-  padding: 0.25rem;
-  margin-bottom: 1.5rem;
-  margin-top: 0.5rem;
-  box-shadow: 0 2px 8px rgba(29, 18, 43, 0.06);
+  z-index: 3;
 }
-.tab-btn {
-  flex: 1;
+.contact-tab-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1.5px solid rgba(200, 197, 201, 0.5);
+  color: #4f6570;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: #4f6570;
-  font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    box-shadow 0.2s;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(29, 18, 43, 0.08);
+  transition: all 0.2s ease;
 }
-.tab-btn.active {
+.contact-tab-icon:hover {
+  background: rgba(255, 255, 255, 0.95);
+  color: #2e9cab;
+  border-color: #b1e5e2;
+}
+.contact-tab-icon--active {
   background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
+  border-color: transparent;
   color: #fff;
-  box-shadow: 0 6px 16px rgba(25, 108, 133, 0.22);
+  box-shadow: 0 6px 16px rgba(25, 108, 133, 0.3);
 }
-.tab-icon {
-  width: 0.95rem;
-  height: 0.95rem;
+.contact-tab-icon--active:hover {
+  filter: brightness(1.05);
+  color: #fff;
+  border-color: transparent;
+}
+.ctab-icon {
+  width: 1.05rem;
+  height: 1.05rem;
   flex-shrink: 0;
 }
 
@@ -623,11 +642,19 @@ a.contact-info-item:hover .ci-icon {
 /* Formulaire */
 .contact-form {
   display: grid;
-  gap: 1rem;
+  gap: 1.1rem;
 }
+
+/* Nom + Email côte à côte */
+.fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
 .field {
   display: grid;
-  gap: 0.38rem;
+  gap: 0.42rem;
 }
 .field label {
   font-size: 0.72rem;
@@ -859,6 +886,34 @@ a.contact-info-item:hover .ci-icon {
   .contact-info-list {
     margin-top: auto;
   }
+  /* Centrer le contenu verticalement dans le panneau droit */
+  .contact-card { justify-content: center; }
+
+  /* Textarea compact pour tenir sans scroll */
+  .field textarea {
+    height: 5rem;
+    max-height: 12rem;
+    resize: vertical;
+  }
+  /* Aération inter-champs */
+  .contact-form { gap: 1.4rem; }
+  /* Titre centré avec un peu plus d'espace sous lui */
+  .contact-header { margin-bottom: 1.4rem; margin-top: 0; }
+  /* CTA : plus de respiration au-dessus du bouton */
+  .primary-btn { margin-top: 0.6rem; }
+
+  /* ── Corrections visuelles desktop ── */
+
+  /* Badge (orange) : décalé de la bordure gauche */
+  .contact-visual { padding: 2.5rem 1.5rem 2rem; }
+
+  /* Titre (bleu clair) : sur une seule ligne + plus grand */
+  br.title-br { display: none; }
+  .visual-copy h1 { font-size: clamp(1.9rem, 2.5vw, 2.6rem); }
+
+  /* Cards info : toutes égales, remplissent toute la largeur */
+  .contact-info-list { gap: 0.7rem; }
+  .contact-info-item { flex: 1 1 0; }   /* base 0 → largeur identique pour toutes */
 }
 
 /* ===== Tablette : 769px – 1100px ===== */
@@ -922,6 +977,13 @@ a.contact-info-item:hover .ci-icon {
     padding: 3rem 2.5rem 1.5rem;
     overflow-y: auto;
   }
+  .field textarea {
+    height: 5rem;
+    max-height: 10rem;
+    resize: vertical;
+  }
+  .contact-form { gap: 1rem; }
+  .contact-header { margin-bottom: 1rem; margin-top: 0; }
 }
 
 /* ===== Mobile : ≤ 768px ===== */
@@ -985,19 +1047,25 @@ a.contact-info-item:hover .ci-icon {
     border-top: 1px solid rgba(255, 255, 255, 0.25);
   }
   .contact-info-item {
-    padding: 0.5rem 0.25rem;
-    gap: 0.3rem;
+    padding: 0.45rem 0.15rem; /* 4 cards sur mobile → padding réduit */
+    gap: 0.25rem;
     border-radius: 10px;
   }
   .ci-icon {
-    width: 1rem;
-    height: 1rem;
+    width: 0.9rem;
+    height: 0.9rem;
   }
   .contact-info-item strong {
-    font-size: 0.6rem;
+    font-size: 0.54rem;
   }
   .contact-info-item span {
     font-size: 0.7rem;
+  }
+
+  /* Nom + Email empilés sur mobile */
+  .fields-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 
   /* ── Panneau formulaire — scroll natif, pas de scroll interne ── */
@@ -1014,7 +1082,7 @@ a.contact-info-item:hover .ci-icon {
   }
   .contact-header {
     margin-bottom: 1rem;
-    margin-top: 0.5rem;
+    margin-top: 0;
   }
   .contact-header h2 {
     font-size: clamp(1.4rem, 5vw, 1.8rem);

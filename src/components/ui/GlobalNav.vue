@@ -1,7 +1,7 @@
 <template>
   <!-- Desktop / tablette : floating pill -->
   <Transition name="nav-slide">
-    <nav v-if="showNav" class="nav-island">
+    <nav v-if="showNav" class="nav-island" :class="{ 'nav-island--contact': isContactPage }">
 
       <router-link
         to="/calculator/1"
@@ -142,6 +142,9 @@ export default {
     showNav() {
       return !['landing', 'login', 'signup', 'privacy', 'mentions-legales'].includes(this.$route.name)
     },
+    isContactPage() {
+      return this.$route.name === 'contact'
+    },
   },
   methods: {
     handleLogout() { this.$emit('logout') },
@@ -257,6 +260,11 @@ export default {
   background: rgba(94, 114, 142, 0.16);
   margin: 0 3px;
   flex-shrink: 0;
+}
+
+/* Sur la page contact (layout 2 colonnes) : centre la pill sur le panneau droit */
+.nav-island--contact {
+  left: 75%;
 }
 
 /* ═══════════════════════════════════════════════════════════════
