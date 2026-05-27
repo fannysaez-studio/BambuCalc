@@ -79,18 +79,24 @@
                     <button class="btn-edit" @click="editQuote(q)" title="Modifier">
                       <Pencil class="del-icon" />
                     </button>
-                    <button class="btn-preview" @click="openPreview(q, 'client')" title="Aperçu client">
-                      <Eye class="del-icon" />
-                    </button>
-                    <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client">
-                      <Download class="del-icon" />
-                    </button>
-                    <button class="btn-preview-int" @click="openPreview(q, 'internal')" title="Aperçu interne (coûts)">
-                      <Eye class="del-icon" />
-                    </button>
-                    <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)">
-                      <FileBarChart2 class="del-icon" />
-                    </button>
+                    <!-- ── Groupe Client ── -->
+                    <div class="act-group" @click.stop>
+                      <button
+                        class="btn-group btn-group--client"
+                        :class="{ 'btn-group--open': openDrop?.quoteId === q.id && openDrop?.group === 'client' }"
+                        @click="toggleDrop($event, q.id, 'client', q)"
+                        title="Aperçu &amp; PDF client"
+                      ><Users class="del-icon" /></button>
+                    </div>
+                    <!-- ── Groupe Interne ── -->
+                    <div class="act-group" @click.stop>
+                      <button
+                        class="btn-group btn-group--int"
+                        :class="{ 'btn-group--open': openDrop?.quoteId === q.id && openDrop?.group === 'internal' }"
+                        @click="toggleDrop($event, q.id, 'internal', q)"
+                        title="Aperçu &amp; PDF coûts"
+                      ><FileBarChart2 class="del-icon" /></button>
+                    </div>
                     <button v-if="sendableQuotes.some(s => s.id === q.id)"
                       class="btn-send-row"
                       @click="selectedQuoteId = q.id; selectedQuote = q; managePage = 2"
@@ -160,10 +166,24 @@
               </select>
               <div class="mtcard-btns">
                 <button class="btn-edit" @click="editQuote(q)" title="Modifier"><Pencil class="del-icon" /></button>
-                <button class="btn-preview" @click="openPreview(q, 'client')" title="Aperçu client"><Eye class="del-icon" /></button>
-                <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client"><Download class="del-icon" /></button>
-                <button class="btn-preview-int" @click="openPreview(q, 'internal')" title="Aperçu interne (coûts)"><Eye class="del-icon" /></button>
-                <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)"><FileBarChart2 class="del-icon" /></button>
+                <!-- ── Groupe Client ── -->
+                <div class="act-group" @click.stop>
+                  <button
+                    class="btn-group btn-group--client"
+                    :class="{ 'btn-group--open': openDrop?.quoteId === q.id && openDrop?.group === 'client' }"
+                    @click="toggleDrop($event, q.id, 'client', q)"
+                    title="Aperçu &amp; PDF client"
+                  ><Users class="del-icon" /></button>
+                </div>
+                <!-- ── Groupe Interne ── -->
+                <div class="act-group" @click.stop>
+                  <button
+                    class="btn-group btn-group--int"
+                    :class="{ 'btn-group--open': openDrop?.quoteId === q.id && openDrop?.group === 'internal' }"
+                    @click="toggleDrop($event, q.id, 'internal', q)"
+                    title="Aperçu &amp; PDF coûts"
+                  ><FileBarChart2 class="del-icon" /></button>
+                </div>
                 <button v-if="sendableQuotes.some(s => s.id === q.id)"
                   class="btn-send-row"
                   @click="selectedQuoteId = q.id; selectedQuote = q; managePage = 2"
@@ -217,17 +237,38 @@
                 <option value="refused">Refusé</option>
               </select>
               <div class="mcard-actions">
+                <!-- Modifier -->
                 <button class="btn-edit" @click="editQuote(q)" title="Modifier"><Pencil class="del-icon" /></button>
-                <button class="btn-preview" @click="openPreview(q, 'client')" title="Aperçu client"><Eye class="del-icon" /></button>
-                <button class="btn-pdf" @click="downloadPDF(q)" title="PDF client"><Download class="del-icon" /></button>
-                <button class="btn-preview-int" @click="openPreview(q, 'internal')" title="Aperçu interne (coûts)"><Eye class="del-icon" /></button>
-                <button class="btn-pdf-int" @click="downloadPDFInternal(q)" title="PDF interne (coûts)"><FileBarChart2 class="del-icon" /></button>
+
+                <!-- ── Groupe Client (aperçu + PDF) ── -->
+                <div class="act-group" @click.stop>
+                  <button
+                    class="btn-group btn-group--client"
+                    :class="{ 'btn-group--open': openDrop?.quoteId === q.id && openDrop?.group === 'client' }"
+                    @click="toggleDrop($event, q.id, 'client', q)"
+                    title="Aperçu &amp; PDF client"
+                  ><Users class="del-icon" /></button>
+                </div>
+
+                <!-- ── Groupe Interne (aperçu coûts + PDF) ── -->
+                <div class="act-group" @click.stop>
+                  <button
+                    class="btn-group btn-group--int"
+                    :class="{ 'btn-group--open': openDrop?.quoteId === q.id && openDrop?.group === 'internal' }"
+                    @click="toggleDrop($event, q.id, 'internal', q)"
+                    title="Aperçu &amp; PDF coûts"
+                  ><FileBarChart2 class="del-icon" /></button>
+                </div>
+
+                <!-- Transmettre (conditionnel) -->
                 <button v-if="sendableQuotes.some(s => s.id === q.id)"
                   class="btn-send-row"
                   @click="selectedQuoteId = q.id; selectedQuote = q; managePage = 2"
                   title="Transmettre par e-mail">
                   <Send class="del-icon" />
                 </button>
+
+                <!-- Supprimer -->
                 <button class="btn-del" @click="emit('delete-quote', q)" title="Supprimer"><Trash2 class="del-icon" /></button>
               </div>
             </div>
@@ -333,11 +374,43 @@
       </div>
     </Teleport>
 
+    <!-- ── Dropdown actions mobile (Teleport → évite le clipping overflow) ── -->
+    <Teleport to="body">
+      <div
+        v-if="openDrop"
+        class="act-drop-portal"
+        :class="openDrop.group === 'client' ? 'act-drop--client' : 'act-drop--int'"
+        :style="{
+          top:    openDrop.top    != null ? openDrop.top    + 'px' : undefined,
+          bottom: openDrop.bottom != null ? openDrop.bottom + 'px' : undefined,
+          right:  openDrop.right  + 'px',
+        }"
+        @click.stop
+      >
+        <template v-if="openDrop.group === 'client'">
+          <button class="act-drop-item" @click="openPreview(openDrop.quote, 'client'); closeDrop()">
+            <Eye class="drop-icon" /><span>Aperçu client</span>
+          </button>
+          <button class="act-drop-item" @click="downloadPDF(openDrop.quote); closeDrop()">
+            <Download class="drop-icon" /><span>PDF client</span>
+          </button>
+        </template>
+        <template v-else>
+          <button class="act-drop-item" @click="openPreview(openDrop.quote, 'internal'); closeDrop()">
+            <Eye class="drop-icon" /><span>Aperçu coûts</span>
+          </button>
+          <button class="act-drop-item" @click="downloadPDFInternal(openDrop.quote); closeDrop()">
+            <Download class="drop-icon" /><span>PDF coûts</span>
+          </button>
+        </template>
+      </div>
+    </Teleport>
+
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabase'
 import { useCalculatorStore } from '@/stores/calculator'
@@ -345,7 +418,7 @@ import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import {
-  FileText, Pencil, Download, Send, Trash2, CheckCircle, FileBarChart2, Eye,
+  FileText, Pencil, Download, Send, Trash2, CheckCircle, FileBarChart2, Eye, Users,
 } from 'lucide-vue-next'
 
 // ── Props ─────────────────────────────────────────────────────────────────────
@@ -376,6 +449,32 @@ const selectedQuote   = ref(null)
 const previewingQuote = ref(null)
 const previewMode     = ref('client')
 const zoomedImageUrl  = ref(null)
+
+// ── Dropdown actions mobile ───────────────────────────────────────────────────
+const openDrop = ref(null) // { quoteId, quote, group, bottom, right }
+
+function toggleDrop(event, quoteId, group, quote) {
+  if (openDrop.value?.quoteId === quoteId && openDrop.value?.group === group) {
+    openDrop.value = null
+    return
+  }
+  const rect       = event.currentTarget.getBoundingClientRect()
+  const spaceBelow = window.innerHeight - rect.bottom
+  const openUpward = spaceBelow < 110
+  openDrop.value = {
+    quoteId,
+    quote,
+    group,
+    right: window.innerWidth - rect.right,
+    ...(openUpward
+      ? { bottom: window.innerHeight - rect.top + 4 }
+      : { top:    rect.bottom + 4 }),
+  }
+}
+function closeDrop() { openDrop.value = null }
+
+onMounted(()       => document.addEventListener('click', closeDrop))
+onBeforeUnmount(() => document.removeEventListener('click', closeDrop))
 
 // ── Computed ──────────────────────────────────────────────────────────────────
 const quoteInfoByUser = computed(() => {
@@ -942,12 +1041,9 @@ function wasEdited(q) {
   .mtcard-status-sel { flex: 1; font-size: 0.82rem; }
   .mtcard-btns { display: flex; gap: 0.3rem; flex-shrink: 0; }
   .mtcard-btns .btn-edit,
-  .mtcard-btns .btn-preview,
-  .mtcard-btns .btn-preview-int,
-  .mtcard-btns .btn-pdf,
-  .mtcard-btns .btn-pdf-int,
   .mtcard-btns .btn-send-row,
-  .mtcard-btns .btn-del { width: 38px; height: 38px; border-radius: 10px; }
+  .mtcard-btns .btn-del,
+  .mtcard-btns .btn-group { width: 38px; height: 38px; border-radius: 10px; }
   .mtcard-piece-with-photo { display: flex; align-items: center; gap: 0.5rem; }
 }
 
@@ -976,12 +1072,9 @@ function wasEdited(q) {
   .mcard-status-sel { flex: 1; font-size: 0.78rem; }
   .mcard-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
   .mcard-actions .btn-edit,
-  .mcard-actions .btn-preview,
-  .mcard-actions .btn-preview-int,
-  .mcard-actions .btn-pdf,
-  .mcard-actions .btn-pdf-int,
   .mcard-actions .btn-send-row,
-  .mcard-actions .btn-del { width: 34px; height: 34px; }
+  .mcard-actions .btn-del,
+  .mcard-actions .btn-group { width: 34px; height: 34px; border-radius: 10px; }
   .manage-send-actions { flex-direction: column; }
   .th-hide-sm, .td-hide-sm { display: none; }
   .mcard-meta-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
@@ -992,4 +1085,48 @@ function wasEdited(q) {
 @media (max-width: 760px) {
   .th-hide-md, .td-hide-md { display: none; }
 }
+
+/* ── Boutons de groupe (mobile uniquement) ── */
+.act-group {
+  position: relative;
+  flex-shrink: 0;
+}
+.btn-group {
+  width: 1.9rem; height: 1.9rem; padding: 0;
+  border: 1.5px solid #e2e8f0; border-radius: 8px;
+  background: #fff; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #cbd5e0; transition: all 0.15s ease; font-family: inherit;
+}
+.btn-group--client:hover,
+.btn-group--client.btn-group--open { border-color: #2e9cab; color: #2e9cab; background: #e8f7f9; }
+.btn-group--int:hover,
+.btn-group--int.btn-group--open    { border-color: #d97706; color: #d97706; background: #fef3c7; }
+
+/* ── Dropdown portal (position:fixed, rendu à body) ── */
+.act-drop-portal {
+  position: fixed;
+  z-index: 9999;
+  min-width: 160px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  padding: 0.3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+.act-drop-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.52rem 0.75rem;
+  border: none; background: none; border-radius: 9px;
+  font-size: 0.84rem; font-weight: 600; font-family: inherit;
+  color: #4a5568; cursor: pointer; text-align: left; width: 100%;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.act-drop--client .act-drop-item:hover { background: #e8f7f9; color: #2e9cab; }
+.act-drop--int    .act-drop-item:hover { background: #fef3c7; color: #d97706; }
+.drop-icon { width: 0.88rem; height: 0.88rem; flex-shrink: 0; }
 </style>
