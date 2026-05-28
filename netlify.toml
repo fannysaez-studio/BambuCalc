@@ -66,6 +66,20 @@
 #   VITE_SUPABASE_ANON_KEY    → Clé publique Supabase (anon/public)
 #   VITE_STRIPE_PUBLIC_KEY    → Clé publique Stripe (pk_live_...)
 #
+# ── Lighthouse CI — audit automatique à chaque déploiement ──────────────────
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+
+  [[plugins.inputs.audits]]
+    path = "/"
+
+    # Seuils minimum (0–1) — le déploiement échoue si un score passe en dessous
+    [plugins.inputs.audits.thresholds]
+      performance     = 0.9
+      accessibility   = 0.9
+      best-practices  = 0.9
+      seo             = 0.9
+
 [context.production.environment]
   VITE_SUPABASE_URL    = "https://upwzdctedpazranppskz.supabase.co"
   VITE_VAPID_PUBLIC_KEY = "BJAUXx87uxhSRLmADQZakueWzzJTbNKYrSBT77wd0hPl672AKtUZSxnWjI9JKLkV-BHfxjFsfaoXUkFWLECgmWY"
