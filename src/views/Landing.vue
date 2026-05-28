@@ -21,7 +21,6 @@
             alt="Bambu Lab P2S Combo"
             class="visual-printer"
             width="170" height="235"
-            loading="lazy"
           />
           <img
             src="/bambuLab Filament.webp"
