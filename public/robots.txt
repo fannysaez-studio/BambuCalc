@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Pages privées (authentification requise)
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /profile
+Disallow: /pay/
+Disallow: /reset-password
+
+Sitemap: https://bambucalc.netlify.app/sitemap.xml
