@@ -21,6 +21,7 @@
             alt="Bambu Lab P2S Combo"
             class="visual-printer"
             width="170" height="235"
+            loading="lazy"
           />
           <img
             src="/bambuLab Filament.webp"
@@ -515,7 +516,7 @@ export default {
   /* Bloc teal : plein écran, contenu réparti badge↑ copy↕ illustration↓ */
   .landing-visual {
     width: 100%;
-    min-height: calc(100dvh - 1.5rem);
+    min-height: calc(100svh - 1.5rem);
     padding: 1.25rem 1.1rem 1rem;
     display: flex;
     flex-direction: column;
@@ -560,7 +561,7 @@ export default {
 
   /* Bloc blanc : même min-height que le bloc teal */
   .landing-panel {
-    min-height: calc(100dvh - 1.5rem);
+    min-height: calc(100svh - 1.5rem);
   }
 
   .landing-card {
