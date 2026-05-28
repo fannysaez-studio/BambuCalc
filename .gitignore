@@ -34,6 +34,7 @@ lerna-debug.log*
 .DS_Store
 
 # Cache & Build artifacts
+.vite/
 .eslintcache
 *.tsbuildinfo
 *.local
@@ -51,9 +52,9 @@ __screenshots__/
 # Supabase CLI — temporary local files
 supabase/.temp/
 
-# Claude / Superpowers — AI-generated files
+# Claude / Superpowers — AI-generated files (usage local uniquement)
 .superpowers/
-docs/superpowers/
+docs/
 
 # Guides locaux — documentation de déploiement (usage personnel, pas sur GitHub)
 NETLIFY-DEPLOY.md
