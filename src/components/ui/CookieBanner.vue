@@ -189,11 +189,30 @@ function decline() {
   transform: translateX(-50%) translateY(1.5rem);
 }
 
-/* ── Mobile ── */
+/* ── Mobile — bannière compacte pour réduire la CLS ── */
 @media (max-width: 600px) {
-  .cookie-banner { bottom: 0; border-radius: 16px 16px 0 0; width: 100%; }
-  .cookie-inner  { flex-direction: column; }
-  .cookie-actions { flex-direction: row; }
-  .cookie-btn    { flex: 1; text-align: center; }
+  .cookie-banner {
+    bottom: 0;
+    border-radius: 12px 12px 0 0;
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+  .cookie-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .cookie-icon  { display: none; }
+  .cookie-text  { display: none; }
+  .cookie-title { font-size: 0.82rem; margin: 0; }
+  .cookie-actions {
+    flex-direction: row;
+    flex-shrink: 0;
+  }
+  .cookie-btn {
+    flex: unset;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.72rem;
+  }
 }
 </style>
