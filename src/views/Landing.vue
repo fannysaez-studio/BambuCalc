@@ -16,11 +16,23 @@
 
       <div class="visual-illustration">
         <div class="visual-composition">
-          <img src="/bambu lab P2S Combo.webp" alt="Bambu Lab P2S Combo" class="visual-printer" />
+          <img
+            src="/bambu lab P2S Combo.webp"
+            srcset="/.netlify/images?url=/bambu%20lab%20P2S%20Combo.webp&w=170&q=80 1x,
+                    /.netlify/images?url=/bambu%20lab%20P2S%20Combo.webp&w=340&q=80 2x"
+            alt="Bambu Lab P2S Combo"
+            class="visual-printer"
+            width="170" height="235"
+            loading="lazy"
+          />
           <img
             src="/bambuLab Filament.webp"
+            srcset="/.netlify/images?url=/bambuLab%20Filament.webp&w=280&q=80 1x,
+                    /.netlify/images?url=/bambuLab%20Filament.webp&w=560&q=80 2x"
             alt="Illustration organique turquoise"
             class="visual-main"
+            fetchpriority="high"
+            width="250" height="250"
           />
         </div>
       </div>

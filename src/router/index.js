@@ -1,31 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Landing from '@/views/Landing.vue'
+import Landing        from '@/views/Landing.vue'
 import CalculatorStep from '@/views/calculator/CalculatorStep.vue'
-import Dashboard from '@/views/dashboard/Dashboard.vue'
-import AdminDashboard from '@/views/admin/AdminDashboard.vue'
-import Login from '@/views/auth/Login.vue'
-import Signup from '@/views/auth/Signup.vue'
-import ResetPassword from '@/views/auth/ResetPassword.vue'
-import PrivacyPolicy from '@/views/PrivacyPolicy.vue'
-import MentionsLegales from '@/views/MentionsLegales.vue'
-import Contact from '@/views/Contact.vue'
-import NotFound from '@/views/NotFound.vue'
-import UserProfile from '@/views/dashboard/UserProfile.vue'
+import Login          from '@/views/auth/Login.vue'
+import Signup         from '@/views/auth/Signup.vue'
 import { supabase } from '@/lib/supabase'
 
 const routes = [
   { path: '/', name: 'landing', component: Landing, meta: { layout: 'landing' } },
-  { path: '/dashboard', name: 'dashboard', component: Dashboard, meta: { requiresAuth: true } },
-  { path: '/admin', name: 'admin', component: AdminDashboard, meta: { requiresAuth: true, requiresAdmin: true } },
   { path: '/calculator', redirect: '/calculator/1' },
   { path: '/calculator/:step', name: 'calculator-step', component: CalculatorStep },
-  { path: '/login', name: 'login', component: Login },
+  { path: '/login',  name: 'login',  component: Login },
   { path: '/signup', name: 'signup', component: Signup },
-  { path: '/reset-password', name: 'reset-password', component: ResetPassword },
-  { path: '/privacy', name: 'privacy', component: PrivacyPolicy },
-  { path: '/mentions-legales', name: 'mentions-legales', component: MentionsLegales },
-  { path: '/contact', name: 'contact', component: Contact },
-  { path: '/profile', name: 'profile', component: UserProfile, meta: { requiresAuth: true } },
+  { path: '/reset-password',   name: 'reset-password',   component: () => import('@/views/auth/ResetPassword.vue') },
+  { path: '/dashboard',        name: 'dashboard',        component: () => import('@/views/dashboard/Dashboard.vue'),      meta: { requiresAuth: true } },
+  { path: '/admin',            name: 'admin',            component: () => import('@/views/admin/AdminDashboard.vue'),     meta: { requiresAuth: true, requiresAdmin: true } },
+  { path: '/profile',          name: 'profile',          component: () => import('@/views/dashboard/UserProfile.vue'),   meta: { requiresAuth: true } },
+  { path: '/contact',          name: 'contact',          component: () => import('@/views/Contact.vue') },
+  { path: '/privacy',          name: 'privacy',          component: () => import('@/views/PrivacyPolicy.vue') },
+  { path: '/mentions-legales', name: 'mentions-legales', component: () => import('@/views/MentionsLegales.vue') },
   {
     path: '/pay/:quoteId',
     name: 'payment',
@@ -35,7 +27,7 @@ const routes = [
   { path: '/guest', redirect: '/calculator/1' },
   { path: '/guest/calculator/:step', redirect: to => `/calculator/${to.params.step}` },
   { path: '/guest/dashboard', redirect: '/dashboard' },
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: NotFound },
+  { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue') },
 ]
 
 const router = createRouter({
