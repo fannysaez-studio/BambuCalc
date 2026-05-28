@@ -21,7 +21,7 @@
             alt="Bambu Lab P2S Combo"
             class="visual-printer"
             width="170" height="235"
-            loading="lazy"
+            fetchpriority="low"
           />
           <img
             src="/bambuLab Filament.webp"
@@ -533,12 +533,14 @@ export default {
 
   .visual-copy p {
     font-size: 0.92rem;
-    margin-top: 3rem;
+    margin-top: 1.5rem;
   }
 
   /* Illustration : taille naturelle, poussée en bas par space-between */
   .visual-illustration {
     min-height: 0;
+    contain: layout;        /* isole le layout pour éviter CLS */
+    will-change: transform; /* couche composite — protège contre les reflows externes */
   }
 
   .visual-composition {
