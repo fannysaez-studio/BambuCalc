@@ -1,26 +1,11 @@
-# BambuCalc 🖨️
+# BambuCalc
 
-> Calculateur de coûts d'impression 3D pour imprimantes **Bambu Lab** — devis PDF, gestion clients, emails automatiques et paiements Stripe.
+> Calculateur de coûts d'impression 3D pour imprimantes **Bambu Lab** — devis PDF, gestion clients, emails automatiques et paiements multi-méthodes.
 
 ![Vue 3](https://img.shields.io/badge/Vue-3.5-42b883?logo=vue.js&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8.0-646cff?logo=vite&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-2.98-3ecf8e?logo=supabase&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-2.106-3ecf8e?logo=supabase&logoColor=white)
 ![Licence MIT](https://img.shields.io/badge/Licence-MIT-blue)
-
----
-
-## Sommaire
-
-- [Vue d'ensemble](#vue-densemble)
-- [Stack](#stack)
-- [Installation](#installation)
-- [Variables d'environnement](#variables-denvironnement)
-- [Structure du projet](#structure-du-projet)
-- [Flux métier](#flux-métier)
-- [Edge Functions](#edge-functions-supabase)
-- [Commandes](#commandes)
-- [Déploiement Netlify](#déploiement-netlify)
-- [Dépannage](#dépannage)
 
 ---
 
@@ -32,95 +17,53 @@ BambuCalc est une application web B2B permettant à un prestataire d'impression 
 - **Générer des devis PDF** professionnels avec coordonnées client
 - **Gérer** l'ensemble des devis et clients depuis un dashboard admin
 - **Envoyer** les devis par email directement au client (avec PDF joint)
-- **Encaisser** via Stripe (paiement en ligne) ou virement/chèque
+- **Encaisser** via Stripe (carte, Apple Pay, Google Pay), PayPal, virement, chèque ou espèces — le client choisit sa préférence dans le formulaire
 
 ---
 
 ## Stack
 
-### Frontend
-
-| Technologie | Version | Rôle |
-| --- | --- | --- |
-| **Vue.js** | 3.5 | Framework UI |
-| **Vite** | 8.0 | Build tool |
-| **Vue Router** | 5.0 | Routage |
-| **Pinia** | 3.0 | État global |
-| **Lucide Vue** | 1.0 | Icônes |
-| **jsPDF** | 4.2 | Génération PDF côté client |
-
-### Backend & Services
-
-| Technologie | Rôle |
-| --- | --- |
-| **Supabase** | Base de données PostgreSQL + Auth + Edge Functions |
-| **Brevo** | Emails transactionnels (devis client + bienvenue) |
-| **Stripe** | Paiements en ligne |
-| **Netlify** | Hébergement frontend |
-
-### Qualité
-
-| Outil | Rôle |
-| --- | --- |
-| **ESLint + Prettier** | Linting et formatage |
-| **Vitest** | Tests unitaires |
-| **Playwright** | Tests E2E |
+| Technologie                 | Rôle                                 |
+| --------------------------- | ------------------------------------ |
+| **Vue.js 3.5** + Vite 8     | Framework UI + build                 |
+| **Vue Router 5** + Pinia 3  | Routage + état global                |
+| **jsPDF 4**                 | Génération PDF côté client           |
+| **Supabase**                | PostgreSQL + Auth + Edge Functions   |
+| **Brevo**                   | Emails transactionnels               |
+| **Stripe**                  | Paiements en ligne (Payment Element) |
+| **Netlify**                 | Hébergement frontend                 |
+| **Vitest** + **Playwright** | Tests unitaires + E2E                |
 
 ---
 
 ## Installation
 
-### Prérequis
-
-- **Node.js** 20.19.0+ ou 22.12.0+
-- **npm** 10.0.0+
-
 ```sh
-node --version   # v20+
-npm --version    # 10+
-```
-
-### Étapes
-
-```sh
-# 1. Cloner
-git clone <url-du-repo>
-cd BambuCalc
-
-# 2. Installer les dépendances
+git clone <url-du-repo> && cd BambuCalc
 npm install
-
-# 3. Configurer l'environnement
-cp .env.example .env.local
-# Remplir .env.local avec vos clés (voir section suivante)
-
-# 4. Lancer
-npm run dev
-# → http://localhost:5173
+cp .env.example .env.local   # remplir avec vos clés
+npm run dev                  # → http://localhost:5173
 ```
 
 ---
 
 ## Variables d'environnement
 
-Créez `.env.local` à la racine du projet :
+`.env.local` (frontend) :
 
 ```env
-# Supabase (obligatoire)
 VITE_SUPABASE_URL=https://xxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJ...
-
-# Stripe — paiements en ligne (optionnel en dev)
-VITE_STRIPE_PUBLIC_KEY=pk_live_...
+VITE_STRIPE_PUBLIC_KEY=pk_live_...   # pk_test_... en dev
 ```
 
-Les secrets backend (jamais exposés au navigateur) sont configurés dans **Supabase → Edge Functions → Secrets** :
+Secrets backend dans **Supabase → Edge Functions → Secrets** :
 
 ```text
-BREVO_API_KEY              → Clé API REST Brevo (xkeysib-...)
-STRIPE_SECRET_KEY          → Clé secrète Stripe
-STRIPE_WEBHOOK_SECRET      → Secret de validation des webhooks Stripe
-SUPABASE_SERVICE_ROLE_KEY  → Clé service Supabase (auto-injectée)
+BREVO_API_KEY              → xkeysib-...
+STRIPE_SECRET_KEY          → sk_live_... (ou sk_test_...)
+STRIPE_WEBHOOK_SECRET      → whsec_...
+SUPABASE_SERVICE_ROLE_KEY  → auto-injectée
 ```
 
 ---
@@ -140,23 +83,19 @@ BambuCalc/
 │   │   ├── dashboard/      # Dashboard, UserProfile
 │   │   ├── admin/          # AdminDashboard
 │   │   ├── Landing.vue
+│   │   ├── Contact.vue
+│   │   ├── PaymentView.vue
 │   │   ├── PrivacyPolicy.vue
 │   │   └── MentionsLegales.vue
 │   ├── router/             # index.js — routes + guards auth/admin
 │   ├── stores/             # Pinia (calculator.js)
 │   ├── utils/              # auth.js · quotes.js · stripe.js · generateQuotePDF.js
 │   ├── lib/                # supabase.js
-│   └── styles/             # admin-dashboard.css + modules CSS
+│   └── styles/             # modules CSS
 ├── supabase/
 │   ├── migrations/         # 5 migrations versionnées
-│   └── functions/
-│       ├── _shared/        # cors.ts (CORS centralisé)
-│       ├── send-quote-email/    # Email devis → client + notification admin
-│       ├── send-welcome-email/  # Email bienvenue à l'inscription
-│       ├── create-payment-intent/  # Création PaymentIntent Stripe
-│       └── stripe-webhook/      # Réception événements Stripe
-├── public/                 # Assets statiques (SVG, images)
-├── netlify.toml            # Config Netlify (headers HTTP sécurité)
+│   └── functions/          # send-quote-email · send-welcome-email · create-payment-intent · stripe-webhook
+├── netlify.toml            # Headers HTTP sécurité
 └── e2e/                    # Tests Playwright
 ```
 
@@ -167,179 +106,91 @@ BambuCalc/
 ### Création d'un devis
 
 ```text
-Utilisateur remplit le calculateur (4 étapes)
-    ↓
-Store Pinia → saveQuote() → Supabase (table quotes)
-    ↓
-Devis visible dans Dashboard client + Admin
+Calculateur (5 étapes) → saveQuote() → Supabase (quotes)
+→ Devis visible Dashboard client + Admin
 ```
 
-### Envoi du devis par l'admin
+### Envoi par l'admin
 
 ```text
-Admin : onglet "Gestion Devis" → bouton "Envoyer"
-    ↓
-Modal de prévisualisation (sujet, intro, total, PDF joint)
-    ↓
-Edge Function send-quote-email (Brevo)
-    ├── Email CLIENT : devis complet + PDF joint
-    └── Email ADMIN  : notification récapitulative
-    ↓
-Statut devis → "sent"
+Admin → "Gestion Devis" → bouton "Envoyer"
+→ Modal prévisualisation → Edge Function send-quote-email (Brevo)
+   ├── Email CLIENT : devis + PDF joint
+   └── Email ADMIN  : notification
+→ Statut "sent"
 ```
 
-### Paiement Stripe
+### Paiement
 
-```text
-Admin ajoute un lien Stripe dans "Gestion Devis"
-    ↓
-Client reçoit le lien par email → page de paiement Stripe
-    ↓
-Webhook Stripe → Edge Function stripe-webhook
-    ↓
-Statut devis → "paid"
-```
+Le client choisit son mode dans le formulaire (`ClientInfo.vue`) :
+
+| Méthode                        | Traitement                                                        |
+| ------------------------------ | ----------------------------------------------------------------- |
+| Carte / Apple Pay / Google Pay | Automatisé via Stripe Payment Element + webhook                   |
+| PayPal                         | Préférence enregistrée — admin envoie un lien PayPal manuellement |
+| Virement / Chèque / Espèces    | Hors-ligne — suivi manuel                                         |
+
+> Le **Stripe Payment Element** (`layout: 'tabs'`) affiche automatiquement les méthodes activées dans le Stripe Dashboard (dont PayPal si activé côté Stripe).
 
 ### Variables email personnalisables
 
-Dans l'onglet **Emails** du dashboard admin :
-
-| Variable | Remplacée par |
-| --- | --- |
-| `[client]` | Prénom du client |
-| `[client_nom]` | Civilité + nom |
-| `[numéro]` | Numéro de devis |
-| `[projet]` | Nom de la pièce |
-| `[total]` | Montant TTC |
+`[client]` · `[client_nom]` · `[numéro]` · `[projet]` · `[total]`
 
 ---
 
 ## Edge Functions Supabase
 
-| Fonction | Déclencheur | Rôle |
-| --- | --- | --- |
-| `send-quote-email` | Admin clique "Envoyer" | Email devis au client (Brevo) + notification admin |
-| `send-welcome-email` | Inscription utilisateur | Email de bienvenue (Brevo) |
-| `create-payment-intent` | Client paie en ligne | Crée un PaymentIntent Stripe sécurisé |
-| `stripe-webhook` | Événement Stripe | Met à jour le statut du devis en base |
-
-### Déployer une fonction
+| Fonction                | Déclencheur      | Rôle                                     |
+| ----------------------- | ---------------- | ---------------------------------------- |
+| `send-quote-email`      | Admin "Envoyer"  | Email devis client (Brevo) + notif admin |
+| `send-welcome-email`    | Inscription      | Email de bienvenue (Brevo)               |
+| `create-payment-intent` | Client paie      | Crée un PaymentIntent Stripe sécurisé    |
+| `stripe-webhook`        | Événement Stripe | Met à jour le statut en base             |
 
 ```sh
-npx supabase functions deploy send-quote-email
-npx supabase functions deploy send-welcome-email
-npx supabase functions deploy create-payment-intent
-npx supabase functions deploy stripe-webhook
+npx supabase functions deploy send-quote-email --no-verify-jwt
+npx supabase functions deploy send-welcome-email --no-verify-jwt
+npx supabase functions deploy create-payment-intent --no-verify-jwt
+npx supabase functions deploy stripe-webhook --no-verify-jwt
 ```
+
+> **`--no-verify-jwt` est obligatoire** : la clé anon Supabase (`sb_publishable_*`) n'est pas un JWT signé. Sans ce flag, le déploiement échoue avec une erreur d'authentification.
 
 ---
 
 ## Commandes
 
-### Développement
-
 ```sh
-npm run dev          # Serveur local → http://localhost:5173
-npm run build        # Build production → dist/
-npm run preview      # Prévisualiser le build
-```
-
-### Linting
-
-```sh
-npm run lint         # ESLint
-npm run format       # Prettier
-```
-
-### Tests
-
-```sh
-# Unitaires
-npm run test:unit
-npm run test:unit -- --watch
-npm run test:unit -- --coverage
-
-# E2E
-npx playwright install   # Une seule fois
-npm run test:e2e
-npm run test:e2e -- --headed   # Mode visible
-```
-
-### Supabase CLI
-
-```sh
-npx supabase secrets list                          # Voir les secrets
-npx supabase secrets set CLE=valeur               # Ajouter un secret
-npx supabase functions deploy <nom-fonction>       # Déployer une fonction
+npm run dev          # → http://localhost:5173
+npm run build        # build → dist/
+npm run lint         # ESLint + Prettier
+npm run test:unit    # Vitest
+npm run test:e2e     # Playwright (npx playwright install au premier lancement)
 ```
 
 ---
 
 ## Déploiement Netlify
 
-1. **Créer un projet** sur [app.netlify.com](https://app.netlify.com) → importer depuis GitHub
-
-2. **Build settings**
-
-   ```text
-   Branche      : main
-   Commande     : npm run build
-   Dossier dist : dist/
-   ```
-
-3. **Variables d'environnement** (Netlify → Site configuration → Environment)
-
-   ```text
-   VITE_SUPABASE_URL
-   VITE_SUPABASE_ANON_KEY
-   VITE_STRIPE_PUBLIC_KEY
-   ```
-
-4. **Déploiement continu**
-
-   ```sh
-   git push origin main
-   # Netlify redéploie automatiquement
-   ```
-
-5. **Après le premier déploiement** (24-48h après SSL stable)
-   Activer HSTS dans `netlify.toml` en décommentant les headers `Strict-Transport-Security`.
+1. Importer le repo sur [app.netlify.com](https://app.netlify.com) — build `npm run build`, dossier `dist/`
+2. Ajouter les variables `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_STRIPE_PUBLIC_KEY`
+3. `git push origin main` redéclenche le déploiement automatiquement
+4. Après 24-48h (SSL stable) : décommenter les headers `Strict-Transport-Security` dans `netlify.toml`
 
 ---
 
 ## Dépannage
 
-### Supabase : variables manquantes
+**Variables Supabase manquantes** → vérifier `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` dans `.env.local`
 
-```text
-[BambuCalc] Variables d'environnement Supabase manquantes.
-```
-
-→ Vérifiez `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` dans `.env.local`
-
-### Edge Function : BREVO_API_KEY absente
+**BREVO_API_KEY absente** →
 
 ```sh
-npx supabase secrets list   # Vérifier que BREVO_API_KEY est présente
 npx supabase secrets set BREVO_API_KEY=xkeysib-...
-npx supabase functions deploy send-quote-email
+npx supabase functions deploy send-quote-email --no-verify-jwt
 ```
 
-### HMR ne fonctionne pas
-
-```sh
-rm -rf node_modules .vite
-npm install
-npm run dev
-```
-
-### Port 5173 déjà utilisé
-
-```sh
-npm run dev -- --port 3000
-```
-
-### Stripe webhook local
+**Tester le webhook Stripe en local** →
 
 ```sh
 stripe listen --forward-to localhost:54321/functions/v1/stripe-webhook
@@ -350,8 +201,8 @@ stripe trigger payment_intent.succeeded
 
 ## Conformité légale
 
-- **RGPD** : formulaire d'inscription avec consentement explicite, politique de confidentialité complète (`/privacy`)
-- **LCEN** : page mentions légales (`/mentions-legales`)
+- **RGPD** : consentement explicite à l'inscription, politique de confidentialité (`/privacy`)
+- **LCEN** : mentions légales (`/mentions-legales`)
 - **Cookies** : bandeau de consentement, Stripe chargé uniquement après accord
 - **Hébergement** : Netlify (USA — SCCs) + Supabase EU (Frankfurt)
 
@@ -359,11 +210,8 @@ stripe trigger payment_intent.succeeded
 
 ## Ressources
 
-- [Vue 3](https://vuejs.org/) · [Vite](https://vite.dev/) · [Pinia](https://pinia.vuejs.org/)
-- [Supabase Docs](https://supabase.com/docs)
-- [Brevo API v3](https://developers.brevo.com/)
-- [Stripe API](https://stripe.com/docs/api)
+[Vue 3](https://vuejs.org/) · [Supabase](https://supabase.com/docs) · [Brevo API](https://developers.brevo.com/) · [Stripe API](https://stripe.com/docs/api)
 
 ---
 
-**Dernière mise à jour** : Mai 2026 — Fanny Saez
+**Dernière mise à jour** : 28 mai 2026 — Fanny Saez
