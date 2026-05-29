@@ -31,9 +31,12 @@ VITE_STRIPE_PUBLIC_KEY=pk_live_...   # pk_test_... en dev
 Configurés dans **Supabase → Edge Functions → Secrets** (jamais exposés au navigateur) :
 
 ```text
-BREVO_API_KEY              → xkeysib-...
-STRIPE_SECRET_KEY          → sk_live_... (ou sk_test_...)
+BREVO_API_KEY              → xkeysib-...          (emails devis + bienvenue)
+RESEND_API_KEY             → re_...               (email formulaire contact)
+STRIPE_SECRET_KEY          → sk_live_...          (ou sk_test_... en dev)
 STRIPE_WEBHOOK_SECRET      → whsec_...
+VAPID_PUBLIC_KEY           → générer via node scripts/generate-vapid.mjs
+VAPID_PRIVATE_KEY          → générer via node scripts/generate-vapid.mjs
 SUPABASE_SERVICE_ROLE_KEY  → auto-injectée
 ```
 

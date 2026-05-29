@@ -5,6 +5,8 @@
 ![Vue 3](https://img.shields.io/badge/Vue-3.5-42b883?logo=vue.js&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8.0-646cff?logo=vite&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-2.106-3ecf8e?logo=supabase&logoColor=white)
+![Brevo](https://img.shields.io/badge/Brevo-email-0B996E?logo=mail.ru&logoColor=white)
+![Resend](https://img.shields.io/badge/Resend-contact-000000?logo=mail.ru&logoColor=white)
 ![Licence MIT](https://img.shields.io/badge/Licence-MIT-blue)
 
 ---

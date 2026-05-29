@@ -18,7 +18,8 @@ BambuCalc est une application web B2B permettant à un prestataire d'impression 
 | **Vue Router 5** + Pinia 3  | Routage + état global                |
 | **jsPDF 4**                 | Génération PDF côté client           |
 | **Supabase**                | PostgreSQL + Auth + Edge Functions   |
-| **Brevo**                   | Emails transactionnels               |
+| **Brevo**                   | Emails devis + bienvenue             |
+| **Resend**                  | Email formulaire de contact          |
 | **Stripe**                  | Paiements en ligne (Payment Element) |
 | **Netlify**                 | Hébergement frontend                 |
 | **Vitest** + **Playwright** | Tests unitaires + E2E                |
