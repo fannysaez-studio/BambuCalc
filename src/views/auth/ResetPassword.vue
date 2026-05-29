@@ -118,6 +118,8 @@ async function onSubmit() {
 
 <style scoped>
 .reset-page {
+  align-self: stretch;
+  width: 100%;
   min-height: 100dvh;
   background: #f0f4f8;
   display: flex;

@@ -920,8 +920,9 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 4.5rem 1.25rem 1.5rem;
-    justify-content: flex-start;
+    padding: 4.5rem 1.5rem 2rem;
+    justify-content: center;
+    gap: 0;
   }
 
   .auth-header {

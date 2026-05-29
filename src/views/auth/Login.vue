@@ -719,43 +719,51 @@ export default defineComponent({
 }
 
 .forgot-wrap {
-  margin-top: 2rem;
+  margin-top: 0;
+  width: 100%;
 }
 
 .forgot-header {
   text-align: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 2rem;
 }
 .forgot-title {
   font-size: 1.5rem;
   font-weight: 800;
   color: #1b2f39;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
 }
 .forgot-sub {
   font-size: 0.92rem;
   color: #4f6570;
   margin: 0;
+  line-height: 1.5;
 }
 
 .back-link {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 1.5rem;
   background: none;
   border: none;
   color: #718096;
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.25rem 0;
+  padding: 0.35rem 0.5rem 0.35rem 0;
   font-family: inherit;
-  text-align: center;
-  width: 100%;
-  display: block;
-  transition: color 0.2s ease;
-  margin-top: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+  margin: 0;
+  width: auto;
+  text-align: left;
 }
 .back-link:hover {
   color: #2e9cab;
+  transform: translateX(-2px);
 }
 
 .forgot-success {
@@ -837,6 +845,14 @@ export default defineComponent({
   .auth-form {
     margin-top: 1.5rem;
     gap: 0.75rem;
+  }
+
+  /* forgot-wrap : plus d'air entre champ et bouton sur desktop */
+  .forgot-wrap .auth-form {
+    gap: 2rem;
+  }
+  .forgot-header {
+    margin-bottom: 2.5rem;
   }
 
   /* 7. Sous-titre du header moins espacé */
@@ -936,30 +952,8 @@ export default defineComponent({
     margin: 0.85rem 0 0.75rem;
   }
 
-  .forgot-wrap {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
   .forgot-wrap .auth-form {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .forgot-wrap .field {
-    margin-top: auto;
-    margin-bottom: 2rem;
-  }
-
-  .forgot-wrap .primary-btn {
-    margin-top: 0;
-  }
-
-  .forgot-wrap .back-link {
-    margin-top: auto;
+    gap: 1.5rem;
   }
 }
 
@@ -1019,8 +1013,9 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 4.5rem 1.25rem 1.5rem;
-    justify-content: flex-start;
+    padding: 4.5rem 1.5rem 4.5rem;
+    justify-content: center;
+    gap: 0;
   }
 
   .auth-header h2 {
@@ -1034,7 +1029,11 @@ export default defineComponent({
 
   .auth-form {
     margin-top: 2rem;
-    gap: 1rem;
+    gap: 1.25rem;
+  }
+
+  .forgot-wrap .auth-form {
+    gap: 1.75rem;
   }
 
   .field input {
@@ -1047,7 +1046,7 @@ export default defineComponent({
   }
 
   .auth-divider {
-    margin: 1.25rem 0 1rem;
+    margin: 1.5rem 0 1rem;
   }
 }
 

@@ -1062,10 +1062,10 @@ a.contact-info-item:hover .ci-icon {
     font-size: 0.7rem;
   }
 
-  /* Nom + Email empilés sur mobile */
+  /* Nom + Email côte à côte sur mobile */
   .fields-row {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
   }
 
   /* ── Panneau formulaire — scroll natif, pas de scroll interne ── */
@@ -1076,12 +1076,12 @@ a.contact-info-item:hover .ci-icon {
   }
   .contact-card {
     flex: 1;
-    padding: 4rem 1.1rem 5rem;
-    justify-content: flex-start;
+    padding: 4rem 1.5rem 3rem;
+    justify-content: center;
     overflow-y: visible;
   }
   .contact-header {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     margin-top: 0;
   }
   .contact-header h2 {
@@ -1089,7 +1089,10 @@ a.contact-info-item:hover .ci-icon {
   }
   .contact-header p {
     font-size: 0.88rem;
-    margin-top: 0.5rem;
+    margin-top: 0.6rem;
+  }
+  .contact-form {
+    gap: 1.35rem;
   }
   /* Textarea réduit sur mobile pour dégager le bouton de la barre nav */
   .field textarea {
