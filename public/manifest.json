@@ -1,0 +1,29 @@
+{
+  "name": "BambuCalc",
+  "short_name": "BambuCalc",
+  "description": "Calculateur de coût d'impression 3D — devis PDF, gestion filaments, suivi projets",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#2e9cab",
+  "background_color": "#f0f4f8",
+  "lang": "fr",
+  "categories": ["utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
