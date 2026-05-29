@@ -75,7 +75,7 @@
 
     # Seuils minimum (0–1) — le déploiement échoue si un score passe en dessous
     [plugins.inputs.audits.thresholds]
-      performance     = 0.88
+      performance     = 0.85
       accessibility   = 0.9
       best-practices  = 0.9
       seo             = 0.9

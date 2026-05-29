@@ -17,16 +17,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (!id.includes('node_modules')) return
-          if (id.includes('@supabase')) return 'vendor-supabase'
-          if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) return 'vendor-vue'
-          if (id.includes('stripe')) return 'vendor-stripe'
-        },
-      },
-    },
-  },
 })
