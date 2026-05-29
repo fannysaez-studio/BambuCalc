@@ -5,6 +5,7 @@ vi.mock('jspdf-autotable', () => ({ default: vi.fn() }))
 vi.mock('@/config/company', () => ({
   company: { name: 'BambuCalc Test', email: 'test@bambucalc.fr' },
 }))
+// formatters are real (pure functions, no side effects)
 
 import {
   fmtEur,

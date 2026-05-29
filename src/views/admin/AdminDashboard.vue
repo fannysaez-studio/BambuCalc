@@ -348,6 +348,7 @@ import {
 } from '@/utils/quotes'
 import { supabase } from '@/lib/supabase'
 import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
+import { fmtEur } from '@/utils/formatters'
 import { useCalculatorStore } from '@/stores/calculator'
 import { usePushNotifications } from '@/composables/usePushNotifications'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
@@ -597,9 +598,6 @@ async function sendQuote() {
   } finally {
     isSending.value = false
   }
-}
-function fmtEur(v) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v ?? 0)
 }
 </script>
 

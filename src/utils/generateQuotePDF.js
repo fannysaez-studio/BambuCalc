@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import { company } from '../config/company'
+import { fmtEur, fmtDate } from './formatters'
 
 const TEAL = [46, 156, 171]
 const DARK = [27, 47, 57]
@@ -17,19 +18,6 @@ const STATUS_MAP = {
 
 function statusInfo(s) {
   return STATUS_MAP[s] || STATUS_MAP.pending
-}
-
-function fmtEur(v) {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v ?? 0)
-}
-
-function fmtDate(iso) {
-  if (!iso) return '—'
-  return new Intl.DateTimeFormat('fr-FR', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(iso))
 }
 
 function validityDate(quoteDate, days) {
