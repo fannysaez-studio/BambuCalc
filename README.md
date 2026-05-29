@@ -27,27 +27,6 @@
 
 ---
 
-## Performances — PageSpeed Insights
-
-> Testé le 29 mai 2026 · [bambucalc.netlify.app](https://bambucalc.netlify.app/)
-
-| | Performances | Accessibilité | Bonnes pratiques | SEO |
-|---|:---:|:---:|:---:|:---:|
-| 🖥️ Desktop | **100** | **100** | **100** | **100** |
-| 📱 Mobile  | **97**  | **100** | **100** | **100** |
-
-<div align="center">
-
-![Lighthouse Desktop 100/100](./bambucalc/assets/lighthouse-desktop.png)
-*Desktop — 100/100 · FCP 0,6 s · LCP 0,6 s · CLS 0,017 · TBT 0 ms*
-
-![Lighthouse Mobile 97/100](./bambucalc/assets/lighthouse-mobile.png)
-*Mobile — 97/100 · FCP 1,4 s · LCP 1,4 s · CLS 0 · TBT 0 ms*
-
-</div>
-
----
-
 **Dernière mise à jour** : 29 mai 2026 — Fanny Saez
 
 ---
