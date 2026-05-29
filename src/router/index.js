@@ -1,16 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Landing        from '@/views/Landing.vue'
-import CalculatorStep from '@/views/calculator/CalculatorStep.vue'
-import Login          from '@/views/auth/Login.vue'
-import Signup         from '@/views/auth/Signup.vue'
+import Landing from '@/views/Landing.vue'
 import { supabase } from '@/lib/supabase'
 
 const routes = [
   { path: '/', name: 'landing', component: Landing, meta: { layout: 'landing' } },
   { path: '/calculator', redirect: '/calculator/1' },
-  { path: '/calculator/:step', name: 'calculator-step', component: CalculatorStep },
-  { path: '/login',  name: 'login',  component: Login },
-  { path: '/signup', name: 'signup', component: Signup },
+  { path: '/calculator/:step', name: 'calculator-step', component: () => import('@/views/calculator/CalculatorStep.vue') },
+  { path: '/login',  name: 'login',  component: () => import('@/views/auth/Login.vue') },
+  { path: '/signup', name: 'signup', component: () => import('@/views/auth/Signup.vue') },
   { path: '/reset-password',   name: 'reset-password',   component: () => import('@/views/auth/ResetPassword.vue') },
   { path: '/dashboard',        name: 'dashboard',        component: () => import('@/views/dashboard/Dashboard.vue'),      meta: { requiresAuth: true } },
   { path: '/admin',            name: 'admin',            component: () => import('@/views/admin/AdminDashboard.vue'),     meta: { requiresAuth: true, requiresAdmin: true } },
