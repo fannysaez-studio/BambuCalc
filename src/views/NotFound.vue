@@ -1,400 +1,376 @@
 <template>
   <div class="nf-page">
-    <!-- Blobs animés en arrière-plan -->
-    <div class="nf-blob nf-blob-1"></div>
-    <div class="nf-blob nf-blob-2"></div>
-    <div class="nf-blob nf-blob-3"></div>
 
-    <!-- Particules flottantes -->
-    <div class="nf-particles">
-      <span class="particle p1"></span>
-      <span class="particle p2"></span>
-      <span class="particle p3"></span>
-      <span class="particle p4"></span>
-      <span class="particle p5"></span>
-      <span class="particle p6"></span>
-    </div>
+    <!-- ── Panneau gauche : illustration ── -->
+    <section class="nf-visual">
+      <router-link to="/" class="nf-icon-btn nf-icon-tl" aria-label="Page d'accueil" title="Page d'accueil">
+        <Home class="nf-icon" aria-hidden="true" />
+      </router-link>
+      <img src="/404.svg" class="nf-illustration" alt="Illustration 404" aria-hidden="true" />
+    </section>
 
-    <div class="nf-card">
-      <!-- 404 animé -->
-      <div class="nf-digits">
-        <span class="digit d1">4</span>
-        <span class="digit d0">
-          0
-          <span class="ring"></span>
-          <span class="ring ring-2"></span>
-        </span>
-        <span class="digit d2">4</span>
-      </div>
-
-      <h1 class="nf-title">Page introuvable</h1>
-      <p class="nf-sub">
-        Oups ! Cette page s'est perdue dans l'espace.<br />
-        Revenez à l'accueil pour continuer.
-      </p>
-
-      <div class="nf-actions">
-        <router-link to="/" class="btn-home">← Accueil</router-link>
-        <router-link v-if="isAuth" to="/dashboard" class="btn-dash">
-          Mon tableau de bord
+    <!-- ── Panneau droit : contenu ── -->
+    <section class="nf-content">
+      <div class="nf-card">
+        <router-link to="/contact" class="nf-icon-btn nf-icon-tl" aria-label="Contact" title="Contact">
+          <MessageSquare class="nf-icon" aria-hidden="true" />
         </router-link>
-      </div>
-    </div>
+        <div class="nf-icon-tr">
+          <router-link to="/login" class="nf-icon-btn" aria-label="Se connecter" title="Se connecter">
+            <LogIn class="nf-icon" aria-hidden="true" />
+          </router-link>
+        </div>
 
-    <p class="nf-brand">BambuCalc</p>
+        <div class="nf-badge">404</div>
+
+        <div class="nf-main">
+          <h1 class="nf-title">Page introuvable</h1>
+          <p class="nf-sub">
+            Oups ! Cette page n'existe pas ou a été déplacée.<br />
+            Revenez à l'accueil pour continuer.
+          </p>
+          <div class="nf-actions">
+            <router-link to="/" class="btn-home">← Accueil</router-link>
+            <router-link v-if="isAuth" to="/dashboard" class="btn-dash">Mon tableau de bord</router-link>
+          </div>
+        </div>
+
+        <p class="nf-brand">BambuCalc</p>
+      </div>
+    </section>
+
   </div>
 </template>
 
 <script>
+import { Home, LogIn, MessageSquare } from 'lucide-vue-next'
 import { supabase } from '../lib/supabase'
 
 export default {
   name: 'NotFound',
-  data() {
-    return { isAuth: false }
-  },
+  components: { Home, LogIn, MessageSquare },
+  data() { return { isAuth: false } },
   async created() {
     const { data } = await supabase.auth.getSession()
     this.isAuth = !!data.session
   },
+  mounted()   { document.body.classList.add('page-404') },
+  unmounted() { document.body.classList.remove('page-404') },
 }
 </script>
 
 <style scoped>
+* { box-sizing: border-box; }
+
 .nf-page {
   width: 100%;
+  align-self: stretch;
   min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
+  padding: 1rem;
+  gap: 0;
+  background-image: url('/hero-vagues.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.nf-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.07) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Panneau gauche teal ── */
+.nf-visual {
+  position: relative;
+  z-index: 1;
+  border-radius: 28px 0 0 28px;
+  background: rgba(177, 229, 226, 0.58);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.24);
+  overflow: hidden;
+}
+
+.nf-visual::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 30%),
+    radial-gradient(circle at 75% 75%, rgba(46,154,171,0.12), transparent 30%);
+  border-radius: 28px 0 0 28px;
+  pointer-events: none;
+}
+
+.nf-illustration {
+  width: min(92%, 480px);
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 20px 40px rgba(29,18,43,0.18));
+  animation: illustIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes illustIn {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Panneau droit ── */
+.nf-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+.nf-card {
+  position: relative;
+  width: 100%;
+  background: rgba(255,255,255,0.64);
+  backdrop-filter: blur(16px);
+  border-radius: 0 28px 28px 0;
+  padding: 3rem 3rem 2rem;
+  box-shadow: -8px 0 24px rgba(29,18,43,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  animation: cardIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+.nf-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1rem;
-  font-family: Inter, 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, #071e26 0%, #0d3d4e 35%, #145f73 65%, #1e8599 100%);
-  background-size: 300% 300%;
-  animation: bgShift 10s ease infinite;
-  position: relative;
-  overflow: hidden;
-}
-
-@keyframes bgShift {
-  0%, 100% { background-position: 0% 50%; }
-  50%       { background-position: 100% 50%; }
-}
-
-/* ── Blobs ── */
-.nf-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-}
-.nf-blob-1 {
-  width: 520px; height: 520px;
-  background: rgba(46, 156, 171, 0.35);
-  top: -180px; left: -160px;
-  animation: blob1 11s ease-in-out infinite;
-}
-.nf-blob-2 {
-  width: 420px; height: 420px;
-  background: rgba(177, 229, 226, 0.2);
-  bottom: -120px; right: -120px;
-  animation: blob2 14s ease-in-out infinite;
-}
-.nf-blob-3 {
-  width: 320px; height: 320px;
-  background: rgba(63, 178, 191, 0.18);
-  top: 50%; left: 55%;
-  transform: translate(-50%, -50%);
-  animation: blob3 18s ease-in-out infinite;
-}
-
-@keyframes blob1 {
-  0%, 100% { transform: translate(0, 0); }
-  33%       { transform: translate(50px, 35px); }
-  66%       { transform: translate(-25px, -45px); }
-}
-@keyframes blob2 {
-  0%, 100% { transform: translate(0, 0); }
-  40%       { transform: translate(-35px, -25px); }
-  70%       { transform: translate(25px, 35px); }
-}
-@keyframes blob3 {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50%       { transform: translate(-50%, -50%) scale(1.4); }
-}
-
-/* ── Particules ── */
-.nf-particles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.particle {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 4px;
-}
-.p1 { width: 10px; height: 10px; top: 14%; left: 9%;   animation: pfloat 6s  ease-in-out infinite; }
-.p2 { width: 6px;  height: 6px;  top: 22%; right: 13%; animation: pfloat 8s  ease-in-out infinite 1.2s; }
-.p3 { width: 14px; height: 14px; bottom: 28%; left: 18%; border-radius: 999px; animation: pfloat 7s ease-in-out infinite 2.1s; }
-.p4 { width: 8px;  height: 8px;  top: 62%; right: 22%;  animation: pfloat 9s  ease-in-out infinite 0.6s; }
-.p5 { width: 12px; height: 12px; bottom: 14%; right: 9%; animation: pfloat 5s ease-in-out infinite 1.8s; }
-.p6 { width: 6px;  height: 6px;  top: 44%; left: 7%;    border-radius: 999px; animation: pfloat 11s ease-in-out infinite 3.4s; }
-
-@keyframes pfloat {
-  0%, 100% { transform: translate(0, 0) rotate(0deg);    opacity: 0.35; }
-  50%       { transform: translate(16px, -28px) rotate(180deg); opacity: 0.85; }
-}
-
-/* ── Card ── */
-.nf-card {
-  position: relative;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.07);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 28px;
-  padding: 3rem 2.5rem;
-  max-width: 460px;
   width: 100%;
-  text-align: center;
-  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.12);
-  animation: cardIn 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes cardIn {
-  from { opacity: 0; transform: translateY(36px) scale(0.94); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── 404 ── */
-.nf-digits {
-  display: flex;
+/* ── Icônes nav ── */
+.nf-icon-btn {
+  position: absolute;
+  top: 1.05rem;
+  left: 1.05rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.05em;
-  margin-bottom: 1.5rem;
-  line-height: 1;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  color: #1f7f97;
+  box-shadow: 0 4px 14px rgba(29,18,43,0.1);
+  text-decoration: none;
+  transition: transform 0.2s, background 0.2s;
+  z-index: 3;
 }
+.nf-icon-btn:hover { transform: translateY(-1px); background: #fff; }
 
-.digit {
-  font-size: clamp(4.5rem, 16vw, 7rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: #fff;
-  text-shadow:
-    0 0 60px rgba(63, 178, 191, 0.9),
-    0 0 20px rgba(63, 178, 191, 0.5),
-    0 6px 20px rgba(0, 0, 0, 0.35);
-  display: block;
-}
-
-.d1 { animation: digitIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s  both, digitFloat 4s ease-in-out 0.65s infinite; }
-.d0 {
-  position: relative;
-  animation: digitIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both, digitFloat 4s ease-in-out 0.8s  infinite;
-  color: transparent;
-  -webkit-text-stroke: 3px rgba(255, 255, 255, 0.88);
-  filter: drop-shadow(0 0 18px rgba(63, 178, 191, 0.7));
-}
-.d2 { animation: digitIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s  both, digitFloat 4s ease-in-out 0.95s infinite; }
-
-@keyframes digitIn {
-  from { opacity: 0; transform: translateY(28px) scale(0.7); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
-}
-@keyframes digitFloat {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-9px); }
-}
-
-/* Rings autour du 0 */
-.ring {
+.nf-icon-tr {
   position: absolute;
-  border-radius: 50%;
-  border: 2px solid rgba(177, 229, 226, 0.65);
-  inset: -14px;
-  animation: ringPulse 2.2s ease-out infinite;
-  pointer-events: none;
+  top: 1.05rem;
+  right: 1.05rem;
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  box-shadow: 0 4px 14px rgba(29,18,43,0.1);
+  z-index: 3;
 }
-.ring-2 {
-  inset: -28px;
-  border-color: rgba(177, 229, 226, 0.28);
-  animation: ringPulse 2.2s ease-out 0.55s infinite;
+.nf-icon-tr .nf-icon-btn {
+  position: static;
+  box-shadow: none;
+  background: transparent;
+}
+.nf-icon-tr .nf-icon-btn:hover { background: rgba(46,156,171,0.1); }
+
+.nf-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
 }
 
-@keyframes ringPulse {
-  0%   { transform: scale(0.75); opacity: 1; }
-  100% { transform: scale(1.5);  opacity: 0; }
+/* ── Badge ── */
+.nf-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 1.1rem;
+  border-radius: 999px;
+  background: rgba(63,178,191,0.1);
+  border: 1.5px solid rgba(46,156,171,0.28);
+  color: #2e9cab;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
 }
 
 /* ── Texte ── */
 .nf-title {
-  font-size: 1.55rem;
+  font-size: clamp(1.8rem, 2.8vw, 2.4rem);
   font-weight: 800;
-  color: #fff;
-  margin: 0 0 0.75rem;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: #1b2f39;
+  margin: 0 0 1.25rem;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 
 .nf-sub {
-  font-size: 0.93rem;
-  color: rgba(255, 255, 255, 0.68);
-  line-height: 1.75;
-  margin: 0 0 2rem;
+  font-size: 0.97rem;
+  color: #4f6570;
+  line-height: 1.85;
+  margin: 0 0 2.75rem;
+  max-width: 340px;
 }
 
 /* ── Boutons ── */
 .nf-actions {
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  width: 100%;
+  max-width: 340px;
 }
 
 .btn-home {
   display: inline-flex;
   align-items: center;
-  padding: 0.72rem 1.7rem;
+  justify-content: center;
+  padding: 0.82rem 1.8rem;
   border-radius: 999px;
   background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
   color: #fff;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 8px 22px rgba(46, 156, 171, 0.5);
+  box-shadow: 0 8px 24px rgba(46,156,171,0.32);
   transition: filter 0.2s, transform 0.2s;
+  width: 100%;
 }
-.btn-home:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.btn-home:hover { filter: brightness(1.08); transform: translateY(-2px); }
 
 .btn-dash {
   display: inline-flex;
   align-items: center;
-  padding: 0.72rem 1.7rem;
+  justify-content: center;
+  padding: 0.82rem 1.8rem;
   border-radius: 999px;
-  border: 1.5px solid rgba(255, 255, 255, 0.28);
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.92rem;
+  border: 1.5px solid rgba(46,156,171,0.3);
+  color: #2e9cab;
+  background: rgba(177,229,226,0.15);
+  font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
   transition: background 0.2s, transform 0.2s;
+  width: 100%;
 }
-.btn-dash:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+.btn-dash:hover { background: rgba(177,229,226,0.3); transform: translateY(-2px); }
 
 /* ── Brand ── */
 .nf-brand {
-  position: relative;
-  z-index: 2;
-  margin-top: 2rem;
-  font-size: 0.8rem;
+  padding-top: 1.5rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.3);
+  color: #2e9cab;
+  opacity: 0.5;
 }
 
 /* ── Desktop ≥ 1101px ── */
 @media (min-width: 1101px) {
-  .nf-page {
-    height: 100dvh;
-    overflow: hidden;
-  }
+  .nf-page { height: 100%; min-height: 100dvh; overflow: hidden; }
+  .nf-visual, .nf-content { min-height: 0; }
 }
 
 /* ── Tablette 769px – 1100px ── */
 @media (max-width: 1100px) and (min-width: 769px) {
-  .nf-blob-1 { width: 380px; height: 380px; }
-  .nf-blob-2 { width: 300px; height: 300px; }
-  .nf-blob-3 { width: 240px; height: 240px; }
-
+  .nf-page {
+    width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: 44fr 56fr;
+    height: 100dvh;
+    min-height: unset;
+    overflow: hidden;
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+  .nf-visual, .nf-content { min-height: 0; }
+  .nf-visual {
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    justify-content: center;
+  }
+  .nf-visual::before { border-radius: 20px; }
+  .nf-illustration { width: min(100%, 240px); }
   .nf-card {
-    max-width: 420px;
-    padding: 2.75rem 2.25rem;
+    border-radius: 20px;
+    padding: 3rem 2.5rem 2rem;
+    justify-content: flex-start;
   }
-
-  .digit {
-    font-size: clamp(4rem, 12vw, 5.5rem);
-  }
-
-  .nf-title { font-size: 1.4rem; }
-  .nf-sub   { font-size: 0.9rem; }
+  .nf-main { justify-content: center; }
+  .nf-badge { margin-bottom: 1.25rem; }
+  .nf-title { font-size: clamp(1.5rem, 3vw, 1.9rem); }
+  .nf-sub { margin-bottom: 2rem; font-size: 0.9rem; }
 }
 
 /* ── Mobile ≤ 768px ── */
 @media (max-width: 768px) {
   .nf-page {
-    padding: 1.5rem 1rem;
-    justify-content: center;
-  }
-
-  /* Blobs réduits pour ne pas déborder */
-  .nf-blob-1 { width: 260px; height: 260px; top: -80px;  left: -80px; }
-  .nf-blob-2 { width: 220px; height: 220px; bottom: -70px; right: -70px; }
-  .nf-blob-3 { width: 180px; height: 180px; }
-
-  /* Particules repositionnées dans les bords */
-  .p1 { top: 8%;  left: 6%; }
-  .p2 { top: 12%; right: 8%; }
-  .p3 { bottom: 20%; left: 10%; }
-  .p4 { top: 55%; right: 12%; }
-  .p5 { bottom: 8%; right: 6%; }
-  .p6 { top: 38%; left: 5%; }
-
-  .nf-card {
-    padding: 2.25rem 1.5rem;
-    border-radius: 22px;
-    max-width: 100%;
-  }
-
-  .nf-digits { margin-bottom: 1.25rem; }
-
-  .digit {
-    font-size: clamp(3.5rem, 18vw, 5rem);
-  }
-
-  .d0 { -webkit-text-stroke: 2px rgba(255, 255, 255, 0.88); }
-
-  .ring   { inset: -10px; }
-  .ring-2 { inset: -20px; }
-
-  .nf-title {
-    font-size: 1.3rem;
-    margin-bottom: 0.6rem;
-  }
-
-  .nf-sub {
-    font-size: 0.88rem;
-    margin-bottom: 1.5rem;
-    line-height: 1.65;
-  }
-
-  .nf-actions {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.6rem;
-  }
-
-  .btn-home,
-  .btn-dash {
     width: 100%;
-    justify-content: center;
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
+    grid-template-columns: 1fr;
+    padding: 0.5rem;
+    gap: 0.5rem;
+    min-height: 100dvh;
+    height: auto;
   }
-
-  .nf-brand { margin-top: 1.5rem; font-size: 0.75rem; }
+  .nf-visual {
+    border-radius: 18px;
+    padding: 1.25rem 1rem;
+    min-height: calc(100dvh - 1.5rem);
+  }
+  .nf-visual::before { border-radius: 18px; }
+  .nf-illustration { width: min(100%, 260px); }
+  .nf-content { align-items: stretch; }
+  .nf-card {
+    border-radius: 18px;
+    padding: 4rem 1.5rem 2rem;
+    min-height: calc(100dvh - 1.5rem);
+    justify-content: flex-start;
+  }
+  .nf-main { justify-content: center; }
+  .nf-badge { margin-bottom: 1.25rem; }
+  .nf-title { font-size: 1.55rem; }
+  .nf-sub { font-size: 0.9rem; margin-bottom: 2rem; }
+  .nf-actions { max-width: 100%; }
+  .nf-brand { padding-top: 1rem; }
 }
+</style>
 
-/* ── Très petit mobile ≤ 390px ── */
-@media (max-width: 390px) {
-  .nf-card { padding: 2rem 1.25rem; }
-
-  .digit { font-size: clamp(3rem, 20vw, 4rem); }
-
-  .nf-title { font-size: 1.2rem; }
-  .nf-sub   { font-size: 0.84rem; }
-}
+<style>
+.page-404 .nav-island,
+.page-404 .nav-bar { display: none !important; }
 </style>
