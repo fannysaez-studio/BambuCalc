@@ -10,7 +10,7 @@
 
 [build.environment]
   # Node 20 LTS — requis par Vite 5 et les dépendances modernes
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 # ── Redirection SPA ──────────────────────────────────────────────────────────
 # Vue Router en mode history : chaque URL doit pointer vers index.html.

@@ -659,6 +659,8 @@ async function _buildDoc(quote, mode = 'client') {
   return doc
 }
 
+export { fmtEur, fmtDate, validityDate, processingLabel, deliveryLabel, paymentLabel, statusInfo }
+
 // ── Exports publics ───────────────────────────────────────────────────────────
 
 export async function generateQuotePDF(quote, mode = 'client') {
