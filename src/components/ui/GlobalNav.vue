@@ -1,7 +1,7 @@
 <template>
   <!-- Desktop / tablette : floating pill -->
   <Transition name="nav-slide">
-    <nav v-if="showNav" class="nav-island" :class="{ 'nav-island--contact': isContactPage }">
+    <nav v-if="showNav" class="nav-island">
 
       <router-link
         to="/calculator/1"
@@ -140,12 +140,9 @@ export default {
   emits: ['logout'],
   computed: {
     showNav() {
-      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales'].includes(this.$route.name)
+      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact'].includes(this.$route.name)
     },
-    isContactPage() {
-      return this.$route.name === 'contact'
-    },
-  },
+},
   methods: {
     handleLogout() { this.$emit('logout') },
     isActive(paths) { return paths.some(p => this.$route.path.startsWith(p)) },
@@ -262,10 +259,6 @@ export default {
   flex-shrink: 0;
 }
 
-/* Sur la page contact (layout 2 colonnes) : centre la pill sur le panneau droit */
-.nav-island--contact {
-  left: 75%;
-}
 
 /* ═══════════════════════════════════════════════════════════════
    MOBILE — bottom tab bar (style iOS)

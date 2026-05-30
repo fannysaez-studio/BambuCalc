@@ -464,6 +464,10 @@ export default defineComponent({
 
 .auth-tab-guest {
   color: #718096;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
 }
 .auth-tab-guest:hover {
   color: #2e9cab;

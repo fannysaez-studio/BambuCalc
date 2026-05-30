@@ -81,6 +81,12 @@
             type="button"
             title="FAQ"
           ><HelpCircle class="ctab-icon" /></button>
+          <router-link
+            v-if="isAuth"
+            to="/dashboard"
+            class="contact-tab-icon"
+            title="Tableau de bord"
+          ><LayoutDashboard class="ctab-icon" /></router-link>
         </div>
 
         <!-- Onglet Formulaire -->
@@ -182,15 +188,16 @@
 
 <script>
 import { defineComponent } from 'vue'
-import { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin } from 'lucide-vue-next'
+import { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin, LayoutDashboard } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 export default defineComponent({
   name: 'Contact',
-  components: { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin },
+  components: { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin, LayoutDashboard },
   data() {
     return {
       tab: 'form',
+      isAuth: false,
       form: { name: '', email: '', message: '' },
       loading: false,
       success: false,
@@ -226,6 +233,10 @@ export default defineComponent({
   },
   created() {
     this.generateCaptcha()
+  },
+  async mounted() {
+    const { data: { session } } = await supabase.auth.getSession()
+    this.isAuth = !!session?.user
   },
   beforeUnmount() {
     if (this.successTimer) clearInterval(this.successTimer)
@@ -567,11 +578,15 @@ a.contact-info-item:hover .ci-icon {
   font-family: inherit;
   box-shadow: 0 4px 12px rgba(29, 18, 43, 0.08);
   transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  text-decoration: none;
 }
 .contact-tab-icon:hover {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(46, 154, 171, 0.12);
   color: #2e9cab;
-  border-color: #b1e5e2;
+  border-color: #2e9cab;
+  transform: translateY(-1px);
 }
 .contact-tab-icon--active {
   background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
@@ -614,6 +629,8 @@ a.contact-info-item:hover .ci-icon {
 }
 .contact-home-link:hover {
   transform: translateY(-1px);
+  background: rgba(46, 154, 171, 0.12);
+  color: #2e9cab;
 }
 .contact-home-icon {
   width: 1.05rem;
@@ -826,6 +843,7 @@ a.contact-info-item:hover .ci-icon {
 .faq-list {
   display: grid;
   gap: 0.6rem;
+  margin-top: 4.5rem;
 }
 .faq-item {
   border: 1px solid #e2e8f0;
@@ -886,8 +904,10 @@ a.contact-info-item:hover .ci-icon {
   .contact-info-list {
     margin-top: auto;
   }
-  /* Centrer le contenu verticalement dans le panneau droit */
-  .contact-card { justify-content: center; }
+  /* Titre en haut, formulaire centré verticalement */
+  .contact-card { justify-content: flex-start; }
+  .contact-header { margin-top: 2rem; margin-bottom: 0; }
+  .contact-form { gap: 1.4rem; margin-top: auto; margin-bottom: auto; }
 
   /* Textarea compact pour tenir sans scroll */
   .field textarea {
@@ -895,12 +915,8 @@ a.contact-info-item:hover .ci-icon {
     max-height: 12rem;
     resize: vertical;
   }
-  /* Aération inter-champs */
-  .contact-form { gap: 1.4rem; }
-  /* Titre centré avec un peu plus d'espace sous lui */
-  .contact-header { margin-bottom: 1.4rem; margin-top: 0; }
   /* CTA : plus de respiration au-dessus du bouton */
-  .primary-btn { margin-top: 0.6rem; }
+  .primary-btn { margin-top: 1.25rem; }
 
   /* ── Corrections visuelles desktop ── */
 
@@ -1081,18 +1097,25 @@ a.contact-info-item:hover .ci-icon {
     overflow-y: visible;
   }
   .contact-header {
-    margin-bottom: 1.5rem;
-    margin-top: 0;
+    margin-bottom: 2.5rem;
+    margin-top: 2rem;
   }
   .contact-header h2 {
     font-size: clamp(1.4rem, 5vw, 1.8rem);
   }
   .contact-header p {
-    font-size: 0.88rem;
+    font-size: 0.78rem;
     margin-top: 0.6rem;
+    white-space: nowrap;
   }
   .contact-form {
     gap: 1.35rem;
+  }
+  .captcha-field {
+    margin-top: 1rem;
+  }
+  .primary-btn {
+    margin-top: 2rem;
   }
   /* Textarea réduit sur mobile pour dégager le bouton de la barre nav */
   .field textarea {
@@ -1149,3 +1172,4 @@ a.contact-info-item:hover .ci-icon {
   box-shadow: 0 0 0 3px rgba(46, 154, 171, 0.16);
 }
 </style>
+
