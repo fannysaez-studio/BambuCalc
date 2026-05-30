@@ -87,7 +87,7 @@ export default {
     linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.78)),
     url('/hero-vagues.svg');
   background-repeat: no-repeat;
-  background-size: 150% auto;
+  background-size: 100% auto;
   background-position: center top;
 }
 
@@ -180,6 +180,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transform: translateY(2.5rem);
 }
 
 .mt-illustration {
