@@ -184,9 +184,10 @@ export default {
 
 .mt-illustration {
   width: min(92%, 620px);
-  height: auto;
+  max-height: 42dvh;
+  object-fit: contain;
   display: block;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   border-radius: 16px;
   animation: floatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   filter: drop-shadow(0 14px 32px rgba(29,18,43,0.13));
@@ -287,5 +288,7 @@ export default {
 
 <style>
 .page-maintenance .nav-island,
-.page-maintenance .nav-bar { display: none !important; }
+.page-maintenance .nav-bar,
+.page-maintenance .cookie-overlay,
+.page-maintenance .cookie-sheet { display: none !important; }
 </style>
