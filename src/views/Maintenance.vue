@@ -23,7 +23,7 @@
 
     <!-- Contenu centré -->
     <div class="mt-content">
-      <img src="/app-preview.png" class="mt-illustration" alt="" aria-hidden="true" />
+      <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
       <h1 class="mt-title">Bientôt disponible</h1>
       <p class="mt-sub">Nous travaillons à vous offrir une expérience optimale. Revenez très vite !</p>
     </div>
@@ -183,12 +183,11 @@ export default {
 }
 
 .mt-illustration {
-  width: min(92%, 620px);
-  max-height: 42dvh;
+  width: min(92%, 420px);
+  max-height: 45dvh;
   object-fit: contain;
   display: block;
-  margin-bottom: 1.5rem;
-  border-radius: 16px;
+  margin-bottom: 2rem;
   animation: floatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   filter: drop-shadow(0 14px 32px rgba(29,18,43,0.13));
 }
@@ -282,7 +281,7 @@ export default {
 @media (max-width: 768px) {
   .mt-title { white-space: normal; }
   .mt-sub   { white-space: normal; text-align: center; }
-  .mt-illustration { width: min(95%, 300px); max-height: 30dvh; }
+  .mt-illustration { width: min(92%, 260px); max-height: 35dvh; }
 }
 </style>
 
