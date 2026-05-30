@@ -23,7 +23,7 @@
 
     <!-- Contenu centré -->
     <div class="mt-content">
-      <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
+      <img src="/app-preview.png" class="mt-illustration" alt="" aria-hidden="true" />
       <h1 class="mt-title">Bientôt disponible</h1>
       <p class="mt-sub">Nous travaillons à vous offrir une expérience optimale. Revenez très vite !</p>
     </div>
@@ -180,15 +180,14 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateY(4.5rem);
 }
 
 .mt-illustration {
-  width: min(92%, 420px);
+  width: min(92%, 620px);
   height: auto;
   display: block;
-  margin-top: -6rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
+  border-radius: 16px;
   animation: floatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   filter: drop-shadow(0 14px 32px rgba(29,18,43,0.13));
 }
@@ -282,7 +281,7 @@ export default {
 @media (max-width: 768px) {
   .mt-title { white-space: normal; }
   .mt-sub   { white-space: normal; text-align: center; }
-  .mt-illustration { width: min(92%, 280px); }
+  .mt-illustration { width: min(95%, 340px); }
 }
 </style>
 
