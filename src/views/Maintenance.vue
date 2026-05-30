@@ -36,9 +36,9 @@
       <a href="https://www.linkedin.com/in/fannysaez/" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="LinkedIn">
         <Linkedin class="mt-icon" aria-hidden="true" />
       </a>
-      <router-link to="/contact" class="mt-social-btn" aria-label="Contact">
+      <a href="mailto:fannysaez.pro@gmail.com" class="mt-social-btn" aria-label="Envoyer un email">
         <Mail class="mt-icon" aria-hidden="true" />
-      </router-link>
+      </a>
     </div>
 
   </div>
