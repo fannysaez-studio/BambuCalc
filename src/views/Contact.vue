@@ -1093,7 +1093,7 @@ a.contact-info-item:hover .ci-icon {
   .contact-card {
     flex: 1;
     padding: 4rem 1.5rem 3rem;
-    justify-content: center;
+    justify-content: flex-start;
     overflow-y: visible;
   }
   .contact-header {
@@ -1116,6 +1116,9 @@ a.contact-info-item:hover .ci-icon {
   }
   .primary-btn {
     margin-top: 2rem;
+  }
+  .faq-list {
+    margin-top: 1rem;
   }
   /* Textarea réduit sur mobile pour dégager le bouton de la barre nav */
   .field textarea {

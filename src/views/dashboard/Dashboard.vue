@@ -105,7 +105,6 @@
         <FileText class="empty-icon" />
         <p class="empty-title">Aucun devis pour l'instant</p>
         <p class="empty-sub">Lance le calculateur pour créer ton premier devis.</p>
-        <router-link to="/calculator/1" class="btn-new btn-new--sm">Créer un devis</router-link>
       </div>
 
       <!-- Vue Tableau (≥641px) / Vue Cartes (≤640px) -->
