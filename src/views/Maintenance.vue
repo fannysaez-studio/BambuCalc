@@ -58,9 +58,11 @@ export default {
   position: relative;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
   background-color: #ffffff;
-  background-image: url('/hero-vagues.svg');
+  background-image:
+    linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.78)),
+    url('/hero-vagues.svg');
   background-repeat: no-repeat;
-  background-size: 200% auto;
+  background-size: 150% auto;
   background-position: center top;
 }
 
