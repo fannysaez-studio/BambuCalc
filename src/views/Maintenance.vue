@@ -68,6 +68,9 @@ export default {
   text-decoration: none;
   transition: transform 0.2s, background 0.2s;
   z-index: 3;
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
 }
 .mt-home-btn:hover { transform: translateY(-1px); background: #fff; }
 .mt-icon { width: 1.1rem; height: 1.1rem; flex-shrink: 0; }
@@ -143,7 +146,7 @@ export default {
   font-size: clamp(0.85rem, 1.5vw, 0.97rem);
   color: #4f6570;
   line-height: 1.6;
-  white-space: nowrap;
+  max-width: 640px;
 }
 
 /* ── Brand ── */
@@ -157,7 +160,7 @@ export default {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #2e9cab;
-  opacity: 0.45;
+  opacity: 0.5;
   white-space: nowrap;
 }
 
