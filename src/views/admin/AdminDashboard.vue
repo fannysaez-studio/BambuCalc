@@ -181,6 +181,7 @@
       :profiles="profiles"
       :loading="loading"
       :initial-filter-user-id="quotesFilterUserId"
+      :highlighted-quote-id="highlightedQuoteId"
       @delete-quote="confirmDeleteQuote($event)"
       @open-send-modal="sendTarget = $event"
       @reload="loadData"
@@ -340,8 +341,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  getAllQuotesAdmin,
-  getAllProfilesAdmin,
   adminDeleteQuote,
   adminDeleteUser,
   adminUnarchiveQuote,
@@ -351,6 +350,7 @@ import { generateQuotePDFDoc, pdfToBase64 } from '@/utils/generateQuotePDF'
 import { fmtEur } from '@/utils/formatters'
 import { useCalculatorStore } from '@/stores/calculator'
 import { usePushNotifications } from '@/composables/usePushNotifications'
+import { useAdminRealtime }    from '@/composables/useAdminRealtime'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import CatalogueTab from '@/components/admin/CatalogueTab.vue'
 import SettingsTab from '@/components/admin/SettingsTab.vue'
@@ -388,12 +388,11 @@ const { isSupported: pushSupported, isSubscribed, permission: pushPermission, lo
 const saved = JSON.parse(localStorage.getItem('bambu_email_settings') || '{}')
 const displayName = ref('')
 const currentUserId = ref(null)
-const profiles = ref([])
-const quotes = ref([])
-const loading = ref(true)
 const activeTab = ref('clients')
 const quotesFilterUserId = ref('')
 const deleteTarget = ref(null)
+const { quotes, profiles, loading, highlightedQuoteId, loadData } = useAdminRealtime(toast)
+
 const deleting = ref(false)
 const senderName = ref(saved.senderName || 'BambuCalc')
 const emailSubject = ref(saved.emailSubject || 'Votre devis BambuCalc — [numéro]')
@@ -456,7 +455,6 @@ const clientCount = computed(
   const meta = data.user.user_metadata || {}
   const full = meta.full_name || meta.name || ''
   displayName.value = full.split(' ')[0] || data.user.email?.split('@')[0] || ''
-  await loadData()
 })()
 
 let lockScrollFn = null
@@ -473,18 +471,6 @@ onUnmounted(() => {
   if (lockScrollFn) window.removeEventListener('resize', lockScrollFn)
 })
 
-async function loadData() {
-  loading.value = true
-  try {
-    const [q, p] = await Promise.all([getAllQuotesAdmin(), getAllProfilesAdmin()])
-    quotes.value = q
-    profiles.value = p
-  } catch {
-    toast.value?.show('Impossible de charger les données.', 'error')
-  } finally {
-    loading.value = false
-  }
-}
 function quoteCountFor(userId) {
   return quotes.value.filter((q) => q.user_id === userId).length
 }
