@@ -12,6 +12,20 @@ const SERVICE_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 serve(async (req) => {
   if (req.method === 'OPTIONS') return handlePreflight()
 
+  // ── Authentification obligatoire ─────────────────────────────────────────
+  const authHeader = req.headers.get('Authorization') ?? ''
+  if (!authHeader.startsWith('Bearer ')) {
+    return errorResponse('Token d\'authentification requis', 401)
+  }
+  const userToken = authHeader.replace('Bearer ', '')
+  const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${userToken}` },
+  })
+  if (!userRes.ok) {
+    return errorResponse('Token invalide ou session expirée', 401)
+  }
+  // ─────────────────────────────────────────────────────────────────────────
+
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
     return errorResponse('VAPID keys non configurées — ajoutez-les dans Supabase Secrets', 500)
   }
