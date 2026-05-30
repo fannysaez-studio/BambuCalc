@@ -55,28 +55,15 @@
         </div>
 
         <form @submit.prevent="onSubmit" class="auth-form">
-          <div class="field-grid">
-            <div class="field">
-              <label for="signup-first-name">Prénom</label>
-              <input
-                id="signup-first-name"
-                v-model="firstName"
-                type="text"
-                placeholder="Jean"
-                required
-              />
-            </div>
-
-            <div class="field">
-              <label for="signup-last-name">Nom</label>
-              <input
-                id="signup-last-name"
-                v-model="lastName"
-                type="text"
-                placeholder="Dupont"
-                required
-              />
-            </div>
+          <div class="field">
+            <label for="signup-full-name">Prénom / Nom</label>
+            <input
+              id="signup-full-name"
+              v-model="fullName"
+              type="text"
+              placeholder="Jean Dupont"
+              required
+            />
           </div>
 
           <div class="field">
@@ -115,8 +102,6 @@
           </button>
         </form>
 
-        <div style="height: 1rem"></div>
-
         <div class="auth-divider"><span>ou</span></div>
 
         <div class="social-grid">
@@ -143,11 +128,6 @@
           </button>
         </div>
 
-        <p class="rgpd-notice">
-          Les informations collectées (nom, email) servent uniquement à gérer votre compte et vous
-          envoyer vos devis. Consultez notre
-          <router-link to="/privacy" target="_blank" class="rgpd-link">politique de confidentialité</router-link>.
-        </p>
       </div>
     </section>
   </div>
@@ -186,8 +166,7 @@ export default defineComponent({
   components: { Home, Lock, UserPlus, UserX, PasswordField },
   data() {
     return {
-      firstName: '',
-      lastName: '',
+      fullName: '',
       email: '',
       password: '',
       gdprAccepted: false,
@@ -203,15 +182,18 @@ export default defineComponent({
         return
       }
       this.loading = true
+      const parts = this.fullName.trim().split(/\s+/)
+      const firstName = parts[0] ?? ''
+      const lastName = parts.slice(1).join(' ')
       try {
         await signup({
           email: this.email,
           password: this.password,
-          firstName: this.firstName,
-          lastName: this.lastName,
+          firstName,
+          lastName,
         })
-        sendWelcomeEmail(this.email, this.firstName, this.lastName)
-        notifyAdminNewClient(this.firstName, this.lastName, this.email)
+        sendWelcomeEmail(this.email, firstName, lastName)
+        notifyAdminNewClient(firstName, lastName, this.email)
         this.$router.push('/calculator')
       } catch (err) {
         this.error = err.message ?? 'Une erreur est survenue.'
@@ -921,12 +903,13 @@ export default defineComponent({
 
   .auth-card {
     padding: 4.5rem 1.5rem 2rem;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 0;
   }
 
   .auth-header {
-    margin-bottom: 1rem;
+    margin-top: 2rem;
+    margin-bottom: 0;
   }
 
   .auth-header h2 {
@@ -939,12 +922,16 @@ export default defineComponent({
   }
 
   .auth-form {
-    margin-top: 0.5rem;
+    margin-top: 3.5rem;
     gap: 0.85rem;
   }
 
   .field-grid {
     gap: 0.65rem;
+  }
+
+  .gdpr-check {
+    margin-top: 1rem;
   }
 
   .field input {
@@ -954,11 +941,11 @@ export default defineComponent({
 
   .primary-btn {
     min-height: 2.6rem;
-    margin-top: 0.5rem;
+    margin-top: 3.5rem;
   }
 
   .auth-divider {
-    margin: 1rem 0 0.75rem;
+    margin: auto 0 0.75rem;
   }
 
   .rgpd-notice {

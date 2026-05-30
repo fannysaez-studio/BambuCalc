@@ -1013,9 +1013,13 @@ export default defineComponent({
   }
 
   .auth-card {
-    padding: 4.5rem 1.5rem 4.5rem;
-    justify-content: center;
+    padding: 4.5rem 1.5rem 2rem;
+    justify-content: flex-start;
     gap: 0;
+  }
+
+  .auth-header {
+    margin-top: 2rem;
   }
 
   .auth-header h2 {
@@ -1028,8 +1032,8 @@ export default defineComponent({
   }
 
   .auth-form {
-    margin-top: 2rem;
-    gap: 1.25rem;
+    margin-top: 5rem;
+    gap: 1.5rem;
   }
 
   .forgot-wrap .auth-form {
@@ -1046,7 +1050,7 @@ export default defineComponent({
   }
 
   .auth-divider {
-    margin: 1.5rem 0 1rem;
+    margin: auto 0 1rem;
   }
 }
 
