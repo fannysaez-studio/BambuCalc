@@ -18,8 +18,8 @@
 
     <div class="mt-content">
       <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
-      <h1 class="mt-title">Maintenance en cours</h1>
-      <p class="mt-sub">BambuCalc est temporairement indisponible pour une mise à jour. Nous revenons très vite !</p>
+      <h1 class="mt-title">Bientôt disponible</h1>
+      <p class="mt-sub">Nous travaillons à vous offrir une expérience optimale. Revenez très vite !</p>
     </div>
 
     <p class="mt-brand">BambuCalc</p>
@@ -57,9 +57,10 @@ export default {
   padding: 2.5rem 2rem;
   position: relative;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
-  background:
-    radial-gradient(ellipse 130% 55% at 50% -5%, rgba(177,229,226,0.58) 0%, transparent 65%),
-    linear-gradient(180deg, #eef9f8 0%, #f7fcfc 50%, #ffffff 100%);
+  background-image: url('/hero-vagues.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 /* ── Bouton home ── */
@@ -133,7 +134,7 @@ export default {
   width: min(92%, 420px);
   height: auto;
   display: block;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
   animation: floatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   filter: drop-shadow(0 14px 32px rgba(29,18,43,0.13));
 }
