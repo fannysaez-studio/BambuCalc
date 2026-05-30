@@ -33,7 +33,7 @@
       <a href="https://github.com/fannysaez" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="GitHub">
         <Github class="mt-icon" aria-hidden="true" />
       </a>
-      <a href="https://www.linkedin.com/in/fanny-saez" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="LinkedIn">
+      <a href="https://www.linkedin.com/in/fannysaez/" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="LinkedIn">
         <Linkedin class="mt-icon" aria-hidden="true" />
       </a>
       <router-link to="/contact" class="mt-social-btn" aria-label="Contact">
