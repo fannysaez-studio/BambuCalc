@@ -1,6 +1,10 @@
 <template>
   <div class="mt-page">
 
+    <!-- Brand haut gauche (quand maintenance active, home masqué) -->
+    <p class="mt-brand" :class="{ 'mt-brand--topleft': !showHomeBtn }">BambuCalc</p>
+
+    <!-- Bouton home haut gauche (hors maintenance) -->
     <router-link
       v-if="showHomeBtn"
       to="/"
@@ -11,27 +15,41 @@
       <Home class="mt-icon" aria-hidden="true" />
     </router-link>
 
+    <!-- Badge LED haut droite -->
     <div class="mt-led-badge">
       <span class="mt-led-dot" aria-hidden="true"></span>
       En maintenance
     </div>
 
+    <!-- Contenu centré -->
     <div class="mt-content">
       <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
       <h1 class="mt-title">Bientôt disponible</h1>
       <p class="mt-sub">Nous travaillons à vous offrir une expérience optimale. Revenez très vite !</p>
     </div>
 
-    <p class="mt-brand">BambuCalc</p>
+    <!-- Icônes sociales bas droite -->
+    <div class="mt-socials">
+      <a href="https://github.com/fannysaez" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="GitHub">
+        <Github class="mt-icon" aria-hidden="true" />
+      </a>
+      <a href="https://www.linkedin.com/in/fanny-saez" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="LinkedIn">
+        <Linkedin class="mt-icon" aria-hidden="true" />
+      </a>
+      <router-link to="/contact" class="mt-social-btn" aria-label="Contact">
+        <Mail class="mt-icon" aria-hidden="true" />
+      </router-link>
+    </div>
+
   </div>
 </template>
 
 <script>
-import { Home } from 'lucide-vue-next'
+import { Home, Github, Linkedin, Mail } from 'lucide-vue-next'
 
 export default {
   name: 'Maintenance',
-  components: { Home },
+  components: { Home, Github, Linkedin, Mail },
   computed: {
     showHomeBtn() {
       return import.meta.env.VITE_MAINTENANCE_MODE !== 'true'
@@ -64,6 +82,30 @@ export default {
   background-repeat: no-repeat;
   background-size: 150% auto;
   background-position: center top;
+}
+
+/* ── Brand ── */
+.mt-brand {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #2e9cab;
+  opacity: 0.5;
+  white-space: nowrap;
+  z-index: 3;
+}
+.mt-brand--topleft {
+  top: 1.15rem;
+  left: 1.25rem;
+  bottom: auto;
+  transform: none;
+  font-size: 0.78rem;
+  opacity: 0.75;
 }
 
 /* ── Bouton home ── */
@@ -168,22 +210,34 @@ export default {
   border: 1.5px solid rgba(46,156,171,0.25);
   border-radius: 999px;
   max-width: 640px;
+  margin-top: 0.5rem;
 }
 
-/* ── Brand ── */
-.mt-brand {
+/* ── Icônes sociales ── */
+.mt-socials {
   position: absolute;
-  bottom: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #2e9cab;
-  opacity: 0.5;
-  white-space: nowrap;
+  bottom: 1.1rem;
+  right: 1.1rem;
+  display: flex;
+  gap: 0.4rem;
+  z-index: 3;
 }
+
+.mt-social-btn {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.85);
+  color: #1f7f97;
+  box-shadow: 0 3px 10px rgba(29,18,43,0.1);
+  text-decoration: none;
+  transition: transform 0.2s, background 0.2s;
+  border: none;
+}
+.mt-social-btn:hover { transform: translateY(-2px); background: #fff; }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
