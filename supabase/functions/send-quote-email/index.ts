@@ -92,7 +92,7 @@ async function sendViaBrevo(payload: object, label: string): Promise<void> {
 // ── Handler principal ─────────────────────────────────────────────────────────
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return handlePreflight()
+  if (req.method === 'OPTIONS') return handlePreflight(req)
 
   // ── LOG 1 : Entrée de la fonction ─────────────────────────────
   console.log('═══════════════════════════════════════════════')

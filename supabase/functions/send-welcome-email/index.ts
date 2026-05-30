@@ -7,7 +7,7 @@ const ADMIN_EMAIL   = 'fannysaez.pro@gmail.com'
 const BRAND_COLOR    = '#2e9cab'
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return handlePreflight()
+  if (req.method === 'OPTIONS') return handlePreflight(req)
 
   try {
     const { email, firstName, lastName, appUrl = 'https://bambucalc.fr' } = await req.json()

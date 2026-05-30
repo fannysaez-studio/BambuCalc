@@ -10,7 +10,7 @@ const SUPABASE_URL      = Deno.env.get('SUPABASE_URL')      ?? ''
 const SERVICE_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return handlePreflight()
+  if (req.method === 'OPTIONS') return handlePreflight(req)
 
   // ── Authentification obligatoire ─────────────────────────────────────────
   const authHeader = req.headers.get('Authorization') ?? ''

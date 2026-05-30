@@ -5,61 +5,56 @@
  *   import { handlePreflight, jsonResponse, errorResponse } from '../_shared/cors.ts'
  *
  *   serve(async (req) => {
- *     if (req.method === 'OPTIONS') return handlePreflight()
+ *     if (req.method === 'OPTIONS') return handlePreflight(req)
  *     // ...
- *     return jsonResponse({ data })
+ *     return jsonResponse({ data }, 200, req)
  *   })
  */
 
-/** Domaine autorisé à appeler nos Edge Functions */
-const ALLOWED_ORIGIN = '*'
+const ALLOWED_ORIGINS = [
+  'https://bambucalc.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:4173',
+]
 
-/**
- * Headers CORS à inclure dans TOUTES les réponses (200 et 4xx).
- * Sans ces headers sur les réponses d'erreur, le navigateur masque
- * le vrai code d'erreur HTTP et affiche uniquement "Network Error".
- */
-export const corsHeaders: Record<string, string> = {
-  'Access-Control-Allow-Origin':  ALLOWED_ORIGIN,
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Max-Age':       '86400', // Cache le preflight 24h côté navigateur
+function resolveOrigin(req?: Request): string {
+  const origin = req?.headers.get('Origin') ?? ''
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
 }
 
-/**
- * Réponse au preflight OPTIONS.
- * Le navigateur envoie cette requête avant chaque POST cross-origin.
- * On répond 204 (No Content) avec les headers CORS — pas de body.
- */
-export function handlePreflight(): Response {
-  return new Response(null, { status: 204, headers: corsHeaders })
+function buildCorsHeaders(req?: Request): Record<string, string> {
+  return {
+    'Access-Control-Allow-Origin':  resolveOrigin(req),
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Max-Age':       '86400',
+    'Vary':                         'Origin',
+  }
 }
 
-/**
- * Sérialise data en JSON et ajoute les headers CORS + Content-Type.
- * À utiliser pour TOUTES les réponses de succès.
- */
-export function jsonResponse(data: unknown, status = 200): Response {
+/** Rétrocompatibilité — préférer getCorsHeaders(req) dans les nouveaux appels */
+export const corsHeaders = buildCorsHeaders()
+
+export function handlePreflight(req?: Request): Response {
+  return new Response(null, { status: 204, headers: buildCorsHeaders(req) })
+}
+
+export function jsonResponse(data: unknown, status = 200, req?: Request): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
-      ...corsHeaders,
+      ...buildCorsHeaders(req),
       'Content-Type': 'application/json; charset=utf-8',
     },
   })
 }
 
-/**
- * Réponse d'erreur JSON avec CORS.
- * IMPORTANT : les headers CORS sont obligatoires même sur les erreurs,
- * sinon le front Vue reçoit une opaque network error au lieu du vrai message.
- */
-export function errorResponse(message: string, status = 400): Response {
+export function errorResponse(message: string, status = 400, req?: Request): Response {
   console.error(`[CORS errorResponse] ${status} — ${message}`)
   return new Response(JSON.stringify({ error: message }), {
     status,
     headers: {
-      ...corsHeaders,
+      ...buildCorsHeaders(req),
       'Content-Type': 'application/json; charset=utf-8',
     },
   })

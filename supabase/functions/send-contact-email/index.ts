@@ -7,12 +7,20 @@ const ADMIN_EMAIL    = 'fannysaez.pro@gmail.com'
 const SENDER_EMAIL   = 'onboarding@resend.dev'
 const BRAND_COLOR    = '#2e9cab'
 
+function htmlEscape(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 serve(async (req) => {
-  if (req.method === 'OPTIONS') return handlePreflight()
+  if (req.method === 'OPTIONS') return handlePreflight(req)
 
   try {
-    const { name, email, message } = await req.json()
-    if (!name || !email || !message) return errorResponse('Champs manquants', 400)
+    const raw = await req.json()
+    if (!raw.name || !raw.email || !raw.message) return errorResponse('Champs manquants', 400, req)
+    const name    = htmlEscape(String(raw.name).slice(0, 200))
+    const email   = htmlEscape(String(raw.email).slice(0, 200))
+    const message = htmlEscape(String(raw.message).slice(0, 5000))
 
     const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -111,7 +119,7 @@ serve(async (req) => {
 
     if (!res.ok) {
       const body = await res.text()
-      return errorResponse(body, 500)
+      return errorResponse(body, 500, req)
     }
 
     // Email de confirmation à l'expéditeur
@@ -163,8 +171,8 @@ serve(async (req) => {
       }),
     }).catch(() => {})
 
-    return jsonResponse({ ok: true })
+    return jsonResponse({ ok: true }, 200, req)
   } catch (err) {
-    return errorResponse(String(err), 500)
+    return errorResponse(String(err), 500, req)
   }
 })

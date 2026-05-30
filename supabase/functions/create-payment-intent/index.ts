@@ -41,7 +41,7 @@ const stripe = new Stripe(STRIPE_SECRET_KEY, {
 // ── Handler principal ────────────────────────────────────────────────────────
 serve(async (req: Request) => {
   // Répondre au preflight CORS envoyé par le navigateur avant chaque POST
-  if (req.method === 'OPTIONS') return handlePreflight()
+  if (req.method === 'OPTIONS') return handlePreflight(req)
 
   if (req.method !== 'POST') {
     return errorResponse('Méthode non autorisée — seul POST est accepté', 405)
