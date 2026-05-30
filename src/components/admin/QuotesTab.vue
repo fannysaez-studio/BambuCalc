@@ -46,7 +46,8 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="q in paginatedQuotes" :key="q.id">
+              <tr v-for="q in paginatedQuotes" :key="q.id"
+                  :class="{ 'quote-row--highlight': q.id === props.highlightedQuoteId }">
                 <td class="td-num">{{ q.quote_number || '—' }}</td>
                 <td class="td-name">{{ q.project_name || '—' }}</td>
                 <td class="td-client td-hide-sm">
@@ -96,7 +97,8 @@
 
       <!-- ══ Vue Cartes — Mobile (≤ 640 px) ══ -->
       <div class="quotes-cards-view">
-        <div v-for="q in paginatedQuotes" :key="q.id" class="qcard">
+        <div v-for="q in paginatedQuotes" :key="q.id"
+             :class="['qcard', { 'qcard--highlight': q.id === props.highlightedQuoteId }]">
           <div class="qcard-top">
             <button class="qcard-client client-link" @click="goToClientFilter(q.user_id)">
               {{ q.client_name || '—' }}
@@ -163,6 +165,7 @@ const props = defineProps({
   profiles:            { type: Array,   default: () => [] },
   loading:             { type: Boolean, default: false },
   initialFilterUserId: { type: String,  default: '' },
+  highlightedQuoteId:  { type: String,  default: null },
 })
 const emit = defineEmits(['delete-quote', 'open-send-modal', 'reload'])
 
@@ -521,4 +524,12 @@ function fmtDate(iso) {
   .panel-header { flex-direction: column; align-items: flex-start; }
   .panel-actions { width: 100%; }
 }
+
+@keyframes rowPulse {
+  0%   { background-color: rgba(46, 156, 171, 0.18); }
+  70%  { background-color: rgba(46, 156, 171, 0.08); }
+  100% { background-color: transparent; }
+}
+.quote-row--highlight { animation: rowPulse 3s ease forwards; }
+.qcard--highlight     { animation: rowPulse 3s ease forwards; }
 </style>
