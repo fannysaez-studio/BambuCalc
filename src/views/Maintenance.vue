@@ -159,9 +159,14 @@ export default {
 }
 
 .mt-sub {
-  font-size: clamp(0.85rem, 1.5vw, 0.97rem);
-  color: #4f6570;
+  font-size: clamp(0.82rem, 1.4vw, 0.92rem);
+  color: #1f7f97;
+  font-weight: 600;
   line-height: 1.6;
+  padding: 0.55rem 1.4rem;
+  background: rgba(46,156,171,0.08);
+  border: 1.5px solid rgba(46,156,171,0.25);
+  border-radius: 999px;
   max-width: 640px;
 }
 
