@@ -140,7 +140,7 @@ export default {
   emits: ['logout'],
   computed: {
     showNav() {
-      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'forbidden'].includes(this.$route.name)
+      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'forbidden', 'maintenance'].includes(this.$route.name)
     },
 },
   methods: {

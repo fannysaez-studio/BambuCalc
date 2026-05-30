@@ -17,7 +17,7 @@
     </div>
 
     <div class="mt-content">
-      <img src="/maintenance.svg" class="mt-illustration" alt="Maintenance en cours" aria-hidden="true" />
+      <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
       <h1 class="mt-title">Maintenance en cours</h1>
       <p class="mt-sub">BambuCalc est temporairement indisponible pour une mise à jour. Nous revenons très vite !</p>
     </div>
