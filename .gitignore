@@ -54,7 +54,6 @@ supabase/.temp/
 
 # Claude / Superpowers — AI-generated files (usage local uniquement)
 .superpowers/
-docs/
 
 # Guides locaux — documentation de déploiement (usage personnel, pas sur GitHub)
 NETLIFY-DEPLOY.md
