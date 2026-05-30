@@ -25,6 +25,7 @@ const routes = [
   { path: '/guest/calculator/:step', redirect: to => `/calculator/${to.params.step}` },
   { path: '/guest/dashboard', redirect: '/dashboard' },
   { path: '/403', name: 'forbidden', component: () => import('@/views/Forbidden.vue') },
+  { path: '/maintenance', name: 'maintenance', component: () => import('@/views/Maintenance.vue') },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue') },
 ]
 
@@ -34,6 +35,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _from, next) => {
+  if (import.meta.env.VITE_MAINTENANCE_MODE === 'true' && to.name !== 'maintenance') {
+    return next({ name: 'maintenance' })
+  }
+
   const { data } = await supabase.auth.getSession()
   const isAuth = !!data.session
 
