@@ -137,7 +137,7 @@ export default {
   width: min(92%, 420px);
   height: auto;
   display: block;
-  margin-top: -3rem;
+  margin-top: -6rem;
   margin-bottom: 2.5rem;
   animation: floatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   filter: drop-shadow(0 14px 32px rgba(29,18,43,0.13));
