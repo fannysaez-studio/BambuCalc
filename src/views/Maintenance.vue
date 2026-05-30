@@ -282,7 +282,7 @@ export default {
 @media (max-width: 768px) {
   .mt-title { white-space: normal; }
   .mt-sub   { white-space: normal; text-align: center; }
-  .mt-illustration { width: min(95%, 340px); }
+  .mt-illustration { width: min(95%, 300px); max-height: 30dvh; }
 }
 </style>
 
