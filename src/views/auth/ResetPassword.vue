@@ -103,6 +103,8 @@ async function onSubmit() {
           </form>
         </div>
 
+        <img src="/new-password-hero.svg" class="rp-mobile-illus" alt="" aria-hidden="true" />
+
         <p class="rp-brand">BambuCalc</p>
       </div>
     </section>
@@ -117,7 +119,7 @@ async function onSubmit() {
           <LogIn class="rp-icon" aria-hidden="true" />
         </router-link>
       </div>
-      <img src="/new-reset-password.svg" class="rp-illustration" alt="Réinitialisation du mot de passe" aria-hidden="true" />
+      <img src="/new-password-hero.svg" class="rp-illustration" alt="Réinitialisation du mot de passe" aria-hidden="true" />
     </section>
 
   </div>
@@ -131,7 +133,7 @@ async function onSubmit() {
   align-self: stretch;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: minmax(420px, 0.9fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
   padding: 1rem;
   gap: 0;
   background-image: url('/hero-vagues.svg');
@@ -165,9 +167,9 @@ async function onSubmit() {
   width: 100%;
   background: rgba(255,255,255,0.64);
   backdrop-filter: blur(16px);
-  border-radius: 28px 0 0 28px;
+  border-radius: 0 28px 28px 0;
   padding: 3rem 3rem 2rem;
-  box-shadow: 8px 0 24px rgba(29,18,43,0.08);
+  box-shadow: -8px 0 24px rgba(29,18,43,0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -177,15 +179,16 @@ async function onSubmit() {
 }
 
 @keyframes cardIn {
-  from { opacity: 0; transform: translateX(-20px); }
+  from { opacity: 0; transform: translateX(20px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── Panneau droit teal ── */
+/* ── Panneau gauche teal ── */
 .rp-visual {
   position: relative;
   z-index: 1;
-  border-radius: 0 28px 28px 0;
+  order: -1;
+  border-radius: 28px 0 0 28px;
   background: rgba(177, 229, 226, 0.58);
   backdrop-filter: blur(8px);
   display: flex;
@@ -201,9 +204,9 @@ async function onSubmit() {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.18), transparent 30%),
-    radial-gradient(circle at 25% 75%, rgba(46,154,171,0.12), transparent 30%);
-  border-radius: 0 28px 28px 0;
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18), transparent 30%),
+    radial-gradient(circle at 75% 75%, rgba(46,154,171,0.12), transparent 30%);
+  border-radius: 28px 0 0 28px;
   pointer-events: none;
 }
 
@@ -360,6 +363,8 @@ async function onSubmit() {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+.rp-mobile-illus { display: none; }
+
 /* ── Brand ── */
 .rp-brand {
   margin-top: auto;
@@ -370,6 +375,34 @@ async function onSubmit() {
   text-transform: uppercase;
   color: #2e9cab;
   opacity: 0.45;
+}
+
+/* ── Desktop ≥ 769px : aération + labels gauche ── */
+@media (min-width: 769px) {
+  .rp-main {
+    width: 100%;
+    max-width: 380px;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  .rp-header {
+    text-align: center;
+    margin-top: 2rem;
+    margin-bottom: 0;
+  }
+  .rp-form {
+    text-align: left;
+    gap: 2rem;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .rp-btn {
+    margin-top: 1.5rem;
+  }
+  .rp-card .rp-icon-tl {
+    left: auto;
+    right: 1.05rem;
+  }
 }
 
 /* ── Desktop ≥ 1101px ── */
@@ -383,7 +416,7 @@ async function onSubmit() {
   .rp-page {
     width: 100%;
     grid-template-columns: 1fr;
-    grid-template-rows: 56fr 44fr;
+    grid-template-rows: 44fr 56fr;
     height: 100dvh;
     min-height: unset;
     overflow: hidden;
@@ -392,7 +425,7 @@ async function onSubmit() {
   }
   .rp-content, .rp-visual { min-height: 0; }
   .rp-card { border-radius: 20px; padding: 3rem 2.5rem 2rem; }
-  .rp-visual { border-radius: 20px; padding: 1.5rem 2rem; }
+  .rp-visual { order: -1; border-radius: 20px; padding: 1.5rem 2rem; }
   .rp-visual::before { border-radius: 20px; }
   .rp-illustration { width: min(100%, 220px); }
   .rp-title { font-size: 1.6rem; }
@@ -411,8 +444,25 @@ async function onSubmit() {
   .rp-content { align-items: stretch; }
   .rp-card {
     border-radius: 18px;
-    padding: 4rem 1.5rem 2rem;
+    padding: 4.5rem 1.5rem 2rem;
     min-height: calc(100dvh - 1.5rem);
+    justify-content: flex-start;
+  }
+  .rp-main {
+    justify-content: flex-start;
+  }
+  .rp-header {
+    margin-top: 1rem;
+    margin-bottom: 0;
+  }
+  .rp-form {
+    margin-top: 5rem;
+    gap: 1.5rem;
+  }
+  .rp-mobile-illus {
+    display: block;
+    width: min(100%, 220px);
+    margin: auto auto 0;
   }
   .rp-visual {
     border-radius: 18px;
