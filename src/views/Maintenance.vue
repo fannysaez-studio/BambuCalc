@@ -180,7 +180,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: translateY(2.5rem);
+  transform: translateY(4.5rem);
 }
 
 .mt-illustration {
