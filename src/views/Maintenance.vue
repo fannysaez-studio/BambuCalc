@@ -28,6 +28,13 @@
       <p class="mt-sub">Nous travaillons à vous offrir une expérience optimale. Revenez très vite !</p>
     </div>
 
+    <!-- Bandeau défilant bas gauche -->
+    <div class="mt-ticker" aria-hidden="true">
+      <div class="mt-ticker-track">
+        <span>BambuCalc — Application en cours de développement&nbsp;&nbsp;•&nbsp;&nbsp;Nous revenons très vite&nbsp;&nbsp;•&nbsp;&nbsp;Expérience optimale en préparation&nbsp;&nbsp;•&nbsp;&nbsp;Merci pour votre patience&nbsp;&nbsp;•&nbsp;&nbsp;BambuCalc — Application en cours de développement&nbsp;&nbsp;•&nbsp;&nbsp;Nous revenons très vite&nbsp;&nbsp;•&nbsp;&nbsp;Expérience optimale en préparation&nbsp;&nbsp;•&nbsp;&nbsp;Merci pour votre patience&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+      </div>
+    </div>
+
     <!-- Icônes sociales bas droite -->
     <div class="mt-socials">
       <a href="https://github.com/fannysaez" target="_blank" rel="noopener noreferrer" class="mt-social-btn" aria-label="GitHub">
@@ -238,6 +245,37 @@ export default {
   border: none;
 }
 .mt-social-btn:hover { transform: translateY(-2px); background: #fff; }
+
+/* ── Ticker défilant ── */
+.mt-ticker {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 0;
+  right: 8rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 90%, transparent 100%);
+}
+
+.mt-ticker-track {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: ticker 22s linear infinite;
+}
+
+.mt-ticker-track span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2e9cab;
+  opacity: 0.55;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
