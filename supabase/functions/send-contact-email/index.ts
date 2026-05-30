@@ -3,13 +3,26 @@ import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 import { handlePreflight, jsonResponse, errorResponse } from '../_shared/cors.ts'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? ''
+const SUPABASE_URL   = Deno.env.get('SUPABASE_URL')   ?? ''
+const SERVICE_KEY    = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const ADMIN_EMAIL    = 'fannysaez.pro@gmail.com'
 const SENDER_EMAIL   = 'onboarding@resend.dev'
 const BRAND_COLOR    = '#2e9cab'
 
+const RATE_LIMIT_MAX     = 3   // messages max
+const RATE_LIMIT_MINUTES = 10  // par tranche de N minutes
+
 function htmlEscape(str: string): string {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
+async function getIpHash(req: Request): Promise<string> {
+  const forwarded = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown'
+  const ip        = forwarded.split(',')[0].trim()
+  const data      = new TextEncoder().encode(ip + 'bambucalc-rl-salt')
+  const hashBuf   = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hashBuf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
 serve(async (req) => {
@@ -21,6 +34,34 @@ serve(async (req) => {
     const name    = htmlEscape(String(raw.name).slice(0, 200))
     const email   = htmlEscape(String(raw.email).slice(0, 200))
     const message = htmlEscape(String(raw.message).slice(0, 5000))
+
+    // ── Rate limiting ─────────────────────────────────────────────────────────
+    const ipHash      = await getIpHash(req)
+    const windowStart = new Date(Date.now() - RATE_LIMIT_MINUTES * 60 * 1000).toISOString()
+
+    const rlRes    = await fetch(
+      `${SUPABASE_URL}/rest/v1/contact_rate_limit?ip_hash=eq.${ipHash}&created_at=gte.${windowStart}&select=id`,
+      { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+    )
+    const recentRequests = await rlRes.json()
+
+    if (Array.isArray(recentRequests) && recentRequests.length >= RATE_LIMIT_MAX) {
+      return errorResponse(`Trop de messages envoyés. Réessayez dans ${RATE_LIMIT_MINUTES} minutes.`, 429, req)
+    }
+
+    // Enregistrer cet envoi
+    await fetch(`${SUPABASE_URL}/rest/v1/contact_rate_limit`, {
+      method:  'POST',
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body:    JSON.stringify({ ip_hash: ipHash }),
+    })
+
+    // Nettoyage des anciennes entrées (async — ne bloque pas la réponse)
+    fetch(`${SUPABASE_URL}/rest/v1/contact_rate_limit?created_at=lt.${windowStart}`, {
+      method:  'DELETE',
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+    }).catch(() => {})
+    // ─────────────────────────────────────────────────────────────────────────
 
     const html = `<!DOCTYPE html>
 <html lang="fr">
