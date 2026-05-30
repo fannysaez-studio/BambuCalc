@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     isFullscreenRoute() {
-      return ['landing', 'login', 'signup', 'reset-password', 'contact', 'not-found', 'forbidden', 'privacy', 'mentions-legales', 'dashboard', 'profile', 'admin', 'payment'].includes(this.$route?.name)
+      return ['landing', 'login', 'signup', 'reset-password', 'contact', 'not-found', 'forbidden', 'maintenance', 'privacy', 'mentions-legales', 'dashboard', 'profile', 'admin', 'payment'].includes(this.$route?.name)
     },
   },
   async created() {
