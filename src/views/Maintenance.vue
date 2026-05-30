@@ -57,7 +57,20 @@ export default {
   padding: 2.5rem 2rem;
   position: relative;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
-  background: radial-gradient(ellipse 100% 45% at 50% 0%, rgba(177,229,226,0.3) 0%, #ffffff 65%);
+  background-color: #f5fdfd;
+  background-image: url('/hero-vagues.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.mt-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.72);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* ── Bouton home ── */
