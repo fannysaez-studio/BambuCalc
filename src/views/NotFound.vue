@@ -331,7 +331,7 @@ export default {
     padding: 3rem 2.5rem 2rem;
     justify-content: flex-start;
   }
-  .nf-main { justify-content: center; }
+  .nf-main { flex: 0 0 auto; margin-top: auto; margin-bottom: auto; justify-content: flex-start; }
   .nf-badge { margin-bottom: 1.25rem; }
   .nf-title { font-size: clamp(1.5rem, 3vw, 1.9rem); }
   .nf-sub { margin-bottom: 2rem; font-size: 0.9rem; }
@@ -358,12 +358,12 @@ export default {
   .nf-card {
     border-radius: 18px;
     padding: 4rem 1.5rem 2rem;
-    min-height: calc(100dvh - 1.5rem);
+    height: calc(100dvh - 1.5rem);
     justify-content: flex-start;
   }
-  .nf-main { justify-content: center; }
-  .nf-badge { margin-bottom: 1.25rem; }
-  .nf-title { font-size: 1.55rem; }
+  .nf-main { flex: 0 0 auto; margin-top: auto; margin-bottom: auto; justify-content: flex-start; }
+  .nf-badge { margin-top: 1.5rem; margin-bottom: 1.25rem; font-size: 1.05rem; padding: 0.45rem 1.5rem; }
+  .nf-title { font-size: 2rem; }
   .nf-sub { font-size: 0.9rem; margin-bottom: 2rem; }
   .nf-actions { max-width: 100%; }
   .nf-brand { padding-top: 1rem; }

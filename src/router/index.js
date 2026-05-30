@@ -24,6 +24,7 @@ const routes = [
   { path: '/guest', redirect: '/calculator/1' },
   { path: '/guest/calculator/:step', redirect: to => `/calculator/${to.params.step}` },
   { path: '/guest/dashboard', redirect: '/dashboard' },
+  { path: '/403', name: 'forbidden', component: () => import('@/views/Forbidden.vue') },
   { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue') },
 ]
 
@@ -47,7 +48,7 @@ router.beforeEach(async (to, _from, next) => {
 
   if (to.meta?.requiresAdmin) {
     const { data: isAdmin } = await supabase.rpc('is_admin')
-    if (!isAdmin) return next({ name: 'dashboard' })
+    if (!isAdmin) return next({ name: 'forbidden' })
   }
 
   return next()
