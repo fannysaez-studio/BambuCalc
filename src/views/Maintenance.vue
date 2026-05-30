@@ -1,7 +1,13 @@
 <template>
   <div class="mt-page">
 
-    <router-link to="/" class="mt-home-btn" aria-label="Page d'accueil" title="Page d'accueil">
+    <router-link
+      v-if="showHomeBtn"
+      to="/"
+      class="mt-home-btn"
+      aria-label="Page d'accueil"
+      title="Page d'accueil"
+    >
       <Home class="mt-icon" aria-hidden="true" />
     </router-link>
 
@@ -26,6 +32,11 @@ import { Home } from 'lucide-vue-next'
 export default {
   name: 'Maintenance',
   components: { Home },
+  computed: {
+    showHomeBtn() {
+      return import.meta.env.VITE_MAINTENANCE_MODE !== 'true'
+    },
+  },
   mounted()   { document.body.classList.add('page-maintenance') },
   unmounted() { document.body.classList.remove('page-maintenance') },
 }
