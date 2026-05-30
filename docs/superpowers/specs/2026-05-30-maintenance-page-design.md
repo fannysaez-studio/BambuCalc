@@ -81,8 +81,10 @@ if (import.meta.env.VITE_MAINTENANCE_MODE === 'true' && to.name !== 'maintenance
 
 - Toutes les routes redirigent vers `/maintenance` quand le flag est actif
 - La route `/maintenance` elle-même est toujours accessible
-- Pour activer : `VITE_MAINTENANCE_MODE=true` dans `.env` (ou variable Netlify) + redéploiement
-- Pour désactiver : supprimer/passer à `false` + redéploiement
+- Pour activer : dans **Netlify dashboard → Site → Environment variables** → ajouter `VITE_MAINTENANCE_MODE = true` → Trigger deploy
+- Pour désactiver : supprimer la variable dans Netlify → Trigger deploy
+- Aucun commit ni push nécessaire pour basculer le mode
+- **En local** : ajouter `VITE_MAINTENANCE_MODE=true` dans `.env.local` (git-ignoré) + relancer `npm run dev`. Si la variable est absente → maintenance désactivée par défaut.
 
 ---
 
