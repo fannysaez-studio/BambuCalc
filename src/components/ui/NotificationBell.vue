@@ -352,6 +352,6 @@ onUnmounted(() => {
 .notif-drop-enter-from, .notif-drop-leave-to { opacity: 0; transform: translateY(8px); }
 @media (max-width: 640px) {
   .notif-panel { right: 8px; left: 8px; width: auto; bottom: 72px; }
-  .notif-panel--top { top: 74px; bottom: auto; left: auto; right: 8px; width: calc(100vw - 16px); }
+  .notif-panel--top { top: 74px; bottom: auto; left: auto; right: 8px; width: 300px; }
 }
 </style>
