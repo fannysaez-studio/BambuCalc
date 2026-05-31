@@ -220,14 +220,6 @@
             <Eye class="btn-preview-icon" />
             <span>Aperçu</span>
           </button>
-          <router-link
-            v-if="currentStep === steps.length"
-            to="/dashboard"
-            class="btn-dash-icon"
-            title="Mon tableau de bord"
-          >
-            <LayoutDashboard :size="18" />
-          </router-link>
           <button
             v-if="currentStep === steps.length"
             :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
@@ -242,6 +234,14 @@
               {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
             </span>
           </button>
+          <router-link
+            v-if="currentStep === steps.length"
+            to="/dashboard"
+            class="btn-dash-icon"
+            title="Mon tableau de bord"
+          >
+            <LayoutDashboard :size="18" />
+          </router-link>
         </div>
       </div>
 
