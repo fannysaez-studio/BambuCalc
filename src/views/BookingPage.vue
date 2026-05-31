@@ -395,41 +395,46 @@ onUnmounted(() => {
   .rdv-info-item { flex: 1 1 0; }
 }
 
-/* ── Tablette ── */
+/* ── Tablette : 769px – 1100px (calqué sur Contact) ── */
 @media (max-width: 1100px) and (min-width: 769px) {
   .rdv-page {
-    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.9fr);
-    grid-template-rows: 1fr;
+    width: 100%;
+    grid-template-columns: 1fr;
+    grid-template-rows: 44fr 56fr;
     height: 100dvh;
+    min-height: unset;
     overflow: hidden;
     padding: 0.75rem;
-    gap: 0;
+    gap: 0.75rem;
   }
+  .rdv-visual, .rdv-card { border-radius: 20px; }
+  .rdv-visual::before, .rdv-visual::after { border-radius: 20px; }
+  .rdv-visual, .rdv-panel { min-height: 0; }
   .rdv-visual {
-    border-radius: 20px 0 0 20px;
-    padding: 2rem 1.5rem 1.5rem;
+    flex-direction: column;
     justify-content: space-between;
+    padding: 1.75rem 2rem 1.25rem;
   }
-  .rdv-visual::before, .rdv-visual::after { border-radius: 20px 0 0 20px; }
-  .rdv-card {
-    border-radius: 0 20px 20px 0;
-    padding: 2.5rem 1.75rem 1.25rem;
-    overflow-y: auto;
-  }
-  .visual-copy { margin-top: 1rem; }
-  .visual-illustration img { width: min(100%, 200px); max-width: 200px; }
-  .rdv-info-list { flex-direction: row; margin-top: 0; padding-top: 0.85rem; flex-wrap: wrap; gap: 0.4rem; }
-  .rdv-info-item { flex: 1 1 calc(50% - 0.4rem); min-width: 0; }
-  .calendly-inline-widget { min-height: 580px; }
+  .visual-copy { margin-top: 0; text-align: center; }
+  .visual-copy h1 { font-size: clamp(1.5rem, 2.8vw, 2rem); white-space: normal; }
+  .visual-copy p { margin-top: 0.4rem; font-size: 0.88rem; }
+  .visual-illustration { flex: 1; min-height: 0; }
+  .visual-illustration img { width: min(100%, 160px); max-width: 160px; }
+  .rdv-info-list { flex-direction: row; justify-content: space-between; gap: 0.5rem; margin-top: 0; padding-top: 0.85rem; }
+  .rdv-info-item { flex: 1 1 0; }
+  .rdv-card { padding: 3rem 2.5rem 1.5rem; overflow-y: auto; }
+  .calendly-inline-widget { min-height: 100%; height: 100%; }
 }
 
-/* ── Mobile ── */
+/* ── Mobile : ≤ 768px (calqué sur Contact) ── */
 @media (max-width: 768px) {
   .rdv-page {
+    width: 100%;
     grid-template-columns: 1fr;
     padding: 0.5rem;
     gap: 0.5rem;
     height: auto;
+    overflow-x: hidden;
   }
   .rdv-visual, .rdv-card { border-radius: 18px; }
   .rdv-visual::before, .rdv-visual::after { border-radius: 18px; }
@@ -447,17 +452,16 @@ onUnmounted(() => {
   .rdv-info-list {
     flex-direction: row;
     justify-content: space-between;
-    gap: 0.35rem;
+    gap: 0.3rem;
     margin-top: 0;
     padding-top: 0.75rem;
   }
-  .rdv-info-list { gap: 0.3rem; }
-  .rdv-info-item { padding: 0.4rem 0.1rem; gap: 0.2rem; border-radius: 10px; }
+  .rdv-info-item { padding: 0.45rem 0.15rem; gap: 0.25rem; border-radius: 10px; }
   .ri-icon { width: 0.85rem; height: 0.85rem; }
   .rdv-info-item strong { font-size: 0.5rem; }
   .rdv-info-item span { font-size: 0.65rem; }
   .rdv-panel { min-height: calc(100dvh - 1.5rem); display: flex; flex-direction: column; }
-  .rdv-card { flex: 1; padding: 4rem 1.25rem 3rem; }
-  .calendly-inline-widget { min-height: 600px; }
+  .rdv-card { flex: 1; padding: 4rem 1.5rem 3rem; overflow-y: visible; }
+  .calendly-inline-widget { min-height: 640px; }
 }
 </style>
