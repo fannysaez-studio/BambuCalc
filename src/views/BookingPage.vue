@@ -230,7 +230,7 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   overflow: visible;
   z-index: 1;
@@ -243,8 +243,8 @@ onUnmounted(() => {
   pointer-events: none;
 }
 .visual-illustration img {
-  width: min(100%, 220px);
-  max-width: 220px;
+  width: min(100%, 270px);
+  max-width: 270px;
   height: auto;
   display: block;
   filter: drop-shadow(0 24px 36px rgba(22,10,45,0.28));
