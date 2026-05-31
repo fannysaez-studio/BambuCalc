@@ -90,12 +90,13 @@ function timeAgo(iso) {
 
 async function loadNotifications() {
   loading.value = true
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) { loading.value = false; return }
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { loading.value = false; return }
+  const userId = session.user.id
   const { data, error } = await supabase
     .from('notifications')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(50)
   if (error) console.error('[NotificationBell] load error:', error)
@@ -104,13 +105,14 @@ async function loadNotifications() {
 }
 
 async function setupRealtime() {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return
+  const userId = session.user.id
   realtimeChannel = supabase
-    .channel(`notif-bell-${user.id}`)
+    .channel(`notif-bell-${userId}`)
     .on(
       'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+      { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
       (payload) => {
         notifications.value = [payload.new, ...notifications.value]
       }
@@ -128,10 +130,10 @@ async function markRead(n) {
 
 async function markAllRead() {
   notifications.value.forEach(n => { n.read = true })
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return
   await supabase.from('notifications').update({ read: true })
-    .eq('user_id', user.id)
+    .eq('user_id', session.user.id)
     .eq('read', false)
 }
 
