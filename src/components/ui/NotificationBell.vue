@@ -207,8 +207,8 @@ onUnmounted(() => {
 
 .notif-badge {
   position: absolute;
-  top: 2px;
-  right: 2px;
+  top: -5px;
+  right: -5px;
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
