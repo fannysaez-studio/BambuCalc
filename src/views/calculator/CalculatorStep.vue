@@ -534,11 +534,12 @@ export default {
           this.$refs.toast.show('Devis mis à jour avec succès !', 'success')
           s.editingQuoteId = null
           this.$router.replace({ query: {} })
+          setTimeout(() => this.$router.push('/dashboard'), 1500)
         } else {
           savedQuote = await saveQuoteToDb(payload)
           this.$refs.toast.show(this.isAdmin ? 'Devis sauvegardé !' : 'Demande envoyée !', 'success')
           supabase.functions.invoke('send-quote-email', { body: { quote: savedQuote } }).catch(() => {})
-          setTimeout(() => s.resetForNewQuote(), 2000)
+          setTimeout(() => { s.resetForNewQuote(); this.$router.push('/dashboard') }, 1500)
         }
         this.saveStatus = 'ok'
       } catch {
