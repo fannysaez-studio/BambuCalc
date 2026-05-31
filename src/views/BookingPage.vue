@@ -311,7 +311,7 @@ onUnmounted(() => {
   background: rgba(255,255,255,0.62);
   backdrop-filter: blur(16px);
   border-radius: 0 28px 28px 0;
-  padding: 3rem 2.5rem 1.5rem;
+  padding: 1rem 2.5rem 1.5rem;
   box-shadow: -8px 0 20px rgba(29,18,43,0.08);
   display: flex;
   flex-direction: column;
@@ -349,7 +349,12 @@ onUnmounted(() => {
 .rdv-card-header {
   text-align: center;
   margin-bottom: 1.25rem;
-  margin-top: 1rem;
+  margin-top: 0;
+  padding: 0 3.5rem;
+  min-height: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .rdv-card-header h2 {
   margin: 0;
@@ -388,7 +393,7 @@ onUnmounted(() => {
   }
   .rdv-visual, .rdv-panel { min-height: 0; }
   .rdv-card { justify-content: flex-start; }
-  .rdv-card-header { margin-top: 2rem; }
+  .rdv-card-header { margin-top: 0; }
   br.title-br { display: none; }
   .visual-copy h1 { font-size: clamp(1.9rem, 2.5vw, 2.6rem); }
   .rdv-info-list { gap: 0.7rem; }
