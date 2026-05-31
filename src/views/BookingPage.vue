@@ -13,7 +13,7 @@
           Prendre<br class="title-br" />
           rendez-vous.
         </h1>
-        <p>Choisissez un créneau,<br>on s'occupe du reste.</p>
+        <p>Choisissez un créneau, on s'occupe du reste.</p>
       </div>
 
       <div class="visual-illustration">
@@ -243,8 +243,8 @@ onUnmounted(() => {
   pointer-events: none;
 }
 .visual-illustration img {
-  width: min(100%, 340px);
-  max-width: 340px;
+  width: min(100%, 220px);
+  max-width: 220px;
   height: auto;
   display: block;
   filter: drop-shadow(0 24px 36px rgba(22,10,45,0.28));
