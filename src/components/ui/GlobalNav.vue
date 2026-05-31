@@ -141,7 +141,7 @@ const emit = defineEmits(['logout'])
 const route = useRoute()
 
 const showNav = computed(() =>
-  !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'forbidden', 'maintenance'].includes(route.name)
+  !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'forbidden', 'maintenance', 'calculator-step'].includes(route.name)
 )
 
 function handleLogout() { emit('logout') }
