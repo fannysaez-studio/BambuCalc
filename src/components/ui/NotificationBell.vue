@@ -75,6 +75,7 @@ const open = ref(false)
 const loading = ref(false)
 const bellWrap = ref(null)
 let realtimeChannel = null
+let authSubscription = null
 
 const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
 
@@ -147,14 +148,21 @@ function handleClickOutside(e) {
   }
 }
 
-onMounted(async () => {
-  await loadNotifications()
-  await setupRealtime()
+onMounted(() => {
+  // Attendre que la session soit restaurée avant de charger
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    if (session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
+      await loadNotifications()
+      if (!realtimeChannel) await setupRealtime()
+    }
+  })
+  authSubscription = subscription
   document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+  if (authSubscription) authSubscription.unsubscribe()
   document.removeEventListener('click', handleClickOutside)
 })
 </script>
@@ -167,24 +175,24 @@ onUnmounted(() => {
 /* ── Bouton cloche ── */
 .notif-btn {
   position: relative;
-  width: 36px;
-  height: 36px;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
-  border: none;
-  background: transparent;
+  color: #718096;
+  border: 1.5px solid #e2e8f0;
+  background: rgba(255,255,255,0.9);
   cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease, transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
+  transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
 }
 .notif-btn:hover, .notif-btn--active {
+  border-color: #2e9cab;
   color: #2e9cab;
-  background: rgba(46, 156, 171, 0.10);
-  transform: translateY(-2px);
+  background: rgba(255,255,255,0.9);
 }
 
 .notif-badge {
