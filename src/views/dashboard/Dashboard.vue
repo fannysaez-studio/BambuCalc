@@ -319,163 +319,193 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
+import { fmtEur } from '@/utils/formatters'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
 
-export default {
-  name: 'Dashboard',
-  components: { ToastMessage, QuotePreviewModal, User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye },
-  data() {
-    return {
-      displayName: '',
-      isAnonymous: false,
-      quotes: [],
-      loading: true,
-      archiveTarget: null,
-      archiving: false,
-      archivedQuotes: [],
-      archivedCount: 0,
-      showArchives: false,
-      loadingArchives: false,
-      previewingQuote: null,
-      zoomedImageUrl: null,
-      showLinkForm: false,
-      linkEmail: '',
-      linkPassword: '',
-      linking: false,
-      linkSuccess: false,
-      linkError: null,
+// ── State ──
+const displayName = ref('')
+const isAnonymous = ref(false)
+const quotes = ref([])
+const loading = ref(true)
+const archiveTarget = ref(null)
+const archiving = ref(false)
+const archivedQuotes = ref([])
+const archivedCount = ref(0)
+const showArchives = ref(false)
+const loadingArchives = ref(false)
+const previewingQuote = ref(null)
+const zoomedImageUrl = ref(null)
+const showLinkForm = ref(false)
+const linkEmail = ref('')
+const linkPassword = ref('')
+const linking = ref(false)
+const linkSuccess = ref(false)
+const linkError = ref(null)
+const toast = ref(null)
+
+// ── Computed ──
+const avgCost = computed(() => {
+  if (!quotes.value.length) return 0
+  const sum = quotes.value.reduce((a, q) => a + (q.total_cost || 0), 0)
+  return sum / quotes.value.length
+})
+
+const totalRevenue = computed(() =>
+  quotes.value.reduce((a, q) => a + (q.total_cost || 0), 0)
+)
+
+const topMaterial = computed(() => {
+  if (!quotes.value.length) return ''
+  const counts = {}
+  quotes.value.forEach(q => { if (q.material) counts[q.material] = (counts[q.material] || 0) + 1 })
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+})
+
+const archivedByYear = computed(() => {
+  const grouped = {}
+  for (const q of archivedQuotes.value) {
+    const year = q.created_at ? new Date(q.created_at).getFullYear() : 'Inconnue'
+    if (!grouped[year]) grouped[year] = []
+    grouped[year].push(q)
+  }
+  return Object.fromEntries(Object.entries(grouped).sort((a, b) => b[0] - a[0]))
+})
+
+// ── Formatters ──
+function fmtDate(iso) {
+  if (!iso) return '—'
+  return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
+}
+
+function wasEdited(q) {
+  if (!q.updated_at || !q.created_at) return false
+  return Math.abs(new Date(q.updated_at) - new Date(q.created_at)) > 60_000
+}
+
+function statusLabel(status) {
+  return { pending: 'En attente', accepted: 'Accepté', refused: 'Refusé', sent: 'Envoyé' }[status] || 'En attente'
+}
+
+// ── Data loading ──
+async function loadQuotes() {
+  loading.value = true
+  try {
+    const [result, { count }] = await Promise.all([
+      getQuotes(),
+      supabase.from('quotes').select('*', { count: 'exact', head: true }).eq('archived', true),
+    ])
+    quotes.value = result ?? []
+    archivedCount.value = count ?? 0
+  } catch (e) {
+    console.error('[Dashboard] loadQuotes error:', e)
+    toast.value?.show(`Erreur : ${e?.message || JSON.stringify(e)}`, 'error')
+  } finally {
+    loading.value = false
+  }
+}
+
+// ── Realtime ──
+let realtimeChannel = null
+
+function setupRealtime(userId) {
+  realtimeChannel = supabase
+    .channel('dashboard-quotes')
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'quotes', filter: `user_id=eq.${userId}` },
+      (payload) => {
+        const idx = quotes.value.findIndex(q => q.id === payload.new.id)
+        if (idx !== -1) quotes.value[idx] = { ...quotes.value[idx], ...payload.new }
+      }
+    )
+    .subscribe()
+}
+
+onUnmounted(() => {
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+})
+
+// ── Init (équivalent de created()) ──
+;(async () => {
+  const { data } = await supabase.auth.getUser()
+  const user = data.user
+  if (user) {
+    isAnonymous.value = user.is_anonymous ?? false
+    if (isAnonymous.value) {
+      displayName.value = 'Invité'
+    } else {
+      const meta = user.user_metadata || {}
+      const full = meta.full_name || meta.name || ''
+      displayName.value = full.split(' ')[0] || user.email?.split('@')[0] || ''
     }
-  },
-  computed: {
-    avgCost() {
-      if (!this.quotes.length) return 0
-      const sum = this.quotes.reduce((a, q) => a + (q.total_cost || 0), 0)
-      return sum / this.quotes.length
-    },
-    totalRevenue() {
-      return this.quotes.reduce((a, q) => a + (q.total_cost || 0), 0)
-    },
-    topMaterial() {
-      if (!this.quotes.length) return ''
-      const counts = {}
-      this.quotes.forEach(q => { if (q.material) counts[q.material] = (counts[q.material] || 0) + 1 })
-      return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
-    },
-    archivedByYear() {
-      const grouped = {}
-      for (const q of this.archivedQuotes) {
-        const year = new Date(q.created_at).getFullYear()
-        if (!grouped[year]) grouped[year] = []
-        grouped[year].push(q)
-      }
-      return Object.fromEntries(Object.entries(grouped).sort((a, b) => b[0] - a[0]))
-    },
-  },
-  async created() {
-    const { data } = await supabase.auth.getUser()
-    const user = data.user
-    if (user) {
-      this.isAnonymous = user.is_anonymous ?? false
-      if (this.isAnonymous) {
-        this.displayName = 'Invité'
-      } else {
-        const meta = user.user_metadata || {}
-        const full = meta.full_name || meta.name || ''
-        this.displayName = full.split(' ')[0] || user.email?.split('@')[0] || ''
-      }
+  }
+  await loadQuotes()
+  if (user) setupRealtime(user.id)  // après loadQuotes — on subscribe depuis un état connu
+})()
+
+// ── Actions ──
+async function downloadPDF(q) {
+  await generateQuotePDF(q)
+}
+
+function confirmArchive(q) {
+  archiveTarget.value = q
+}
+
+async function doArchive() {
+  archiving.value = true
+  try {
+    await archiveQuote(archiveTarget.value.id)
+    quotes.value = quotes.value.filter(q => q.id !== archiveTarget.value.id)
+    archivedCount.value++
+    if (showArchives.value) archivedQuotes.value = await getArchivedQuotes()
+    toast.value?.show('Devis archivé.', 'success', 2500)
+    archiveTarget.value = null
+  } catch {
+    toast.value?.show("Erreur lors de l'archivage.", 'error')
+  } finally {
+    archiving.value = false
+  }
+}
+
+async function toggleArchives() {
+  showArchives.value = !showArchives.value
+  if (showArchives.value && archivedQuotes.value.length === 0) {
+    loadingArchives.value = true
+    try {
+      archivedQuotes.value = await getArchivedQuotes()
+    } catch {
+      toast.value?.show('Erreur chargement archives.', 'error')
+    } finally {
+      loadingArchives.value = false
     }
-    await this.loadQuotes()
-  },
-  methods: {
-    async loadQuotes() {
-      this.loading = true
-      try {
-        const [result, { count }] = await Promise.all([
-          getQuotes(),
-          supabase.from('quotes').select('*', { count: 'exact', head: true }).eq('archived', true),
-        ])
-        this.quotes = result ?? []
-        this.archivedCount = count ?? 0
-      } catch (e) {
-        console.error('[Dashboard] loadQuotes error:', e)
-        this.$refs.toast?.show(`Erreur : ${e?.message || JSON.stringify(e)}`, 'error')
-      } finally {
-        this.loading = false
-      }
-    },
-    statusLabel(status) {
-      return { pending: 'En attente', accepted: 'Accepté', refused: 'Refusé', sent: 'Envoyé' }[status] || 'En attente'
-    },
-    async downloadPDF(q) {
-      await generateQuotePDF(q)
-    },
-    confirmArchive(q) {
-      this.archiveTarget = q
-    },
-    async doArchive() {
-      this.archiving = true
-      try {
-        await archiveQuote(this.archiveTarget.id)
-        this.quotes = this.quotes.filter(q => q.id !== this.archiveTarget.id)
-        this.archivedCount++
-        if (this.showArchives) this.archivedQuotes = await getArchivedQuotes()
-        this.$refs.toast.show('Devis archivé.', 'success', 2500)
-        this.archiveTarget = null
-      } catch {
-        this.$refs.toast.show('Erreur lors de l\'archivage.', 'error')
-      } finally {
-        this.archiving = false
-      }
-    },
-    async toggleArchives() {
-      this.showArchives = !this.showArchives
-      if (this.showArchives && this.archivedQuotes.length === 0) {
-        this.loadingArchives = true
-        try {
-          this.archivedQuotes = await getArchivedQuotes()
-        } catch {
-          this.$refs.toast.show('Erreur chargement archives.', 'error')
-        } finally {
-          this.loadingArchives = false
-        }
-      }
-    },
-    async linkAccount() {
-      this.linking = true
-      this.linkError = null
-      this.linkSuccess = false
-      try {
-        const { error } = await supabase.auth.updateUser({
-          email: this.linkEmail,
-          password: this.linkPassword,
-        })
-        if (error) throw error
-        this.linkSuccess = true
-        this.isAnonymous = false
-      } catch (e) {
-        this.linkError = e.message || 'Une erreur est survenue.'
-      } finally {
-        this.linking = false
-      }
-    },
-    fmtEur(v) {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v ?? 0)
-    },
-    fmtDate(iso) {
-      if (!iso) return '—'
-      return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(iso))
-    },
-    wasEdited(q) {
-      if (!q.updated_at || !q.created_at) return false
-      return Math.abs(new Date(q.updated_at) - new Date(q.created_at)) > 60_000
-    },
-  },
+  }
+}
+
+async function linkAccount() {
+  linking.value = true
+  linkError.value = null
+  linkSuccess.value = false
+  try {
+    const { error } = await supabase.auth.updateUser({
+      email: linkEmail.value,
+      password: linkPassword.value,
+    })
+    if (error) throw error
+    linkSuccess.value = true
+    isAnonymous.value = false
+  } catch (e) {
+    linkError.value = e.message || 'Une erreur est survenue.'
+  } finally {
+    linking.value = false
+  }
 }
 </script>
 
