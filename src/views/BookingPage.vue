@@ -53,14 +53,16 @@
       </div>
     </section>
 
-    <!-- ── Panneau droit ── -->
+    <!-- ── Panneau Calendly droite ── -->
     <section class="rdv-panel">
       <div class="rdv-card">
 
+        <!-- Home -->
         <router-link to="/" class="rdv-home-link" aria-label="Page d'accueil">
           <Home class="rdv-home-icon" />
         </router-link>
 
+        <!-- Retour contact -->
         <router-link to="/contact" class="rdv-back-link" title="Retour contact">
           <ArrowLeft class="rdv-back-icon" />
         </router-link>
@@ -70,38 +72,12 @@
           <p>Sélectionnez une date et une heure disponible.</p>
         </div>
 
-        <div class="rdv-body">
-          <div class="rdv-steps">
-            <div class="rdv-step">
-              <div class="step-num">1</div>
-              <div class="step-text">
-                <strong>Choisissez un créneau</strong>
-                <span>Consultez mes disponibilités et réservez en quelques clics.</span>
-              </div>
-            </div>
-            <div class="rdv-step">
-              <div class="step-num">2</div>
-              <div class="step-text">
-                <strong>Renseignez vos infos</strong>
-                <span>Nom, e-mail et un mot sur votre projet.</span>
-              </div>
-            </div>
-            <div class="rdv-step">
-              <div class="step-num">3</div>
-              <div class="step-text">
-                <strong>Confirmation par e-mail</strong>
-                <span>Vous recevez un lien de visioconférence automatiquement.</span>
-              </div>
-            </div>
-          </div>
-
-          <button class="rdv-cta-btn" @click="openCalendly">
-            <CalendarCheck class="cta-icon" />
-            Ouvrir le calendrier
-            <ArrowRight class="cta-arrow" />
-          </button>
-
-          <p class="rdv-note">Gratuit · Sans engagement · Annulation libre</p>
+        <!-- Calendly inline widget -->
+        <div class="rdv-cal-wrap">
+          <div
+            class="calendly-inline-widget"
+            data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=2e9cab&locale=fr"
+          ></div>
         </div>
 
       </div>
@@ -112,19 +88,11 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { Home, ArrowLeft, Clock, Video, MapPin, Globe, CalendarCheck, ArrowRight } from 'lucide-vue-next'
-
-const CALENDLY_URL = 'https://calendly.com/fannysaez-pro/30min?locale=fr&primary_color=2e9cab&hide_landing_page_details=1&hide_gdpr_banner=1'
+import { Home, ArrowLeft, Clock, Video, MapPin, Globe } from 'lucide-vue-next'
 
 let script = null
-let link = null
 
 onMounted(() => {
-  link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.href = 'https://assets.calendly.com/assets/external/widget.css'
-  document.head.appendChild(link)
-
   script = document.createElement('script')
   script.src = 'https://assets.calendly.com/assets/external/widget.js'
   script.async = true
@@ -132,13 +100,10 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (script && document.head.contains(script)) document.head.removeChild(script)
-  if (link && document.head.contains(link)) document.head.removeChild(link)
+  if (script && document.head.contains(script)) {
+    document.head.removeChild(script)
+  }
 })
-
-function openCalendly() {
-  window.Calendly?.initPopupWidget({ url: CALENDLY_URL })
-}
 </script>
 
 <style scoped>
@@ -294,6 +259,7 @@ function openCalendly() {
   z-index: 1;
 }
 
+/* Infos bas gauche */
 .rdv-info-list {
   display: flex;
   justify-content: space-between;
@@ -345,10 +311,11 @@ function openCalendly() {
   background: rgba(255,255,255,0.62);
   backdrop-filter: blur(16px);
   border-radius: 0 28px 28px 0;
-  padding: 1rem 2.5rem 2rem;
+  padding: 3rem 2.5rem 1.5rem;
   box-shadow: -8px 0 20px rgba(29,18,43,0.08);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 /* Boutons top */
@@ -381,13 +348,8 @@ function openCalendly() {
 /* Header */
 .rdv-card-header {
   text-align: center;
-  margin-bottom: 2rem;
-  margin-top: 0;
-  padding: 0 3.5rem;
-  min-height: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  margin-bottom: 1.25rem;
+  margin-top: 1rem;
 }
 .rdv-card-header h2 {
   margin: 0;
@@ -402,92 +364,18 @@ function openCalendly() {
   font-size: 0.92rem;
 }
 
-/* Body */
-.rdv-body {
+/* Calendly */
+.rdv-cal-wrap {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2rem;
+  min-height: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
-
-/* Steps */
-.rdv-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.rdv-step {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.step-num {
-  flex-shrink: 0;
-  width: 2rem; height: 2rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #2e9cab, #1f7f97);
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(46,154,171,0.35);
-}
-
-.step-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  padding-top: 0.1rem;
-}
-.step-text strong {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #1b2f39;
-}
-.step-text span {
-  font-size: 0.84rem;
-  color: #4f6570;
-  line-height: 1.4;
-}
-
-/* CTA */
-.rdv-cta-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  width: 100%;
-  padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, #2e9cab 0%, #1f7f97 100%);
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(46,154,171,0.4);
-  transition: all 0.2s ease;
-  letter-spacing: 0.01em;
-}
-.rdv-cta-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(46,154,171,0.5);
-}
-.rdv-cta-btn:active { transform: translateY(0); }
-.cta-icon { width: 1.2rem; height: 1.2rem; flex-shrink: 0; }
-.cta-arrow { width: 1rem; height: 1rem; flex-shrink: 0; margin-left: auto; }
-
-.rdv-note {
-  text-align: center;
-  font-size: 0.78rem;
-  color: #a0aec0;
-  margin: 0;
-  letter-spacing: 0.02em;
+.calendly-inline-widget {
+  min-width: 280px;
+  height: 100%;
+  min-height: 560px;
 }
 
 /* ── Desktop fixe ── */
@@ -500,14 +388,14 @@ function openCalendly() {
   }
   .rdv-visual, .rdv-panel { min-height: 0; }
   .rdv-card { justify-content: flex-start; }
-  .rdv-card-header { margin-top: 0; }
+  .rdv-card-header { margin-top: 2rem; }
   br.title-br { display: none; }
   .visual-copy h1 { font-size: clamp(1.9rem, 2.5vw, 2.6rem); }
   .rdv-info-list { gap: 0.7rem; }
   .rdv-info-item { flex: 1 1 0; }
 }
 
-/* ── Tablette : 769px – 1100px ── */
+/* ── Tablette : 769px – 1100px (calqué sur Contact) ── */
 @media (max-width: 1100px) and (min-width: 769px) {
   .rdv-page {
     width: 100%;
@@ -534,11 +422,11 @@ function openCalendly() {
   .visual-illustration img { width: min(100%, 160px); max-width: 160px; }
   .rdv-info-list { flex-direction: row; justify-content: space-between; gap: 0.5rem; margin-top: 0; padding-top: 0.85rem; }
   .rdv-info-item { flex: 1 1 0; }
-  .rdv-card { padding: 1rem 2.5rem 2rem; overflow-y: auto; }
-  .rdv-body { gap: 1.5rem; }
+  .rdv-card { padding: 3rem 2.5rem 1.5rem; overflow-y: auto; }
+  .calendly-inline-widget { min-height: 100%; height: 100%; }
 }
 
-/* ── Mobile : ≤ 768px ── */
+/* ── Mobile : ≤ 768px (calqué sur Contact) ── */
 @media (max-width: 768px) {
   .rdv-page {
     width: 100%;
@@ -573,7 +461,7 @@ function openCalendly() {
   .rdv-info-item strong { font-size: 0.5rem; }
   .rdv-info-item span { font-size: 0.65rem; }
   .rdv-panel { min-height: calc(100dvh - 1.5rem); display: flex; flex-direction: column; }
-  .rdv-card { flex: 1; padding: 4rem 1.5rem 2.5rem; }
-  .rdv-body { gap: 1.75rem; }
+  .rdv-card { flex: 1; padding: 4rem 1.5rem 3rem; overflow-y: visible; }
+  .calendly-inline-widget { min-height: 640px; }
 }
 </style>
