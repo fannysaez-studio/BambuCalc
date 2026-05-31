@@ -308,6 +308,7 @@ onUnmounted(() => {
 .notif-item--unread:hover { background: rgba(46,156,171,0.10); }
 
 .notif-icon-wrap {
+  position: relative;
   width: 28px;
   height: 28px;
   border-radius: 50%;
@@ -318,6 +319,18 @@ onUnmounted(() => {
   justify-content: center;
   flex-shrink: 0;
   margin-top: 1px;
+}
+
+.notif-item--unread .notif-icon-wrap::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dc2626;
+  border: 1.5px solid #fff;
 }
 
 .notif-content { flex: 1; min-width: 0; }
