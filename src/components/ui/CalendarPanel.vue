@@ -185,9 +185,9 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
 
 /* ── Panel ── */
 .cal-panel {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  right: 0;
+  position: fixed;
+  bottom: 88px;
+  right: 16px;
   width: 300px;
   max-height: 420px;
   background: #fff;
@@ -270,16 +270,15 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
 /* Transitions */
 .cal-drop-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
 .cal-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
-.cal-drop-enter-from, .cal-drop-leave-to { opacity: 0; transform: translateY(6px); }
+.cal-drop-enter-from, .cal-drop-leave-to { opacity: 0; transform: translateY(8px); }
 
 /* Mobile */
 @media (max-width: 640px) {
   .cal-panel {
-    right: auto; left: 50%; transform: translateX(-50%);
-    width: calc(100vw - 2rem); max-width: 320px;
-  }
-  .cal-drop-enter-from, .cal-drop-leave-to {
-    opacity: 0; transform: translateX(-50%) translateY(6px);
+    right: 8px;
+    left: 8px;
+    width: auto;
+    bottom: 72px;
   }
 }
 </style>

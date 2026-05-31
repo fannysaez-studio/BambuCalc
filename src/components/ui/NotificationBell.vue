@@ -270,9 +270,9 @@ onUnmounted(() => {
 
 /* ── Panel dropdown ── */
 .notif-panel {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  position: fixed;
+  bottom: 88px;
+  right: 16px;
   width: 320px;
   max-height: 420px;
   background: #fff;
@@ -428,36 +428,16 @@ onUnmounted(() => {
 .notif-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
 .notif-drop-enter-from, .notif-drop-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
-}
-
-/* ── Panel ouverture vers le haut ── */
-.notif-panel--up {
-  top: auto;
-  bottom: calc(100% + 8px);
+  transform: translateY(8px);
 }
 
 /* ── Mobile ── */
 @media (max-width: 640px) {
   .notif-panel {
-    right: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100vw - 2rem);
-    max-width: 340px;
-  }
-  .notif-drop-enter-from, .notif-drop-leave-to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-6px);
-  }
-  .notif-panel--up {
-    top: auto;
-    bottom: calc(100% + 8px);
-    transform: translateX(-50%);
-  }
-  .notif-drop-enter-from.notif-panel--up,
-  .notif-drop-leave-to.notif-panel--up {
-    transform: translateX(-50%) translateY(6px);
+    right: 8px;
+    left: 8px;
+    width: auto;
+    bottom: 72px;
   }
 }
 </style>
