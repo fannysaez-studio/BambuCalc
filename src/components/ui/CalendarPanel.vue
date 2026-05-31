@@ -13,6 +13,7 @@
     </button>
 
     <!-- Panel -->
+    <Teleport to="body">
     <Transition name="cal-drop">
       <div v-if="open" class="cal-panel">
         <div class="cal-panel-header">
@@ -51,6 +52,7 @@
         </div>
       </div>
     </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -183,7 +185,10 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
 }
 .cal-badge--dot { top: 0px; right: 0px; }
 
-/* ── Panel ── */
+</style>
+
+<style>
+/* ── Panel téléporté (hors scoped) ── */
 .cal-panel {
   position: fixed;
   bottom: 88px;
@@ -198,51 +203,40 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
   display: flex;
   flex-direction: column;
   z-index: 10000;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
 }
-
 .cal-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: #1b2f39;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.5rem; padding: 0.75rem 1rem; background: #1b2f39; flex-shrink: 0;
 }
 .cal-panel-title { font-size: 0.82rem; font-weight: 800; color: #fff; }
 .cal-action {
   font-size: 0.68rem; font-weight: 600; color: rgba(255,255,255,0.65);
-  background: none; border: none; cursor: pointer; padding: 0; font-family: inherit;
-  transition: color 0.15s;
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: inherit; transition: color 0.15s;
 }
 .cal-action:hover { color: #fff; }
-
-/* Empty / Loading */
 .cal-empty {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 0.5rem; padding: 2rem 1rem; color: #a0aec0; font-size: 0.8rem;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0.5rem; padding: 2rem 1rem;
+  color: #a0aec0; font-size: 0.8rem;
 }
 .cal-empty-icon { color: #cbd5e0; }
 .cal-spinner {
   width: 1.5rem; height: 1.5rem;
   border: 2px solid #e2e8f0; border-top-color: #2e9cab;
-  border-radius: 50%; animation: spin 0.7s linear infinite;
+  border-radius: 50%; animation: cal-spin 0.7s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* Liste */
+@keyframes cal-spin { to { transform: rotate(360deg); } }
 .cal-list { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: #e2e8f0 transparent; }
-
 .cal-item {
   display: flex; align-items: flex-start; gap: 0.65rem;
-  padding: 0.75rem 1rem; border-bottom: 1px solid #f0f4f8;
-  transition: background 0.15s;
+  padding: 0.75rem 1rem; border-bottom: 1px solid #f0f4f8; transition: background 0.15s;
 }
 .cal-item:last-child { border-bottom: none; }
 .cal-item:hover { background: #f7f9fc; }
 .cal-item--new { background: rgba(46,156,171,0.06); }
 .cal-item--new:hover { background: rgba(46,156,171,0.10); }
-
 .cal-item-icon {
   position: relative; width: 28px; height: 28px; border-radius: 50%;
   background: rgba(46,156,171,0.12); color: #2e9cab;
@@ -254,31 +248,20 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
   width: 8px; height: 8px; border-radius: 50%;
   background: #dc2626; border: 1.5px solid #fff;
 }
-
 .cal-item-body { flex: 1; min-width: 0; }
 .cal-item-title { font-size: 0.78rem; font-weight: 700; color: #1b2f39; margin: 0 0 0.15rem; line-height: 1.35; }
 .cal-item-date  { font-size: 0.72rem; color: #2e9cab; margin: 0 0 0.1rem; font-weight: 600; }
 .cal-item-who   { font-size: 0.72rem; color: #4a5568; margin: 0 0 0.05rem; }
 .cal-item-email { font-size: 0.65rem; color: #a0aec0; margin: 0; }
-
 .cal-item-canceled {
   font-size: 0.62rem; font-weight: 700; color: #e53e3e;
   background: rgba(229,62,62,0.08); border-radius: 999px;
   padding: 0.15rem 0.5rem; flex-shrink: 0; align-self: flex-start; margin-top: 2px;
 }
-
-/* Transitions */
 .cal-drop-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
 .cal-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
 .cal-drop-enter-from, .cal-drop-leave-to { opacity: 0; transform: translateY(8px); }
-
-/* Mobile */
 @media (max-width: 640px) {
-  .cal-panel {
-    right: 8px;
-    left: 8px;
-    width: auto;
-    bottom: 72px;
-  }
+  .cal-panel { right: 8px; left: 8px; width: auto; bottom: 72px; }
 }
 </style>

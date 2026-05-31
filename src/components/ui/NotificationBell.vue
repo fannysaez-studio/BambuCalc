@@ -13,8 +13,9 @@
     </button>
 
     <!-- Panel dropdown -->
+    <Teleport to="body">
     <Transition name="notif-drop">
-      <div v-if="open" class="notif-panel" :class="{ 'notif-panel--up': up }">
+      <div v-if="open" class="notif-panel">
         <div class="notif-panel-header">
           <span class="notif-panel-title">Notifications</span>
           <div class="notif-panel-actions">
@@ -63,6 +64,7 @@
         </div>
       </div>
     </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -268,7 +270,10 @@ onUnmounted(() => {
   right: 0px;
 }
 
-/* ── Panel dropdown ── */
+</style>
+
+<style>
+/* ── Panel téléporté (hors scoped) ── */
 .notif-panel {
   position: fixed;
   bottom: 88px;
@@ -283,161 +288,68 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   z-index: 10000;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
 }
-
 .notif-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: #1b2f39;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 0.5rem; padding: 0.75rem 1rem; background: #1b2f39; flex-shrink: 0;
 }
-.notif-panel-title {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: #fff;
-}
-.notif-panel-actions {
-  display: flex;
-  gap: 0.5rem;
-}
+.notif-panel-title { font-size: 0.82rem; font-weight: 800; color: #fff; }
+.notif-panel-actions { display: flex; gap: 0.5rem; }
 .notif-action {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: rgba(255,255,255,0.65);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  font-family: inherit;
-  transition: color 0.15s;
+  font-size: 0.68rem; font-weight: 600; color: rgba(255,255,255,0.65);
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-family: inherit; transition: color 0.15s;
 }
 .notif-action:hover { color: #fff; }
 .notif-action--danger:hover { color: #fca5a5; }
-
-/* ── Empty / Loading ── */
 .notif-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 2rem 1rem;
-  color: #a0aec0;
-  font-size: 0.8rem;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0.5rem; padding: 2rem 1rem;
+  color: #a0aec0; font-size: 0.8rem;
 }
 .notif-empty-icon { color: #cbd5e0; }
 .notif-spinner {
   width: 1.5rem; height: 1.5rem;
-  border: 2px solid #e2e8f0;
-  border-top-color: #2e9cab;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+  border: 2px solid #e2e8f0; border-top-color: #2e9cab;
+  border-radius: 50%; animation: notif-spin 0.7s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── Liste ── */
-.notif-list {
-  overflow-y: auto;
-  flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: #e2e8f0 transparent;
-}
-
+@keyframes notif-spin { to { transform: rotate(360deg); } }
+.notif-list { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: #e2e8f0 transparent; }
 .notif-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #f0f4f8;
-  cursor: pointer;
-  transition: background 0.15s;
+  display: flex; align-items: flex-start; gap: 0.65rem;
+  padding: 0.75rem 1rem; border-bottom: 1px solid #f0f4f8;
+  cursor: pointer; transition: background 0.15s;
 }
 .notif-item:last-child { border-bottom: none; }
 .notif-item:hover { background: #f7f9fc; }
 .notif-item--unread { background: rgba(46,156,171,0.06); }
 .notif-item--unread:hover { background: rgba(46,156,171,0.10); }
-
 .notif-icon-wrap {
-  position: relative;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(46,156,171,0.12);
-  color: #2e9cab;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
+  position: relative; width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(46,156,171,0.12); color: #2e9cab;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
 }
-
 .notif-item--unread .notif-icon-wrap::after {
-  content: '';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #dc2626;
-  border: 1.5px solid #fff;
+  content: ''; position: absolute; top: -2px; right: -2px;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #dc2626; border: 1.5px solid #fff;
 }
-
 .notif-content { flex: 1; min-width: 0; }
-.notif-title {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #1b2f39;
-  margin: 0 0 0.15rem;
-  line-height: 1.35;
-}
-.notif-message {
-  font-size: 0.72rem;
-  color: #718096;
-  margin: 0 0 0.2rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.notif-time {
-  font-size: 0.65rem;
-  color: #a0aec0;
-  margin: 0;
-}
-
+.notif-title { font-size: 0.78rem; font-weight: 700; color: #1b2f39; margin: 0 0 0.15rem; line-height: 1.35; }
+.notif-message { font-size: 0.72rem; color: #718096; margin: 0 0 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-time { font-size: 0.65rem; color: #a0aec0; margin: 0; }
 .notif-close {
-  font-size: 0.7rem;
-  color: #cbd5e0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.1rem 0.2rem;
-  border-radius: 4px;
-  line-height: 1;
-  flex-shrink: 0;
-  transition: color 0.15s, background 0.15s;
-  font-family: inherit;
+  font-size: 0.7rem; color: #cbd5e0; background: none; border: none;
+  cursor: pointer; padding: 0.1rem 0.2rem; border-radius: 4px; line-height: 1;
+  flex-shrink: 0; transition: color 0.15s, background 0.15s; font-family: inherit;
 }
 .notif-close:hover { color: #e53e3e; background: rgba(229,62,62,0.08); }
-
-/* ── Transition dropdown ── */
 .notif-drop-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
 .notif-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
-.notif-drop-enter-from, .notif-drop-leave-to {
-  opacity: 0;
-  transform: translateY(8px);
-}
-
-/* ── Mobile ── */
+.notif-drop-enter-from, .notif-drop-leave-to { opacity: 0; transform: translateY(8px); }
 @media (max-width: 640px) {
-  .notif-panel {
-    right: 8px;
-    left: 8px;
-    width: auto;
-    bottom: 72px;
-  }
+  .notif-panel { right: 8px; left: 8px; width: auto; bottom: 72px; }
 }
 </style>
