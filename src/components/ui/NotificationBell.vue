@@ -1,0 +1,390 @@
+<template>
+  <div class="notif-wrap" ref="bellWrap">
+    <!-- Bouton cloche -->
+    <button
+      class="notif-btn"
+      :class="{ 'notif-btn--active': open }"
+      @click="open = !open"
+      :title="unreadCount > 0 ? `${unreadCount} notification(s)` : 'Notifications'"
+    >
+      <Bell :size="18" />
+      <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+    </button>
+
+    <!-- Panel dropdown -->
+    <Transition name="notif-drop">
+      <div v-if="open" class="notif-panel">
+        <div class="notif-panel-header">
+          <span class="notif-panel-title">Notifications</span>
+          <div class="notif-panel-actions">
+            <button
+              v-if="notifications.some(n => !n.read)"
+              class="notif-action"
+              @click="markAllRead"
+            >✓ Tout lire</button>
+            <button
+              v-if="notifications.length > 0"
+              class="notif-action notif-action--danger"
+              @click="removeAll"
+            >Tout supprimer</button>
+          </div>
+        </div>
+
+        <div v-if="loading" class="notif-empty">
+          <div class="notif-spinner" />
+        </div>
+
+        <div v-else-if="notifications.length === 0" class="notif-empty">
+          <BellOff :size="22" class="notif-empty-icon" />
+          <p>Aucune notification</p>
+        </div>
+
+        <div v-else class="notif-list">
+          <div
+            v-for="n in notifications"
+            :key="n.id"
+            class="notif-item"
+            :class="{ 'notif-item--unread': !n.read }"
+            @click="markRead(n)"
+          >
+            <div class="notif-icon-wrap">
+              <FileText v-if="n.type === 'new_quote'" :size="14" />
+              <CheckCircle v-else-if="n.type === 'status_changed'" :size="14" />
+              <Pencil v-else :size="14" />
+            </div>
+            <div class="notif-content">
+              <p class="notif-title">{{ n.title }}</p>
+              <p v-if="n.message" class="notif-message">{{ n.message }}</p>
+              <p class="notif-time">{{ timeAgo(n.created_at) }}</p>
+            </div>
+            <button class="notif-close" @click.stop="remove(n.id)" title="Supprimer">✕</button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { Bell, BellOff, FileText, CheckCircle, Pencil } from 'lucide-vue-next'
+import { supabase } from '@/lib/supabase'
+
+const notifications = ref([])
+const open = ref(false)
+const loading = ref(false)
+const bellWrap = ref(null)
+let realtimeChannel = null
+
+const unreadCount = computed(() => notifications.value.filter(n => !n.read).length)
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime()
+  const min = Math.floor(diff / 60000)
+  if (min < 1) return "À l'instant"
+  if (min < 60) return `Il y a ${min} min`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `Il y a ${h}h`
+  return `Il y a ${Math.floor(h / 24)}j`
+}
+
+async function loadNotifications() {
+  loading.value = true
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) { loading.value = false; return }
+  const { data, error } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  if (error) console.error('[NotificationBell] load error:', error)
+  notifications.value = data ?? []
+  loading.value = false
+}
+
+async function setupRealtime() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  realtimeChannel = supabase
+    .channel(`notif-bell-${user.id}`)
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
+      (payload) => {
+        notifications.value = [payload.new, ...notifications.value]
+      }
+    )
+    .subscribe()
+}
+
+async function markRead(n) {
+  if (n.read) return
+  notifications.value = notifications.value.map(item =>
+    item.id === n.id ? { ...item, read: true } : item
+  )
+  await supabase.from('notifications').update({ read: true }).eq('id', n.id)
+}
+
+async function markAllRead() {
+  notifications.value.forEach(n => { n.read = true })
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase.from('notifications').update({ read: true })
+    .eq('user_id', user.id)
+    .eq('read', false)
+}
+
+async function remove(id) {
+  notifications.value = notifications.value.filter(n => n.id !== id)
+  await supabase.from('notifications').delete().eq('id', id)
+}
+
+async function removeAll() {
+  const ids = notifications.value.map(n => n.id)
+  notifications.value = []
+  open.value = false
+  if (ids.length) await supabase.from('notifications').delete().in('id', ids)
+}
+
+function handleClickOutside(e) {
+  if (bellWrap.value && !bellWrap.value.contains(e.target)) {
+    open.value = false
+  }
+}
+
+onMounted(async () => {
+  await loadNotifications()
+  await setupRealtime()
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+  document.removeEventListener('click', handleClickOutside)
+})
+</script>
+
+<style scoped>
+.notif-wrap {
+  position: relative;
+}
+
+/* ── Bouton cloche ── */
+.notif-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+.notif-btn:hover, .notif-btn--active {
+  color: #2e9cab;
+  background: rgba(46, 156, 171, 0.10);
+  transform: translateY(-2px);
+}
+
+.notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 800;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* ── Panel dropdown ── */
+.notif-panel {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 50%;
+  transform: translateX(50%);
+  width: 320px;
+  max-height: 420px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+}
+
+.notif-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #1b2f39;
+  flex-shrink: 0;
+}
+.notif-panel-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #fff;
+}
+.notif-panel-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.notif-action {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+.notif-action:hover { color: #fff; }
+.notif-action--danger:hover { color: #fca5a5; }
+
+/* ── Empty / Loading ── */
+.notif-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem 1rem;
+  color: #a0aec0;
+  font-size: 0.8rem;
+}
+.notif-empty-icon { color: #cbd5e0; }
+.notif-spinner {
+  width: 1.5rem; height: 1.5rem;
+  border: 2px solid #e2e8f0;
+  border-top-color: #2e9cab;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Liste ── */
+.notif-list {
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 transparent;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f4f8;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: #f7f9fc; }
+.notif-item--unread { background: rgba(46,156,171,0.06); }
+.notif-item--unread:hover { background: rgba(46,156,171,0.10); }
+
+.notif-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(46,156,171,0.12);
+  color: #2e9cab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.notif-content { flex: 1; min-width: 0; }
+.notif-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1b2f39;
+  margin: 0 0 0.15rem;
+  line-height: 1.35;
+}
+.notif-message {
+  font-size: 0.72rem;
+  color: #718096;
+  margin: 0 0 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.notif-time {
+  font-size: 0.65rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+.notif-close {
+  font-size: 0.7rem;
+  color: #cbd5e0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.1rem 0.2rem;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s;
+  font-family: inherit;
+}
+.notif-close:hover { color: #e53e3e; background: rgba(229,62,62,0.08); }
+
+/* ── Transition dropdown ── */
+.notif-drop-enter-active { transition: opacity 0.18s ease, transform 0.18s ease; }
+.notif-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
+.notif-drop-enter-from, .notif-drop-leave-to {
+  opacity: 0;
+  transform: translateX(50%) translateY(6px);
+}
+
+/* ── Mobile (barre bottom) ── */
+@media (max-width: 640px) {
+  /* S'intègre dans le flex de la nav-bar comme les autres items */
+  .notif-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .notif-panel {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: calc(100vw - 2rem);
+    max-width: 360px;
+  }
+  .notif-drop-enter-from, .notif-drop-leave-to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+}
+</style>
