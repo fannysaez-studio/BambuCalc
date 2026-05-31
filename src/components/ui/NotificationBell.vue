@@ -15,7 +15,7 @@
     <!-- Panel dropdown -->
     <Teleport to="body">
     <Transition name="notif-drop">
-      <div v-if="open" class="notif-panel">
+      <div v-if="open" class="notif-panel" :class="{ 'notif-panel--top': topPanel }">
         <div class="notif-panel-header">
           <span class="notif-panel-title">Notifications</span>
           <div class="notif-panel-actions">
@@ -74,9 +74,10 @@ import { Bell, BellOff, FileText, CheckCircle, Pencil } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 const props = defineProps({
-  up:      { type: Boolean, default: false },
-  compact: { type: Boolean, default: false },
-  tab:     { type: Boolean, default: false },
+  up:       { type: Boolean, default: false },
+  compact:  { type: Boolean, default: false },
+  tab:      { type: Boolean, default: false },
+  topPanel: { type: Boolean, default: false },
 })
 
 const notifications = ref([])
@@ -351,5 +352,6 @@ onUnmounted(() => {
 .notif-drop-enter-from, .notif-drop-leave-to { opacity: 0; transform: translateY(8px); }
 @media (max-width: 640px) {
   .notif-panel { right: 8px; left: 8px; width: auto; bottom: 72px; }
+  .notif-panel--top { top: 74px; bottom: auto; left: auto; right: 8px; width: calc(100vw - 16px); }
 }
 </style>

@@ -45,6 +45,9 @@
         </div>
       </div>
       <div class="dash-hero-actions">
+        <div class="hero-bell-mobile">
+          <NotificationBell :topPanel="true" />
+        </div>
         <router-link to="/profile" class="btn-profile" title="Mon profil">
           <User class="btn-profile-icon" />
         </router-link>
@@ -326,6 +329,7 @@ import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import { fmtEur } from '@/utils/formatters'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
+import NotificationBell from '@/components/ui/NotificationBell.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
 
@@ -703,6 +707,8 @@ async function linkAccount() {
 .btn-new-icon { width: 0.95rem; height: 0.95rem; }
 
 .dash-hero-actions { display: flex; align-items: center; gap: 0.65rem; }
+.hero-bell-mobile { display: none; }
+@media (max-width: 640px) { .hero-bell-mobile { display: flex; } }
 .btn-profile {
   display: inline-flex; align-items: center; justify-content: center;
   width: 2.4rem; height: 2.4rem; border-radius: 999px;

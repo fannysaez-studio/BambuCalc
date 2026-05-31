@@ -117,10 +117,6 @@
       <span>Connexion</span>
     </router-link>
 
-    <div v-if="isAuth" class="nav-bar-item nav-bar-notif">
-      <NotificationBell :up="true" :tab="true" />
-    </div>
-
     <button
       v-if="isAuth"
       class="nav-bar-item nav-bar-item--logout"
