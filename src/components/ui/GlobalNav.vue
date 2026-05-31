@@ -21,8 +21,6 @@
         <Mail :size="17" />
       </router-link>
 
-      <NotificationBell v-if="isAuth" />
-
       <router-link
         v-if="isAdminUser"
         to="/admin"
@@ -87,8 +85,6 @@
       <span>Contact</span>
     </router-link>
 
-    <NotificationBell v-if="isAuth" />
-
     <router-link
       v-if="isAdminUser"
       to="/admin"
@@ -134,7 +130,6 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Home, ShieldCheck, User, LogIn, LogOut, Mail } from 'lucide-vue-next'
-import NotificationBell from '@/components/ui/NotificationBell.vue'
 
 defineProps({
   isAuth:      { type: Boolean, default: false },

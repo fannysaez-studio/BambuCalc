@@ -216,9 +216,8 @@ onUnmounted(() => {
 /* ── Panel dropdown ── */
 .notif-panel {
   position: absolute;
-  bottom: calc(100% + 12px);
-  right: 50%;
-  transform: translateX(50%);
+  top: calc(100% + 8px);
+  right: 0;
   width: 320px;
   max-height: 420px;
   background: #fff;
@@ -361,30 +360,21 @@ onUnmounted(() => {
 .notif-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
 .notif-drop-enter-from, .notif-drop-leave-to {
   opacity: 0;
-  transform: translateX(50%) translateY(6px);
+  transform: translateY(-6px);
 }
 
-/* ── Mobile (barre bottom) ── */
+/* ── Mobile ── */
 @media (max-width: 640px) {
-  /* S'intègre dans le flex de la nav-bar comme les autres items */
-  .notif-wrap {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
   .notif-panel {
-    position: fixed;
-    bottom: 70px;
-    left: 50%;
     right: auto;
+    left: 50%;
     transform: translateX(-50%);
     width: calc(100vw - 2rem);
-    max-width: 360px;
+    max-width: 340px;
   }
   .notif-drop-enter-from, .notif-drop-leave-to {
     opacity: 0;
-    transform: translateX(-50%) translateY(6px);
+    transform: translateX(-50%) translateY(-6px);
   }
 }
 </style>

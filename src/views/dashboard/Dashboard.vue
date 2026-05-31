@@ -45,6 +45,7 @@
         </div>
       </div>
       <div class="dash-hero-actions">
+        <NotificationBell />
         <router-link to="/profile" class="btn-profile" title="Mon profil">
           <User class="btn-profile-icon" />
         </router-link>
@@ -326,6 +327,7 @@ import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import { fmtEur } from '@/utils/formatters'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
+import NotificationBell from '@/components/ui/NotificationBell.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
 
