@@ -561,7 +561,7 @@ export default {
   inset: 0;
   overflow: hidden;
   background: #f0f4f8;
-  padding: 1rem 1.25rem 0.75rem;
+  padding: 1rem 1.25rem 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
