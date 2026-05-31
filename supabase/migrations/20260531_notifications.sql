@@ -27,3 +27,6 @@ CREATE POLICY "notifications_delete_own"
 
 -- Index pour les requêtes fréquentes
 CREATE INDEX notifications_user_id_idx ON notifications (user_id, created_at DESC);
+
+-- Permissions (INSERT géré par triggers SECURITY DEFINER uniquement)
+GRANT SELECT, UPDATE, DELETE ON public.notifications TO authenticated;
