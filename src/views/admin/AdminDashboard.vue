@@ -18,16 +18,6 @@
         </div>
       </div>
       <div class="admin-hero-actions">
-        <button
-          v-if="pushSupported"
-          :class="['btn-push-toggle', isSubscribed && 'btn-push-toggle--active']"
-          :title="isSubscribed ? 'Désactiver les notifications push' : 'Activer les notifications push'"
-          :disabled="pushLoading"
-          @click="isSubscribed ? unsubscribePush() : subscribePush()"
-        >
-          <BellOff v-if="isSubscribed" class="btn-push-icon" />
-          <Bell v-else class="btn-push-icon" />
-        </button>
         <NotificationBell />
         <button class="btn-new-quote" @click="startNewQuote" title="Nouveau devis">
           <Plus class="btn-cta-icon" />
