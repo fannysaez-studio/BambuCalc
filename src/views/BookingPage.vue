@@ -328,8 +328,8 @@ onUnmounted(() => {
   transition: all 0.2s ease;
   z-index: 2;
 }
-.rdv-home-link { left: 1.05rem; }
-.rdv-back-link { left: 3.85rem; }
+.rdv-home-link { right: 1.05rem; }
+.rdv-back-link { left: 1.05rem; }
 .rdv-home-link:hover, .rdv-back-link:hover {
   background: rgba(46,154,171,0.12);
   color: #2e9cab;
