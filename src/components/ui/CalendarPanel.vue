@@ -191,8 +191,8 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
 /* ── Panel téléporté (hors scoped) ── */
 .cal-panel {
   position: fixed;
-  bottom: 88px;
-  right: 16px;
+  bottom: 21px;
+  left: 16px;
   width: 300px;
   max-height: 420px;
   background: #fff;
@@ -262,6 +262,6 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
 .cal-drop-leave-active { transition: opacity 0.13s ease, transform 0.13s ease; }
 .cal-drop-enter-from, .cal-drop-leave-to { opacity: 0; transform: translateY(8px); }
 @media (max-width: 640px) {
-  .cal-panel { right: 8px; left: 8px; width: auto; bottom: 72px; }
+  .cal-panel { left: 8px; right: 8px; width: auto; bottom: 72px; }
 }
 </style>

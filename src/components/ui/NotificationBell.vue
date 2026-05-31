@@ -276,7 +276,7 @@ onUnmounted(() => {
 /* ── Panel téléporté (hors scoped) ── */
 .notif-panel {
   position: fixed;
-  bottom: 88px;
+  bottom: 21px;
   right: 16px;
   width: 320px;
   max-height: 420px;
