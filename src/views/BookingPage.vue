@@ -18,7 +18,7 @@
 
       <div class="visual-illustration">
         <div class="visual-illustration-glow"></div>
-        <img src="/contact-hero.svg" alt="Illustration rendez-vous" />
+        <img src="/prendre-rdv.svg" alt="Illustration rendez-vous" />
       </div>
 
       <div class="rdv-info-list">
