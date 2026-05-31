@@ -52,6 +52,9 @@
 
       <span class="nav-sep" />
 
+      <CalendarPanel v-if="isAdminUser" class="nav-cal" />
+      <NotificationBell v-if="isAuth" :compact="true" :up="true" class="nav-bell" />
+
       <button
         v-if="isAuth"
         class="nav-item nav-item--danger"
@@ -114,6 +117,10 @@
       <span>Connexion</span>
     </router-link>
 
+    <div v-if="isAuth" class="nav-bar-item nav-bar-notif">
+      <NotificationBell :up="true" :tab="true" />
+    </div>
+
     <button
       v-if="isAuth"
       class="nav-bar-item nav-bar-item--logout"
@@ -130,6 +137,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { Home, ShieldCheck, User, LogIn, LogOut, Mail } from 'lucide-vue-next'
+import NotificationBell from '@/components/ui/NotificationBell.vue'
+import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 
 defineProps({
   isAuth:      { type: Boolean, default: false },
@@ -323,6 +332,40 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 }
 
 .nav-bar-item--logout:hover { color: #dc2626; }
+
+/* ── Bell & Calendar dans la pill ── */
+.nav-bell :deep(.notif-btn--compact),
+.nav-cal  :deep(.cal-btn) {
+  border-color: transparent;
+  background: transparent;
+  width: 36px;
+  height: 36px;
+  color: #94a3b8;
+  border-radius: 50%;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.22s cubic-bezier(0.34,1.3,0.64,1);
+}
+.nav-bell :deep(.notif-btn--compact):hover,
+.nav-bell :deep(.notif-btn--compact.notif-btn--active),
+.nav-cal  :deep(.cal-btn):hover,
+.nav-cal  :deep(.cal-btn.cal-btn--active) {
+  color: #2e9cab;
+  background: rgba(46, 156, 171, 0.10);
+  transform: translateY(-2px);
+}
+
+/* ── Notif dans la mobile bottom bar ── */
+.nav-bar-notif {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0;
+}
+.nav-bar-notif :deep(.notif-wrap),
+.nav-bar-notif :deep(.notif-btn--tab) {
+  width: 100%;
+  height: 100%;
+}
 
 /* ── Responsive ── */
 @media (max-width: 640px) {

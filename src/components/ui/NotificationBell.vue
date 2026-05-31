@@ -3,17 +3,18 @@
     <!-- Bouton cloche -->
     <button
       class="notif-btn"
-      :class="{ 'notif-btn--active': open }"
+      :class="{ 'notif-btn--active': open, 'notif-btn--compact': compact, 'notif-btn--tab': tab }"
       @click="open = !open"
       :title="unreadCount > 0 ? `${unreadCount} notification(s)` : 'Notifications'"
     >
-      <Bell :size="18" />
-      <span v-if="unreadCount > 0" class="notif-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+      <Bell :size="tab ? 21 : 18" />
+      <span v-if="unreadCount > 0" class="notif-badge" :class="{ 'notif-badge--dot': tab }">{{ tab ? '' : (unreadCount > 9 ? '9+' : unreadCount) }}</span>
+      <span v-if="tab" class="notif-tab-label">Alertes</span>
     </button>
 
     <!-- Panel dropdown -->
     <Transition name="notif-drop">
-      <div v-if="open" class="notif-panel">
+      <div v-if="open" class="notif-panel" :class="{ 'notif-panel--up': up }">
         <div class="notif-panel-header">
           <span class="notif-panel-title">Notifications</span>
           <div class="notif-panel-actions">
@@ -69,6 +70,12 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Bell, BellOff, FileText, CheckCircle, Pencil } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
+
+const props = defineProps({
+  up:      { type: Boolean, default: false },
+  compact: { type: Boolean, default: false },
+  tab:     { type: Boolean, default: false },
+})
 
 const notifications = ref([])
 const open = ref(false)
@@ -213,6 +220,52 @@ onUnmounted(() => {
   justify-content: center;
   line-height: 1;
   pointer-events: none;
+}
+
+/* ── Variante compact (pill desktop) ── */
+.notif-btn--compact {
+  border-color: transparent;
+  background: transparent;
+  width: 36px;
+  height: 36px;
+  color: #94a3b8;
+}
+.notif-btn--compact:hover,
+.notif-btn--compact.notif-btn--active {
+  border-color: transparent;
+  color: #2e9cab;
+  background: rgba(46, 156, 171, 0.10);
+}
+
+/* ── Variante tab (mobile bottom bar) ── */
+.notif-btn--tab {
+  flex-direction: column;
+  gap: 3px;
+  height: 100%;
+  width: 100%;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  padding: 0 0.25rem;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  color: #94a3b8;
+}
+.notif-btn--tab:hover,
+.notif-btn--tab.notif-btn--active { color: #2e9cab; background: transparent; border-color: transparent; }
+
+.notif-tab-label { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.03em; line-height: 1; white-space: nowrap; }
+
+/* Badge dot (mode tab) */
+.notif-badge--dot {
+  min-width: 8px;
+  height: 8px;
+  padding: 0;
+  font-size: 0;
+  top: 0px;
+  right: 0px;
 }
 
 /* ── Panel dropdown ── */
@@ -378,6 +431,12 @@ onUnmounted(() => {
   transform: translateY(-6px);
 }
 
+/* ── Panel ouverture vers le haut ── */
+.notif-panel--up {
+  top: auto;
+  bottom: calc(100% + 8px);
+}
+
 /* ── Mobile ── */
 @media (max-width: 640px) {
   .notif-panel {
@@ -390,6 +449,15 @@ onUnmounted(() => {
   .notif-drop-enter-from, .notif-drop-leave-to {
     opacity: 0;
     transform: translateX(-50%) translateY(-6px);
+  }
+  .notif-panel--up {
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+  }
+  .notif-drop-enter-from.notif-panel--up,
+  .notif-drop-leave-to.notif-panel--up {
+    transform: translateX(-50%) translateY(6px);
   }
 }
 </style>

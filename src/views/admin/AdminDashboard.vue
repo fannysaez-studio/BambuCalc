@@ -18,7 +18,6 @@
         </div>
       </div>
       <div class="admin-hero-actions">
-        <NotificationBell />
         <button class="btn-new-quote" @click="startNewQuote" title="Nouveau devis">
           <Plus class="btn-cta-icon" />
           <span class="btn-cta-text">Nouveau devis</span>
@@ -343,7 +342,6 @@ import { useCalculatorStore } from '@/stores/calculator'
 import { usePushNotifications } from '@/composables/usePushNotifications'
 import { useAdminRealtime }    from '@/composables/useAdminRealtime'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
-import NotificationBell from '@/components/ui/NotificationBell.vue'
 import CatalogueTab from '@/components/admin/CatalogueTab.vue'
 import SettingsTab from '@/components/admin/SettingsTab.vue'
 import GestionDevisTab from '@/components/admin/GestionDevisTab.vue'
