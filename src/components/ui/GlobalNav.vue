@@ -364,7 +364,7 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 }
 
 /* ── Responsive ── */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   /* Cache la pill, affiche la barre */
   .nav-island { display: none !important; }
   .nav-bar    { display: flex; }
