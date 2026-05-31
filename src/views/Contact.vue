@@ -21,7 +21,7 @@
       </div>
 
       <div class="contact-info-list">
-        <a class="contact-info-item" href="https://calendly.com/fannysaez.pro" target="_blank" rel="noopener" title="Prendre un rendez-vous">
+        <a class="contact-info-item" href="https://calendly.com/fannysaez-pro/30min" target="_blank" rel="noopener" title="Prendre un rendez-vous">
           <Calendar class="ci-icon" />
           <div>
             <strong>Rendez-vous</strong>
