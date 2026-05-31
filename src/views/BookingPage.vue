@@ -69,7 +69,7 @@
         <div class="rdv-cal-wrap">
           <div
             class="calendly-inline-widget"
-            data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=2e9cab"
+            data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=2e9cab&locale=fr"
           ></div>
         </div>
 
