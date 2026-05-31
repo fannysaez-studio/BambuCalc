@@ -210,7 +210,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from 'vue'
 import { Eye, Download } from 'lucide-vue-next'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import { company } from '@/config/company'
@@ -233,123 +234,122 @@ const PRINTER_LABELS = {
   'x1c': 'Bambu X1C', 'a1-mini': 'Bambu A1 Mini', 'a1': 'Bambu A1',
 }
 
-export default {
-  name: 'QuotePreviewModal',
-  components: { Eye, Download },
-  props: {
-    quote: { type: Object, required: true },
-    mode:  { type: String, default: 'client' },
-  },
-  emits: ['close'],
-  data() {
-    return { co: company, downloading: false }
-  },
-  computed: {
-    q() { return this.quote },
+const props = defineProps({
+  quote: { type: Object, required: true },
+  mode:  { type: String, default: 'client' },
+})
 
-    clientName() {
-      return this.q.client_name
-        || [this.q.client_first_name, this.q.client_last_name].filter(Boolean).join(' ')
-        || ''
-    },
+defineEmits(['close'])
 
-    taxRate() { return this.q.tax_rate ?? 20 },
+const co = company
+const downloading = ref(false)
 
-    unitPriceHT() {
-      return (this.q.cost_per_unit || 0) / (1 + this.taxRate / 100)
-    },
+const q = computed(() => props.quote)
 
-    totalHT() {
-      return this.unitPriceHT * (this.q.quantity || 1)
-    },
+const clientName = computed(() =>
+  q.value.client_name
+    || [q.value.client_first_name, q.value.client_last_name].filter(Boolean).join(' ')
+    || ''
+)
 
-    totalTVA() {
-      return (this.q.total_cost || 0) - this.totalHT
-    },
+const taxRate = computed(() => q.value.tax_rate ?? 20)
 
-    specParts() {
-      const printTime = this.q.print_hours || this.q.print_minutes
-        ? `${this.q.print_hours || 0}h${String(this.q.print_minutes || 0).padStart(2, '0')}`
-        : null
-      const printerLabel = PRINTER_LABELS[this.q.printer_model] || this.q.printer_model || '—'
-      return [
-        `Matière : ${this.q.material || '—'}`,
-        printTime ? `Durée impression : ${printTime}` : null,
-        this.q.weight ? `Poids : ${this.q.weight} g` : null,
-        this.q.nozzle_size ? `Buse : ${this.q.nozzle_size} mm` : null,
-        `Imprimante : ${printerLabel}`,
-      ].filter(Boolean)
-    },
+const unitPriceHT = computed(() =>
+  (q.value.cost_per_unit || 0) / (1 + taxRate.value / 100)
+)
 
-    condLines() {
-      const lines = [
-        `Mode de paiement : ${PAYMENT_LABELS[this.q.payment_method] || this.q.payment_method || 'Virement bancaire'}`,
-      ]
-      if (this.q.processing_delay)
-        lines.push(`Délai de fabrication : ${PROCESSING_LABELS[this.q.processing_delay] || this.q.processing_delay}`)
-      if (this.q.delivery_delay)
-        lines.push(`Livraison : ${DELIVERY_LABELS[this.q.delivery_delay] || this.q.delivery_delay}`)
-      if ((this.q.deposit_percent || 0) > 0)
-        lines.push(`Acompte de ${this.q.deposit_percent}% à la commande`)
-      lines.push(`Devis valable jusqu'au ${this.validityDate(this.q.quote_date, this.q.quote_validity_days || 30)}`)
-      if (company.paymentIban) lines.push(`IBAN : ${company.paymentIban}`)
-      return lines
-    },
+const totalHT = computed(() =>
+  unitPriceHT.value * (q.value.quantity || 1)
+)
 
-    totalsRows() {
-      const rows = [
-        ['Sous-total HT', this.fmtEur(this.totalHT)],
-        [`TVA (${this.taxRate}%)`, this.fmtEur(this.totalTVA)],
-      ]
-      if ((this.q.deposit_percent || 0) > 0) {
-        const acompte = (this.q.total_cost || 0) * (this.q.deposit_percent / 100)
-        rows.push([`Acompte (${this.q.deposit_percent}%)`, this.fmtEur(acompte)])
-      }
-      return rows
-    },
+const totalTVA = computed(() =>
+  (q.value.total_cost || 0) - totalHT.value
+)
 
-    costBase() {
-      const q = this.q
-      return q.subtotal_ht || ((q.material_cost || 0) + (q.equipment_cost || 0) + (q.work_cost || 0))
-    },
-    sellingHT() {
-      return Math.round(this.costBase * (1 + (this.q.margin_percent || 40) / 100) * 100) / 100
-    },
+const specParts = computed(() => {
+  const printTime = q.value.print_hours || q.value.print_minutes
+    ? `${q.value.print_hours || 0}h${String(q.value.print_minutes || 0).padStart(2, '0')}`
+    : null
+  const printerLabel = PRINTER_LABELS[q.value.printer_model] || q.value.printer_model || '—'
+  return [
+    `Matière : ${q.value.material || '—'}`,
+    printTime ? `Durée impression : ${printTime}` : null,
+    q.value.weight ? `Poids : ${q.value.weight} g` : null,
+    q.value.nozzle_size ? `Buse : ${q.value.nozzle_size} mm` : null,
+    `Imprimante : ${printerLabel}`,
+  ].filter(Boolean)
+})
 
-    validateSteps() {
-      const acompte = (this.q.deposit_percent || 0) > 0
-        ? `Versez l'acompte de ${this.q.deposit_percent}%`
-        : 'Procédez au paiement'
-      return [
-        { num: 1, lines: ['Signez et datez ce document'] },
-        { num: 2, lines: ['Renvoyez par email :', company.email] },
-        { num: 3, lines: [acompte] },
-      ]
-    },
-  },
-  methods: {
-    fmtEur(v) {
-      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v ?? 0)
-    },
-    fmtDate(iso) {
-      if (!iso) return '—'
-      return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(iso))
-    },
-    validityDate(quoteDate, days) {
-      if (!quoteDate || !days) return '—'
-      const d = new Date(quoteDate)
-      d.setDate(d.getDate() + Number(days))
-      return this.fmtDate(d.toISOString())
-    },
-    async handleDownload() {
-      this.downloading = true
-      try {
-        await generateQuotePDF(this.quote, this.mode)
-      } finally {
-        this.downloading = false
-      }
-    },
-  },
+const condLines = computed(() => {
+  const lines = [
+    `Mode de paiement : ${PAYMENT_LABELS[q.value.payment_method] || q.value.payment_method || 'Virement bancaire'}`,
+  ]
+  if (q.value.processing_delay)
+    lines.push(`Délai de fabrication : ${PROCESSING_LABELS[q.value.processing_delay] || q.value.processing_delay}`)
+  if (q.value.delivery_delay)
+    lines.push(`Livraison : ${DELIVERY_LABELS[q.value.delivery_delay] || q.value.delivery_delay}`)
+  if ((q.value.deposit_percent || 0) > 0)
+    lines.push(`Acompte de ${q.value.deposit_percent}% à la commande`)
+  lines.push(`Devis valable jusqu'au ${validityDate(q.value.quote_date, q.value.quote_validity_days || 30)}`)
+  if (company.paymentIban) lines.push(`IBAN : ${company.paymentIban}`)
+  return lines
+})
+
+const totalsRows = computed(() => {
+  const rows = [
+    ['Sous-total HT', fmtEur(totalHT.value)],
+    [`TVA (${taxRate.value}%)`, fmtEur(totalTVA.value)],
+  ]
+  if ((q.value.deposit_percent || 0) > 0) {
+    const acompte = (q.value.total_cost || 0) * (q.value.deposit_percent / 100)
+    rows.push([`Acompte (${q.value.deposit_percent}%)`, fmtEur(acompte)])
+  }
+  return rows
+})
+
+const costBase = computed(() => {
+  const qv = q.value
+  return qv.subtotal_ht || ((qv.material_cost || 0) + (qv.equipment_cost || 0) + (qv.work_cost || 0))
+})
+
+const sellingHT = computed(() =>
+  Math.round(costBase.value * (1 + (q.value.margin_percent || 40) / 100) * 100) / 100
+)
+
+const validateSteps = computed(() => {
+  const acompte = (q.value.deposit_percent || 0) > 0
+    ? `Versez l'acompte de ${q.value.deposit_percent}%`
+    : 'Procédez au paiement'
+  return [
+    { num: 1, lines: ['Signez et datez ce document'] },
+    { num: 2, lines: ['Renvoyez par email :', company.email] },
+    { num: 3, lines: [acompte] },
+  ]
+})
+
+function fmtEur(v) {
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v ?? 0)
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—'
+  return new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(iso))
+}
+
+function validityDate(quoteDate, days) {
+  if (!quoteDate || !days) return '—'
+  const d = new Date(quoteDate)
+  d.setDate(d.getDate() + Number(days))
+  return fmtDate(d.toISOString())
+}
+
+async function handleDownload() {
+  downloading.value = true
+  try {
+    await generateQuotePDF(props.quote, props.mode)
+  } finally {
+    downloading.value = false
+  }
 }
 </script>
 

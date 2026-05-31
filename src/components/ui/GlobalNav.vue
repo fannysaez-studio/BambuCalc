@@ -126,28 +126,26 @@
   </nav>
 </template>
 
-<script>
+<script setup>
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { Home, ShieldCheck, User, LogIn, LogOut, Mail } from 'lucide-vue-next'
 
-export default {
-  name: 'GlobalNav',
-  components: { Home, ShieldCheck, User, LogIn, LogOut, Mail },
-  props: {
-    isAuth:      { type: Boolean, default: false },
-    isAdminUser: { type: Boolean, default: false },
-    displayName: { type: String,  default: '' },
-  },
-  emits: ['logout'],
-  computed: {
-    showNav() {
-      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'forbidden', 'maintenance'].includes(this.$route.name)
-    },
-},
-  methods: {
-    handleLogout() { this.$emit('logout') },
-    isActive(paths) { return paths.some(p => this.$route.path.startsWith(p)) },
-  },
-}
+defineProps({
+  isAuth:      { type: Boolean, default: false },
+  isAdminUser: { type: Boolean, default: false },
+  displayName: { type: String,  default: '' },
+})
+
+const emit = defineEmits(['logout'])
+const route = useRoute()
+
+const showNav = computed(() =>
+  !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'forbidden', 'maintenance'].includes(route.name)
+)
+
+function handleLogout() { emit('logout') }
+function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 </script>
 
 <style scoped>
