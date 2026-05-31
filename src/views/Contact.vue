@@ -21,13 +21,13 @@
       </div>
 
       <div class="contact-info-list">
-        <a class="contact-info-item" href="https://calendly.com/fannysaez-pro/30min" target="_blank" rel="noopener" title="Prendre un rendez-vous">
+        <router-link to="/rdv" class="contact-info-item" title="Prendre un rendez-vous">
           <Calendar class="ci-icon" />
           <div>
             <strong>Rendez-vous</strong>
             <span>Prendre un appel</span>
           </div>
-        </a>
+        </router-link>
         <div class="contact-info-item">
           <MapPin class="ci-icon" />
           <div>

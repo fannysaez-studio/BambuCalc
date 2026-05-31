@@ -13,6 +13,7 @@ const routes = [
   { path: '/admin',            name: 'admin',            component: () => import('@/views/admin/AdminDashboard.vue'),     meta: { requiresAuth: true, requiresAdmin: true } },
   { path: '/profile',          name: 'profile',          component: () => import('@/views/dashboard/UserProfile.vue'),   meta: { requiresAuth: true } },
   { path: '/contact',          name: 'contact',          component: () => import('@/views/Contact.vue') },
+  { path: '/rdv',             name: 'rdv',              component: () => import('@/views/BookingPage.vue') },
   { path: '/privacy',          name: 'privacy',          component: () => import('@/views/PrivacyPolicy.vue') },
   { path: '/mentions-legales', name: 'mentions-legales', component: () => import('@/views/MentionsLegales.vue') },
   {
