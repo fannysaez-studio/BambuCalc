@@ -220,6 +220,14 @@
             <Eye class="btn-preview-icon" />
             <span>Aperçu</span>
           </button>
+          <router-link
+            v-if="currentStep === steps.length"
+            to="/dashboard"
+            class="btn-dash-icon"
+            title="Mon tableau de bord"
+          >
+            <LayoutDashboard :size="18" />
+          </router-link>
           <button
             v-if="currentStep === steps.length"
             :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
@@ -262,7 +270,7 @@ import PrintingTime      from '@/components/calculator/PrintingTime.vue'
 import PricingSuggestions from '@/components/calculator/PricingSuggestions.vue'
 import CostBreakdown     from '@/components/calculator/CostBreakdown.vue'
 import ToastMessage      from '@/components/ui/ToastMessage.vue'
-import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye } from 'lucide-vue-next'
+import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard } from 'lucide-vue-next'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 
 export default {
@@ -271,7 +279,7 @@ export default {
     ProjectDetails, ProjectMatter, ClientInfo, FilamentSection,
     PrintingTime, PricingSuggestions, CostBreakdown, ToastMessage,
     QuotePreviewModal,
-    Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye,
+    Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard,
   },
   setup() {
     return { store: useCalculatorStore() }
@@ -788,6 +796,23 @@ export default {
 }
 
 .btn-next:hover { filter: brightness(1.07); transform: translateY(-1px); }
+
+.btn-dash-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  color: #718096;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+.btn-dash-icon:hover { border-color: #2e9cab; color: #2e9cab; background: #e8f7f9; }
 
 .btn-preview-devis {
   display: flex;
