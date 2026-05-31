@@ -513,7 +513,7 @@ async function linkAccount() {
 .dash-page {
   background: #f0f4f8;
   padding: 1.5rem 1.5rem 3rem;
-  max-width: 900px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
