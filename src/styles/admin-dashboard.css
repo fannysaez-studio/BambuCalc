@@ -391,10 +391,9 @@
   gap: 0.1rem;
 }
 .tab-dropdown--right {
-  left: auto;
-  right: -0.75rem;
-  min-width: unset;
-  width: max-content;
+  left: 0;
+  right: auto;
+  min-width: 100%;
 }
 .tab-dropdown-item {
   display: flex;
