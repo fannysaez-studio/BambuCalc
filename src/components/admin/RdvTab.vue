@@ -269,8 +269,14 @@ async function cancelAppointment(a) {
     'cancel'
   )
   if (!ok) return
+  const prev = a.status
   a.status = 'canceled'
-  await supabase.from('appointments').update({ status: 'canceled' }).eq('id', a.id)
+  const { error } = await supabase.from('appointments').update({ status: 'canceled' }).eq('id', a.id)
+  if (error) {
+    console.error('Annulation échouée :', error)
+    a.status = prev
+    return
+  }
   emit('count-change', appointments.value.filter(x => !isPast(x) && x.status === 'active').length)
 }
 
@@ -281,8 +287,12 @@ async function deleteAppointment(a) {
     'delete'
   )
   if (!ok) return
+  const { error } = await supabase.from('appointments').delete().eq('id', a.id)
+  if (error) {
+    console.error('Suppression échouée :', error)
+    return
+  }
   appointments.value = appointments.value.filter(x => x.id !== a.id)
-  await supabase.from('appointments').delete().eq('id', a.id)
   emit('count-change', appointments.value.filter(x => !isPast(x) && x.status === 'active').length)
 }
 
