@@ -463,7 +463,7 @@ const tabs = computed(() => [
   { id: 'manage', label: 'Gestion Devis', icon: Send, count: manageCount.value || 0 },
   { id: 'emails', label: 'Emails', icon: Mail },
   { id: 'archives', label: 'Archives', icon: Archive, count: archiveCount.value || 0 },
-  { id: 'rdv', label: 'RDV', icon: CalendarDays, count: rdvCount.value || undefined },
+  { id: 'rdv', label: 'Rendez-vous', icon: CalendarDays, count: rdvCount.value || undefined },
   { id: 'catalogue', label: 'Catalogue', icon: Package, count: catalogueCount.value || 0 },
 ])
 const currentTabIcon = computed(() => {

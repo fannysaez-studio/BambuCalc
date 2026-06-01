@@ -32,6 +32,7 @@
             <th>Présent</th>
             <th>Note admin</th>
             <th>Statut</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -83,6 +84,19 @@
               <span :class="['badge-status', `badge-status--${a.status === 'canceled' ? 'canceled' : isPast(a) ? 'past' : 'upcoming'}`]">
                 {{ a.status === 'canceled' ? 'Annulé' : isPast(a) ? 'Passé' : 'À venir' }}
               </span>
+            </td>
+            <td class="td-actions">
+              <button
+                v-if="a.status === 'active'"
+                class="rdv-action-btn rdv-action-btn--cancel"
+                title="Annuler le RDV"
+                @click="cancelAppointment(a)"
+              >Annuler</button>
+              <button
+                class="rdv-action-btn rdv-action-btn--delete"
+                title="Supprimer"
+                @click="deleteAppointment(a)"
+              >✕</button>
             </td>
           </tr>
         </tbody>
@@ -167,6 +181,22 @@ async function toggleAttended(a) {
   await supabase.from('appointments').update({ attended: val }).eq('id', a.id)
 }
 
+async function cancelAppointment(a) {
+  if (!confirm(`Annuler le RDV de ${a.invitee_name || a.invitee_email} ?`)) return
+  a.status = 'canceled'
+  await supabase.from('appointments').update({ status: 'canceled' }).eq('id', a.id)
+  const upcoming = appointments.value.filter(x => !isPast(x) && x.status === 'active').length
+  emit('count-change', upcoming)
+}
+
+async function deleteAppointment(a) {
+  if (!confirm(`Supprimer définitivement ce RDV ?`)) return
+  appointments.value = appointments.value.filter(x => x.id !== a.id)
+  await supabase.from('appointments').delete().eq('id', a.id)
+  const upcoming = appointments.value.filter(x => !isPast(x) && x.status === 'active').length
+  emit('count-change', upcoming)
+}
+
 async function saveNote(a, val) {
   const note = val.trim() || null
   if (note === (a.admin_note || null)) return
@@ -211,4 +241,20 @@ onMounted(load)
 
 .tr--canceled td { opacity: 0.55; }
 .tr--past .td-name { color: #718096; }
+
+.td-actions { white-space: nowrap; text-align: right; }
+.rdv-action-btn {
+  border: none; border-radius: 6px; cursor: pointer;
+  font-size: 0.7rem; font-weight: 600; font-family: inherit;
+  padding: 0.2rem 0.55rem; transition: all 0.15s;
+}
+.rdv-action-btn--cancel {
+  background: rgba(234,179,8,0.1); color: #b45309;
+  margin-right: 0.3rem;
+}
+.rdv-action-btn--cancel:hover { background: rgba(234,179,8,0.2); }
+.rdv-action-btn--delete {
+  background: rgba(229,62,62,0.08); color: #e53e3e;
+}
+.rdv-action-btn--delete:hover { background: rgba(229,62,62,0.15); }
 </style>
