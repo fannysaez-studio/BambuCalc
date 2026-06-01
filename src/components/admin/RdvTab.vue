@@ -265,7 +265,7 @@ onMounted(load)
 .td-client   { white-space: nowrap; }
 .td-name     { display: block; font-size: 0.8rem; font-weight: 600; color: #1b2f39; }
 .td-duration { display: block; font-size: 0.7rem; color: #a0aec0; margin-top: 1px; }
-.td-email    { font-size: 0.72rem; max-width: 150px; }
+.td-email    { font-size: 0.72rem; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .td-object   { font-size: 0.75rem; color: #4a5568; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .td-format, .td-presence { white-space: nowrap; }
 
@@ -273,23 +273,22 @@ onMounted(load)
 .td-client-link:hover { text-decoration: underline; }
 .text-muted-sm { color: #a0aec0; font-size: 0.72rem; }
 
-/* ── LED lumineuse ── */
+/* ── LED lumineuse (même style que CatalogueSection) ── */
 .rdv-select-wrap {
   display: inline-flex; align-items: center; gap: 0.35rem;
 }
 .led-glow {
-  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
-  display: inline-block;
+  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; display: inline-block;
 }
-.led-glow--online   { background: #63b3ed; box-shadow: 0 0 4px 2px rgba(66,153,225,0.6), 0 0 8px rgba(66,153,225,0.3); }
-.led-glow--inperson { background: #68d391; box-shadow: 0 0 4px 2px rgba(72,187,120,0.6), 0 0 8px rgba(72,187,120,0.3); }
-.led-glow--unknown  { background: #a0aec0; box-shadow: 0 0 3px 1px rgba(160,174,192,0.4); }
-.led-glow--present  { background: #48bb78; box-shadow: 0 0 4px 2px rgba(72,187,120,0.7), 0 0 10px rgba(72,187,120,0.35); animation: pulse-green 2s infinite; }
-.led-glow--absent   { background: #fc8181; box-shadow: 0 0 4px 2px rgba(252,129,129,0.7), 0 0 10px rgba(252,129,129,0.35); }
+.led-glow--online   { background: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.2),  0 0 7px 2px rgba(59,130,246,0.5); }
+.led-glow--inperson { background: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.2),   0 0 7px 2px rgba(34,197,94,0.5); }
+.led-glow--unknown  { background: #a0aec0; box-shadow: 0 0 0 2px rgba(160,174,192,0.2), 0 0 5px 1px rgba(160,174,192,0.4); animation: led-blink 2s ease-in-out infinite; }
+.led-glow--present  { background: #22c55e; box-shadow: 0 0 0 2px rgba(34,197,94,0.2),   0 0 7px 2px rgba(34,197,94,0.5); }
+.led-glow--absent   { background: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.2),   0 0 7px 2px rgba(239,68,68,0.5); }
 
-@keyframes pulse-green {
-  0%, 100% { box-shadow: 0 0 4px 2px rgba(72,187,120,0.7), 0 0 10px rgba(72,187,120,0.35); }
-  50%       { box-shadow: 0 0 6px 3px rgba(72,187,120,0.9), 0 0 14px rgba(72,187,120,0.5); }
+@keyframes led-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
 }
 
 /* ── Select badge (Format + Présence) ── */
