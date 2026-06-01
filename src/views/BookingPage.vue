@@ -85,20 +85,22 @@
 
     <!-- ── Modale de confirmation ── -->
     <Transition name="modal">
-      <div v-if="confirmed" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div v-if="confirmed" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" @click.self="closeModal">
         <div class="modal-card">
-          <div class="modal-icon">
-            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="32" cy="32" r="31" stroke="#2e9cab" stroke-width="2"/>
-              <circle cx="32" cy="32" r="31" stroke="#2e9cab" stroke-width="2" stroke-dasharray="195" stroke-dashoffset="0" class="circle-draw"/>
-              <path d="M18 33l11 11 17-22" stroke="#2e9cab" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="check-draw"/>
-            </svg>
+          <div class="modal-accent"></div>
+          <button class="modal-close" aria-label="Fermer" @click="closeModal">✕</button>
+          <div class="modal-body">
+            <div class="modal-icon-wrap">
+              <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M8 19l8 8 13-16" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2 id="modal-title">Rendez-vous confirmé !</h2>
+            <p>Un email de confirmation vient de vous être envoyé avec tous les détails de votre séance.</p>
+            <router-link to="/" class="modal-btn">
+              Réserver mon accompagnement
+            </router-link>
           </div>
-          <h2 id="modal-title">Rendez-vous confirmé !</h2>
-          <p>Un email de confirmation vient de vous être envoyé avec tous les détails de votre séance.</p>
-          <router-link to="/" class="modal-btn">
-            Réserver mon accompagnement
-          </router-link>
         </div>
       </div>
     </Transition>
@@ -108,10 +110,14 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { Home, ArrowLeft, Clock, Video, MapPin, Globe } from 'lucide-vue-next'
 
+const router = useRouter()
 let script = null
 const confirmed = ref(false)
+
+function closeModal() { router.push('/') }
 
 function handleCalendlyEvent(e) {
   if (e.data?.event === 'calendly.event_scheduled') {
@@ -508,49 +514,68 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  pointer-events: none;
+  background: rgba(15, 25, 35, 0.12);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .modal-card {
+  position: relative;
   background: #fff;
-  border-radius: 24px;
-  padding: 2rem 2rem 1.75rem;
-  max-width: 380px;
+  border-radius: 20px;
+  max-width: 360px;
   width: 100%;
+  overflow: hidden;
+  box-shadow: 0 32px 64px rgba(15,25,35,0.16), 0 4px 16px rgba(15,25,35,0.06);
+}
+.modal-accent {
+  height: 5px;
+  background: linear-gradient(90deg, #2e9cab, #5bc4d4);
+}
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: none;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+.modal-close:hover { background: #e2e8f0; color: #475569; }
+.modal-body {
+  padding: 1.75rem 1.75rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
   text-align: center;
-  box-shadow: 0 24px 60px rgba(15, 25, 35, 0.22), 0 4px 16px rgba(15,25,35,0.08);
-  pointer-events: all;
 }
-.modal-icon {
-  width: 3rem;
-  height: 3rem;
+.modal-icon-wrap {
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2e9cab, #5bc4d4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(46,154,171,0.35);
+  flex-shrink: 0;
 }
-.modal-icon svg {
-  width: 100%;
-  height: 100%;
-}
-.circle-draw {
-  animation: drawCircle 0.6s ease-out forwards;
-  stroke-dasharray: 195;
-  stroke-dashoffset: 195;
-}
-.check-draw {
-  animation: drawCheck 0.4s 0.5s ease-out forwards;
-  stroke-dasharray: 50;
-  stroke-dashoffset: 50;
-}
-@keyframes drawCircle {
-  to { stroke-dashoffset: 0; }
-}
-@keyframes drawCheck {
-  to { stroke-dashoffset: 0; }
+.modal-icon-wrap svg {
+  width: 1.3rem;
+  height: 1.3rem;
 }
 .modal-card h2 {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: 800;
   color: #1b2f39;
   letter-spacing: -0.02em;
@@ -558,40 +583,39 @@ onUnmounted(() => {
 .modal-card p {
   margin: 0;
   color: #4f6570;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   line-height: 1.6;
-  max-width: 320px;
 }
 .modal-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 0.5rem;
-  padding: 0.9rem 1.75rem;
+  margin-top: 0.25rem;
+  padding: 0.75rem 1.5rem;
   background: #2e9cab;
   color: #fff;
   border-radius: 999px;
-  font-size: 1rem;
+  font-size: 0.92rem;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 6px 20px rgba(46,154,171,0.32);
+  box-shadow: 0 4px 14px rgba(46,154,171,0.3);
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
 .modal-btn:hover {
   background: #1f7f97;
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(46,154,171,0.38);
+  box-shadow: 0 8px 20px rgba(46,154,171,0.38);
 }
 
 /* Transition Vue */
 .modal-enter-active { animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .modal-leave-active { animation: modalOut 0.2s ease; }
 @keyframes modalIn {
-  from { opacity: 0; transform: scale(0.88); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.88) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 @keyframes modalOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.94); }
 }
 </style>
