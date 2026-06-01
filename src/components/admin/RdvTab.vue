@@ -67,12 +67,12 @@
             <!-- Format : select badge LED -->
             <td class="td-format">
               <div class="rdv-select-wrap">
-                <span :class="['led-glow', `led-glow--${resolvedFormat(a)}`]" />
+                <span :class="['led-glow', `led-glow--${a.format}`]" />
                 <select
-                  :class="['rdv-select', `rdv-select--${resolvedFormat(a)}`]"
-                  :value="resolvedFormat(a)"
+                  v-model="a.format"
+                  :class="['rdv-select', `rdv-select--${a.format}`]"
                   :disabled="a.status === 'canceled'"
-                  @change="saveFormat(a, $event.target.value)"
+                  @change="saveFormat(a)"
                 >
                   <option value="online">En ligne</option>
                   <option value="inperson">Extérieur</option>
@@ -83,9 +83,9 @@
             <!-- Présence : select badge LED -->
             <td class="td-presence">
               <div class="rdv-select-wrap">
-                <span :class="['led-glow', `led-glow--${resolvedPresence(a)}`]" />
+                <span :class="['led-glow', `led-glow--${ledPresence(a)}`]" />
                 <select
-                  :class="['rdv-select', `rdv-select--${resolvedPresence(a)}`]"
+                  :class="['rdv-select', `rdv-select--${ledPresence(a)}`]"
                   :value="a.presence ?? ''"
                   :disabled="a.status === 'canceled'"
                   @change="savePresence(a, $event.target.value)"
@@ -178,13 +178,12 @@ function getObjectRdv(a) {
   return '—'
 }
 
-function resolvedFormat(a) {
-  if (a.format) return a.format
+function deriveFormat(a) {
   const loc = a.raw?.payload?.scheduled_event?.location?.type ?? ''
   return ONLINE_TYPES.some(t => loc.includes(t)) ? 'online' : 'inperson'
 }
 
-function resolvedPresence(a) {
+function ledPresence(a) {
   if (a.presence === 'present') return 'present'
   if (a.presence === 'absent')  return 'absent'
   return 'unknown'
@@ -210,7 +209,11 @@ async function load() {
     .from('appointments')
     .select('id, event_name, invitee_name, invitee_email, start_at, end_at, status, presence, format, admin_note, raw, created_at')
     .order('start_at', { ascending: false, nullsFirst: true })
-  appointments.value = data ?? []
+  appointments.value = (data ?? []).map(a => ({
+    ...a,
+    format:   a.format   ?? deriveFormat(a),
+    presence: a.presence ?? null,
+  }))
   emit('count-change', appointments.value.filter(a => !isPast(a) && a.status === 'active').length)
   loading.value = false
 }
@@ -220,9 +223,8 @@ function startEdit(a) {
   nextTick(() => { noteRefs.value[a.id]?.focus() })
 }
 
-async function saveFormat(a, val) {
-  a.format = val
-  await supabase.from('appointments').update({ format: val }).eq('id', a.id)
+async function saveFormat(a) {
+  await supabase.from('appointments').update({ format: a.format }).eq('id', a.id)
 }
 
 async function savePresence(a, val) {
