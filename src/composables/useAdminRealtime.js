@@ -29,7 +29,7 @@ export function useAdminRealtime(toast) {
 
   // ── Canal quotes ──────────────────────────────────────────────────────────
   const quotesChannel = supabase
-    .channel('admin-quotes')
+    .channel(`admin-quotes-${Date.now()}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'quotes' }, ({ new: q }) => {
       quotes.value = [q, ...quotes.value]
       const total = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })
@@ -48,7 +48,7 @@ export function useAdminRealtime(toast) {
 
   // ── Canal profiles ────────────────────────────────────────────────────────
   const profilesChannel = supabase
-    .channel('admin-profiles')
+    .channel(`admin-profiles-${Date.now()}`)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, ({ new: p }) => {
       profiles.value = [p, ...profiles.value]
     })

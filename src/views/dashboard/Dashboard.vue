@@ -420,7 +420,7 @@ let realtimeChannel = null
 
 function setupRealtime(userId) {
   realtimeChannel = supabase
-    .channel('dashboard-quotes')
+    .channel(`dashboard-quotes-${Date.now()}`)
     .on(
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'quotes', filter: `user_id=eq.${userId}` },

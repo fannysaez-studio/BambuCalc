@@ -114,9 +114,10 @@ async function loadNotifications() {
 async function setupRealtime() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
+  if (realtimeChannel) { await supabase.removeChannel(realtimeChannel); realtimeChannel = null }
   const userId = user.id
   realtimeChannel = supabase
-    .channel(`notif-bell-${userId}`)
+    .channel(`notif-bell-${userId}-${Date.now()}`)
     .on(
       'postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
@@ -124,7 +125,9 @@ async function setupRealtime() {
         notifications.value = [payload.new, ...notifications.value]
       }
     )
-    .subscribe()
+    .subscribe(status => {
+      if (status === 'CHANNEL_ERROR') console.warn('[NotificationBell] realtime indisponible')
+    })
 }
 
 async function markRead(n) {
@@ -163,7 +166,7 @@ onMounted(() => {
   const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
     if (session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
       await loadNotifications()
-      if (!realtimeChannel) await setupRealtime()
+      await setupRealtime()
     }
   })
   authSubscription = subscription
