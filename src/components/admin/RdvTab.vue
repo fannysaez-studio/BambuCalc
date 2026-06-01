@@ -13,21 +13,23 @@
     </div>
 
     <!-- Modale de confirmation custom -->
-    <Transition name="modal">
-      <div v-if="dialog.visible" class="confirm-backdrop" role="dialog" aria-modal="true">
-        <div class="confirm-card">
-          <div :class="['confirm-icon-wrap', `confirm-icon-wrap--${dialog.type}`]">
-            <component :is="dialog.type === 'delete' ? Trash2 : XCircle" class="confirm-icon" />
-          </div>
-          <h3 class="confirm-title">{{ dialog.title }}</h3>
-          <p class="confirm-msg">{{ dialog.message }}</p>
-          <div class="confirm-actions">
-            <button class="confirm-btn confirm-btn--neutral" @click="cancelDialog">Annuler</button>
-            <button :class="['confirm-btn', `confirm-btn--${dialog.type}`]" @click="confirmDialog">Confirmer</button>
+    <Teleport to="body">
+      <Transition name="modal">
+        <div v-if="dialogVisible" class="rdv-confirm-backdrop" role="dialog" aria-modal="true">
+          <div class="rdv-confirm-card">
+            <div :class="['rdv-confirm-icon-wrap', `rdv-confirm-icon-wrap--${dialogType}`]">
+              <component :is="dialogType === 'delete' ? Trash2 : XCircle" class="rdv-confirm-icon" />
+            </div>
+            <h3 class="rdv-confirm-title">{{ dialogTitle }}</h3>
+            <p class="rdv-confirm-msg">{{ dialogMessage }}</p>
+            <div class="rdv-confirm-actions">
+              <button class="rdv-confirm-btn rdv-confirm-btn--neutral" @click="cancelDialog">Annuler</button>
+              <button :class="['rdv-confirm-btn', `rdv-confirm-btn--${dialogType}`]" @click="confirmDialog">Confirmer</button>
+            </div>
           </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
 
     <div v-if="loading" class="empty-state"><div class="spinner" /><p>Chargement…</p></div>
 
@@ -159,17 +161,23 @@ const filter = ref('upcoming')
 const editingId = ref(null)
 const noteRefs = ref({})
 
-const dialog = ref({ visible: false, title: '', message: '', type: 'delete' })
-let dialogResolve = null
+const dialogVisible = ref(false)
+const dialogTitle   = ref('')
+const dialogMessage = ref('')
+const dialogType    = ref('delete')
+let dialogResolve   = null
 
 function askConfirm(title, message, type = 'delete') {
   return new Promise(resolve => {
-    dialog.value = { visible: true, title, message, type }
-    dialogResolve = resolve
+    dialogTitle.value   = title
+    dialogMessage.value = message
+    dialogType.value    = type
+    dialogVisible.value = true
+    dialogResolve       = resolve
   })
 }
-function confirmDialog() { dialog.value.visible = false; dialogResolve?.(true) }
-function cancelDialog()  { dialog.value.visible = false; dialogResolve?.(false) }
+function confirmDialog() { dialogVisible.value = false; dialogResolve?.(true) }
+function cancelDialog()  { dialogVisible.value = false; dialogResolve?.(false) }
 
 const ONLINE_TYPES = ['google_conference', 'zoom', 'teams', 'gotomeeting', 'webex', 'microsoft_teams', 'google_meet']
 
@@ -314,90 +322,7 @@ onMounted(load)
 </script>
 
 <style scoped>
-/* ── Modale confirmation ── */
-.confirm-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: rgba(15, 25, 35, 0.5);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-.confirm-card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 2rem 1.75rem 1.75rem;
-  max-width: 380px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(15,25,35,0.2);
-}
-.confirm-icon-wrap {
-  width: 3.2rem; height: 3.2rem;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.confirm-icon-wrap--delete { background: #fff5f5; }
-.confirm-icon-wrap--cancel { background: #fffbeb; }
-.confirm-icon {
-  width: 1.4rem; height: 1.4rem;
-}
-.confirm-icon-wrap--delete .confirm-icon { color: #e53e3e; }
-.confirm-icon-wrap--cancel .confirm-icon { color: #d97706; }
-.confirm-title {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1b2f39;
-}
-.confirm-msg {
-  margin: 0;
-  font-size: 0.88rem;
-  color: #4f6570;
-  line-height: 1.55;
-}
-.confirm-actions {
-  display: flex;
-  gap: 0.6rem;
-  margin-top: 0.5rem;
-  width: 100%;
-}
-.confirm-btn {
-  flex: 1;
-  padding: 0.65rem 1rem;
-  border: none;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  font-family: inherit;
-}
-.confirm-btn--neutral { background: #f1f5f9; color: #475569; }
-.confirm-btn--neutral:hover { background: #e2e8f0; }
-.confirm-btn--delete { background: #e53e3e; color: #fff; }
-.confirm-btn--delete:hover { background: #c53030; }
-.confirm-btn--cancel { background: #d97706; color: #fff; }
-.confirm-btn--cancel:hover { background: #b45309; }
-.modal-enter-active { animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-.modal-leave-active { animation: modalOut 0.18s ease; }
-@keyframes modalIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes modalOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
+/* styles déplacés vers le bloc global ci-dessous */
 
 .rdv-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
@@ -474,4 +399,48 @@ onMounted(load)
 .tr--canceled td { opacity: 0.5; }
 .tr--past .td-date, .tr--past .td-name { color: #a0aec0; }
 .tr--editing { background: rgba(46,156,171,0.04); }
+</style>
+
+<style>
+/* ── Modale confirmation (global — hors scoped pour Teleport) ── */
+.rdv-confirm-backdrop {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center; padding: 1rem;
+  background: rgba(15,25,35,0.45);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.rdv-confirm-card {
+  background: #fff; border-radius: 20px;
+  padding: 2rem 1.75rem 1.75rem; max-width: 380px; width: 100%;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.75rem; text-align: center;
+  box-shadow: 0 20px 50px rgba(15,25,35,0.22);
+}
+.rdv-confirm-icon-wrap {
+  width: 3.2rem; height: 3.2rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.rdv-confirm-icon-wrap--delete { background: #fff5f5; }
+.rdv-confirm-icon-wrap--cancel { background: #fffbeb; }
+.rdv-confirm-icon { width: 1.4rem; height: 1.4rem; }
+.rdv-confirm-icon-wrap--delete .rdv-confirm-icon { color: #e53e3e; }
+.rdv-confirm-icon-wrap--cancel .rdv-confirm-icon { color: #d97706; }
+.rdv-confirm-title { margin: 0; font-size: 1.1rem; font-weight: 700; color: #1b2f39; font-family: Inter, sans-serif; }
+.rdv-confirm-msg   { margin: 0; font-size: 0.88rem; color: #4f6570; line-height: 1.55; font-family: Inter, sans-serif; }
+.rdv-confirm-actions { display: flex; gap: 0.6rem; margin-top: 0.5rem; width: 100%; }
+.rdv-confirm-btn {
+  flex: 1; padding: 0.65rem 1rem; border: none; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: background 0.15s; font-family: Inter, sans-serif;
+}
+.rdv-confirm-btn--neutral { background: #f1f5f9; color: #475569; }
+.rdv-confirm-btn--neutral:hover { background: #e2e8f0; }
+.rdv-confirm-btn--delete { background: #e53e3e; color: #fff; }
+.rdv-confirm-btn--delete:hover { background: #c53030; }
+.rdv-confirm-btn--cancel { background: #d97706; color: #fff; }
+.rdv-confirm-btn--cancel:hover { background: #b45309; }
+.modal-enter-active { animation: rdvModalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.modal-leave-active { animation: rdvModalOut 0.18s ease; }
+@keyframes rdvModalIn  { from { opacity:0; transform:scale(0.9); } to { opacity:1; transform:scale(1); } }
+@keyframes rdvModalOut { from { opacity:1; } to { opacity:0; } }
 </style>
