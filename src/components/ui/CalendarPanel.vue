@@ -119,9 +119,11 @@ onMounted(async () => {
   await load()
   document.addEventListener('click', handleOutside)
   realtimeChannel = supabase
-    .channel('calendar-appointments')
+    .channel(`calendar-appointments-${Date.now()}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => load())
-    .subscribe()
+    .subscribe(status => {
+      if (status === 'CHANNEL_ERROR') console.warn('Realtime appointments: canal indisponible, rechargement manuel actif')
+    })
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleOutside)
