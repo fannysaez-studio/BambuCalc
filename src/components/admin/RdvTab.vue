@@ -26,7 +26,6 @@
             <th>Date &amp; Heure</th>
             <th>Client</th>
             <th>Email</th>
-            <th>Durée</th>
             <th>Objet</th>
             <th>Format</th>
             <th>Présence</th>
@@ -46,7 +45,10 @@
               <span class="td-time">{{ fmtTime(a.start_at) }}</span>
             </td>
 
-            <td class="td-name">{{ a.invitee_name || '—' }}</td>
+            <td class="td-client">
+              <span class="td-name">{{ a.invitee_name || '—' }}</span>
+              <span class="td-duration">{{ duration(a.start_at, a.end_at) }}</span>
+            </td>
 
             <td class="td-email">
               <a v-if="clientByEmail[a.invitee_email]" class="td-client-link" href="#"
@@ -55,8 +57,6 @@
               </a>
               <span v-else class="text-muted-sm">{{ a.invitee_email || '—' }}</span>
             </td>
-
-            <td class="td-duration">{{ duration(a.start_at, a.end_at) }}</td>
 
             <td class="td-object">
               <span :title="getObjectRdv(a) !== '—' ? getObjectRdv(a) : ''">
@@ -262,9 +262,10 @@ onMounted(load)
 .td-datetime { white-space: nowrap; }
 .td-date { display: block; font-size: 0.78rem; font-weight: 600; color: #1b2f39; }
 .td-time { display: block; font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
-.td-name     { font-size: 0.8rem; font-weight: 600; color: #1b2f39; white-space: nowrap; }
+.td-client   { white-space: nowrap; }
+.td-name     { display: block; font-size: 0.8rem; font-weight: 600; color: #1b2f39; }
+.td-duration { display: block; font-size: 0.7rem; color: #a0aec0; margin-top: 1px; }
 .td-email    { font-size: 0.72rem; max-width: 150px; }
-.td-duration { font-size: 0.75rem; color: #718096; white-space: nowrap; }
 .td-object   { font-size: 0.75rem; color: #4a5568; max-width: 130px; }
 .td-format, .td-presence { white-space: nowrap; }
 
