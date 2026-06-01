@@ -508,9 +508,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(15, 25, 35, 0.25);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
 }
 .modal-card {
   background: #fff;
@@ -523,7 +521,8 @@ onUnmounted(() => {
   align-items: center;
   gap: 0.85rem;
   text-align: center;
-  box-shadow: 0 24px 60px rgba(15, 25, 35, 0.18);
+  box-shadow: 0 24px 60px rgba(15, 25, 35, 0.22), 0 4px 16px rgba(15,25,35,0.08);
+  pointer-events: all;
 }
 .modal-icon {
   width: 3rem;
