@@ -105,7 +105,7 @@
             <span v-if="tab.count !== undefined" class="burger-item-count">{{ tab.count }}</span>
           </button>
           <div class="burger-sep" />
-          <div class="burger-group-label">Outils</div>
+          <div class="burger-group-label">Boîte à outils</div>
           <button
             class="burger-item"
             :class="activeTab === 'catalogue' && 'burger-item--active'"
@@ -186,7 +186,7 @@
           @click="outilsDropdownOpen = !outilsDropdownOpen"
         >
           <Wrench class="tab-icon" />
-          Outils
+          Boîte à outils
           <ChevronDown :class="['tab-chevron', outilsDropdownOpen && 'tab-chevron--open']" />
         </button>
         <Transition name="dropdown">
@@ -477,8 +477,8 @@ const rdvCount = ref(0)
 
 const tabs = computed(() => [
   { id: 'manage', label: 'Gestion Devis', icon: Send, count: manageCount.value || 0 },
-  { id: 'emails', label: 'Emails', icon: Mail },
-  { id: 'archives', label: 'Archives', icon: Archive, count: archiveCount.value || 0 },
+  { id: 'emails', label: 'Gestion des Emails', icon: Mail },
+  { id: 'archives', label: 'Archives devis', icon: Archive, count: archiveCount.value || 0 },
   { id: 'rdv', label: 'Rendez-vous', icon: CalendarDays, count: rdvCount.value || undefined },
 ])
 const currentTabIcon = computed(() => {
@@ -495,6 +495,8 @@ const currentTabLabel = computed(() => {
   if (activeTab.value === 'quotes') return 'Tous les devis'
   if (activeTab.value === 'stats') return 'Statistiques'
   if (activeTab.value === 'settings') return 'Paramètres'
+  if (activeTab.value === 'emails') return 'Gestion des Emails'
+  if (activeTab.value === 'archives') return 'Archives devis'
   if (activeTab.value === 'catalogue') return 'Catalogue'
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.label : ''
