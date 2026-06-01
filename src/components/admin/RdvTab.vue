@@ -66,29 +66,35 @@
 
             <!-- Format : select badge LED -->
             <td class="td-format">
-              <select
-                :class="['rdv-select', `rdv-select--${resolvedFormat(a)}`]"
-                :value="resolvedFormat(a)"
-                :disabled="a.status === 'canceled'"
-                @change="saveFormat(a, $event.target.value)"
-              >
-                <option value="online">🔵 En ligne</option>
-                <option value="inperson">🟢 Extérieur</option>
-              </select>
+              <div class="rdv-select-wrap">
+                <span :class="['led-glow', `led-glow--${resolvedFormat(a)}`]" />
+                <select
+                  :class="['rdv-select', `rdv-select--${resolvedFormat(a)}`]"
+                  :value="resolvedFormat(a)"
+                  :disabled="a.status === 'canceled'"
+                  @change="saveFormat(a, $event.target.value)"
+                >
+                  <option value="online">En ligne</option>
+                  <option value="inperson">Extérieur</option>
+                </select>
+              </div>
             </td>
 
             <!-- Présence : select badge LED -->
             <td class="td-presence">
-              <select
-                :class="['rdv-select', `rdv-select--${resolvedPresence(a)}`]"
-                :value="a.presence ?? ''"
-                :disabled="a.status === 'canceled'"
-                @change="savePresence(a, $event.target.value)"
-              >
-                <option value="">⚫ À confirmer</option>
-                <option value="present">🟢 Présent(e)</option>
-                <option value="absent">🔴 Absent(e)</option>
-              </select>
+              <div class="rdv-select-wrap">
+                <span :class="['led-glow', `led-glow--${resolvedPresence(a)}`]" />
+                <select
+                  :class="['rdv-select', `rdv-select--${resolvedPresence(a)}`]"
+                  :value="a.presence ?? ''"
+                  :disabled="a.status === 'canceled'"
+                  @change="savePresence(a, $event.target.value)"
+                >
+                  <option value="">À confirmer</option>
+                  <option value="present">Présent(e)</option>
+                  <option value="absent">Absent(e)</option>
+                </select>
+              </div>
             </td>
 
             <td class="td-note">
@@ -265,6 +271,25 @@ onMounted(load)
 .td-client-link { color: #2e9cab; text-decoration: none; }
 .td-client-link:hover { text-decoration: underline; }
 .text-muted-sm { color: #a0aec0; font-size: 0.72rem; }
+
+/* ── LED lumineuse ── */
+.rdv-select-wrap {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+}
+.led-glow {
+  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+  display: inline-block;
+}
+.led-glow--online   { background: #63b3ed; box-shadow: 0 0 4px 2px rgba(66,153,225,0.6), 0 0 8px rgba(66,153,225,0.3); }
+.led-glow--inperson { background: #68d391; box-shadow: 0 0 4px 2px rgba(72,187,120,0.6), 0 0 8px rgba(72,187,120,0.3); }
+.led-glow--unknown  { background: #a0aec0; box-shadow: 0 0 3px 1px rgba(160,174,192,0.4); }
+.led-glow--present  { background: #48bb78; box-shadow: 0 0 4px 2px rgba(72,187,120,0.7), 0 0 10px rgba(72,187,120,0.35); animation: pulse-green 2s infinite; }
+.led-glow--absent   { background: #fc8181; box-shadow: 0 0 4px 2px rgba(252,129,129,0.7), 0 0 10px rgba(252,129,129,0.35); }
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 4px 2px rgba(72,187,120,0.7), 0 0 10px rgba(72,187,120,0.35); }
+  50%       { box-shadow: 0 0 6px 3px rgba(72,187,120,0.9), 0 0 14px rgba(72,187,120,0.5); }
+}
 
 /* ── Select badge (Format + Présence) ── */
 .rdv-select {
