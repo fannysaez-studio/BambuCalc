@@ -28,7 +28,7 @@
             <th>Client</th>
             <th>Email</th>
             <th>Durée</th>
-            <th>Objet</th>
+            <th>Objet du RDV</th>
             <th>Format</th>
             <th>Présence</th>
             <th>Note admin</th>
@@ -52,7 +52,7 @@
               <span v-else class="text-muted-sm">{{ a.invitee_email || '—' }}</span>
             </td>
             <td class="td-duration">{{ duration(a.start_at, a.end_at) }}</td>
-            <td class="td-object">{{ a.event_name || '—' }}</td>
+            <td class="td-object">{{ getObjectRdv(a) }}</td>
 
             <!-- Format : Présentiel / Distanciel -->
             <td class="td-format">
@@ -142,6 +142,14 @@ function duration(start, end) {
   if (!start || !end) return '—'
   const min = Math.round((new Date(end) - new Date(start)) / 60000)
   return `${min} min`
+}
+
+function getObjectRdv(a) {
+  try {
+    const qa = a.raw?.payload?.questions_and_answers
+    if (Array.isArray(qa) && qa.length > 0 && qa[0].answer?.trim()) return qa[0].answer.trim()
+  } catch { /* */ }
+  return '—'
 }
 
 function getFormat(a) {
