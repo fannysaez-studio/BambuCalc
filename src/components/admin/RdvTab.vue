@@ -7,8 +7,15 @@
           v-for="f in filters"
           :key="f.id"
           :class="['uf-btn', filter === f.id && 'uf-btn--active']"
-          @click="filter = f.id"
+          @click="filter = f.id; selectedIds.clear()"
         >{{ f.label }}<span class="uf-count">{{ f.count }}</span></button>
+
+        <Transition name="bulk-fade">
+          <button v-if="selectedIds.size > 0" class="btn-bulk-del" @click="deleteSelected" title="Supprimer la sélection">
+            <Trash2 class="bulk-icon" />
+            <span>{{ selectedIds.size }}</span>
+          </button>
+        </Transition>
       </div>
     </div>
 
@@ -42,6 +49,9 @@
       <table class="data-table">
         <thead>
           <tr>
+            <th class="th-check">
+              <input type="checkbox" class="rdv-checkbox" :checked="allSelected" @change="toggleAll" />
+            </th>
             <th>Date &amp; Heure</th>
             <th>Client</th>
             <th>Email</th>
@@ -56,8 +66,12 @@
           <tr
             v-for="a in filtered"
             :key="a.id"
-            :class="{ 'tr--canceled': a.status === 'canceled', 'tr--past': isPast(a) && a.status !== 'canceled', 'tr--editing': editingId === a.id }"
+            :class="{ 'tr--canceled': a.status === 'canceled', 'tr--past': isPast(a) && a.status !== 'canceled', 'tr--editing': editingId === a.id, 'tr--selected': selectedIds.has(a.id) }"
           >
+            <td class="td-check">
+              <input type="checkbox" class="rdv-checkbox" :checked="selectedIds.has(a.id)" @change="toggleOne(a.id)" />
+            </td>
+
             <!-- Date & Heure fusionnés -->
             <td class="td-datetime">
               <span class="td-date">{{ fmtDate(a.start_at) }}</span>
@@ -148,7 +162,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, reactive } from 'vue'
 import { CalendarOff, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
@@ -160,6 +174,25 @@ const loading = ref(false)
 const filter = ref('upcoming')
 const editingId = ref(null)
 const noteRefs = ref({})
+
+const selectedIds = reactive(new Set())
+const allSelected = computed(() => filtered.value.length > 0 && filtered.value.every(a => selectedIds.has(a.id)))
+function toggleAll() { allSelected.value ? filtered.value.forEach(a => selectedIds.delete(a.id)) : filtered.value.forEach(a => selectedIds.add(a.id)) }
+function toggleOne(id) { selectedIds.has(id) ? selectedIds.delete(id) : selectedIds.add(id) }
+
+async function deleteSelected() {
+  const ids = [...selectedIds]
+  const ok = await askConfirm(
+    `Supprimer ${ids.length} rendez-vous ?`,
+    'Cette action est irréversible. Les RDV sélectionnés seront définitivement supprimés.',
+    'delete'
+  )
+  if (!ok) return
+  await Promise.all(ids.map(id => adminAction('delete', id)))
+  appointments.value = appointments.value.filter(a => !ids.includes(a.id))
+  ids.forEach(id => selectedIds.delete(id))
+  emit('count-change', appointments.value.filter(x => !isPast(x) && x.status === 'active').length)
+}
 
 const dialogVisible = ref(false)
 const dialogTitle   = ref('')
@@ -324,7 +357,31 @@ onMounted(load)
 <style scoped>
 /* styles déplacés vers le bloc global ci-dessous */
 
-.rdv-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.rdv-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+
+/* ── Sélection groupée ── */
+.th-check, .td-check { width: 2rem; padding-right: 0; }
+.rdv-checkbox {
+  width: 1rem; height: 1rem; cursor: pointer;
+  accent-color: #2e9cab; border-radius: 4px;
+}
+.tr--selected { background: rgba(46,156,171,0.07) !important; }
+
+.btn-bulk-del {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.3rem 0.75rem; border: none; border-radius: 8px;
+  background: #e53e3e; color: #fff;
+  font-size: 0.78rem; font-weight: 700; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit;
+}
+.btn-bulk-del:hover { background: #c53030; transform: translateY(-1px); }
+.bulk-icon { width: 0.85rem; height: 0.85rem; }
+
+.bulk-fade-enter-active { animation: bulkIn 0.2s ease; }
+.bulk-fade-leave-active { animation: bulkOut 0.15s ease; }
+@keyframes bulkIn  { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+@keyframes bulkOut { from { opacity:1; } to { opacity:0; transform:scale(0.85); } }
 
 /* ── Cellules ── */
 .td-datetime { white-space: nowrap; }
