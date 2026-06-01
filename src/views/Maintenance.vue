@@ -25,13 +25,13 @@
     <div class="mt-content">
       <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
       <h1 class="mt-title">Bientôt disponible</h1>
-      <p class="mt-sub">Nous travaillons à vous offrir une expérience optimale. Revenez très vite !</p>
+      <p class="mt-sub">Je peaufine les derniers détails pour vous offrir la meilleure expérience. À très vite !</p>
     </div>
 
     <!-- Bandeau défilant bas gauche -->
     <div class="mt-ticker" aria-hidden="true">
       <div class="mt-ticker-track">
-        <span>BambuCalc — Application en cours de développement&nbsp;&nbsp;•&nbsp;&nbsp;Nous revenons très vite&nbsp;&nbsp;•&nbsp;&nbsp;Expérience optimale en préparation&nbsp;&nbsp;•&nbsp;&nbsp;Merci pour votre patience&nbsp;&nbsp;•&nbsp;&nbsp;BambuCalc — Application en cours de développement&nbsp;&nbsp;•&nbsp;&nbsp;Nous revenons très vite&nbsp;&nbsp;•&nbsp;&nbsp;Expérience optimale en préparation&nbsp;&nbsp;•&nbsp;&nbsp;Merci pour votre patience&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+        <span>BambuCalc — Calculateur d'impression 3D&nbsp;&nbsp;•&nbsp;&nbsp;Je reviens très vite&nbsp;&nbsp;•&nbsp;&nbsp;Devis bambou en quelques clics&nbsp;&nbsp;•&nbsp;&nbsp;Merci pour votre patience&nbsp;&nbsp;•&nbsp;&nbsp;BambuCalc — Calculateur d'impression 3D&nbsp;&nbsp;•&nbsp;&nbsp;Je reviens très vite&nbsp;&nbsp;•&nbsp;&nbsp;Devis bambou en quelques clics&nbsp;&nbsp;•&nbsp;&nbsp;Merci pour votre patience&nbsp;&nbsp;•&nbsp;&nbsp;</span>
       </div>
     </div>
 
