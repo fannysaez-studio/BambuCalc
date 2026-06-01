@@ -35,7 +35,7 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach(async (to) => {
   if (import.meta.env.VITE_MAINTENANCE_MODE === 'true' && to.name !== 'maintenance') {
     const previewSecret = import.meta.env.VITE_PREVIEW_SECRET
     if (to.query.preview && previewSecret && to.query.preview === previewSecret) {
@@ -43,7 +43,7 @@ router.beforeEach(async (to, _from, next) => {
     }
     const bypass = localStorage.getItem('preview_bypass')
     if (!bypass || bypass !== previewSecret) {
-      return next({ name: 'maintenance' })
+      return { name: 'maintenance' }
     }
   }
 
@@ -52,19 +52,17 @@ router.beforeEach(async (to, _from, next) => {
 
   if (isAuth && (to.name === 'login' || to.name === 'signup')) {
     const { data: isAdmin } = await supabase.rpc('is_admin')
-    return next({ path: isAdmin ? '/admin' : '/dashboard' })
+    return { path: isAdmin ? '/admin' : '/dashboard' }
   }
 
   if (to.meta?.requiresAuth && !isAuth) {
-    return next({ name: 'login' })
+    return { name: 'login' }
   }
 
   if (to.meta?.requiresAdmin) {
     const { data: isAdmin } = await supabase.rpc('is_admin')
-    if (!isAdmin) return next({ name: 'forbidden' })
+    if (!isAdmin) return { name: 'forbidden' }
   }
-
-  return next()
 })
 
 export default router
