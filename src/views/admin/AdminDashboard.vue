@@ -97,7 +97,7 @@
             :class="activeTab === 'manage' && 'burger-item--active'"
             @click="activeTab = 'manage'; burgerOpen = false"
           >
-            <Send class="burger-item-icon" />Gestion Devis
+            <Send class="burger-item-icon" />Devis sauvegardés
             <span class="burger-item-count">{{ manageCount }}</span>
           </button>
           <button
@@ -105,7 +105,7 @@
             :class="activeTab === 'archives' && 'burger-item--active'"
             @click="activeTab = 'archives'; burgerOpen = false"
           >
-            <Archive class="burger-item-icon" />Devis sauvegardés
+            <Archive class="burger-item-icon" />Archive Devis
             <span class="burger-item-count">{{ archiveCount }}</span>
           </button>
           <div class="burger-sep" />
@@ -186,7 +186,7 @@
               @click="activeTab = 'manage'; devisDropdownOpen = false"
             >
               <Send class="tab-dropdown-icon" />
-              Gestion Devis
+              Devis sauvegardés
               <span class="tab-dropdown-count">{{ manageCount }}</span>
             </button>
             <button
@@ -194,7 +194,7 @@
               @click="activeTab = 'archives'; devisDropdownOpen = false"
             >
               <Archive class="tab-dropdown-icon" />
-              Devis sauvegardés
+              Archive Devis
               <span class="tab-dropdown-count">{{ archiveCount }}</span>
             </button>
           </div>
@@ -526,8 +526,8 @@ const currentTabIcon = computed(() => {
 const currentTabLabel = computed(() => {
   if (activeTab.value === 'clients')   return 'Gestion des clients'
   if (activeTab.value === 'quotes')    return 'Tous les devis'
-  if (activeTab.value === 'manage')    return 'Gestion des devis'
-  if (activeTab.value === 'archives')  return 'Devis sauvegardés'
+  if (activeTab.value === 'manage')   return 'Devis sauvegardés'
+  if (activeTab.value === 'archives') return 'Archive Devis'
   if (activeTab.value === 'stats')     return 'Statistiques'
   if (activeTab.value === 'settings')  return 'Paramètres'
   if (activeTab.value === 'catalogue') return 'Catalogue'
