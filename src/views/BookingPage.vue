@@ -84,8 +84,11 @@
         <!-- Aperçu event + CTA -->
         <div class="rdv-preview">
           <div class="rdv-preview-card">
-            <div class="rdv-preview-avatar">FS</div>
-            <div class="rdv-preview-name">Fanny Saez</div>
+            <div class="preview-ribbon">Offert</div>
+            <div class="rdv-preview-identity">
+              <div class="rdv-preview-avatar">FS</div>
+              <div class="rdv-preview-name">Fanny Saez</div>
+            </div>
             <div class="rdv-preview-event">Découverte de l'impression 3D</div>
             <div class="rdv-preview-meta">
               <span class="rdv-meta-item">
@@ -360,6 +363,14 @@ onUnmounted(() => {
   padding: 0.75rem 0.5rem;
   box-shadow: 0 6px 18px rgba(29,18,43,0.12);
   text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.rdv-info-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(29,18,43,0.18);
+}
+.rdv-info-item:hover .ri-icon {
+  color: #1f7f97;
 }
 .ri-icon { width: 1.15rem; height: 1.15rem; color: #2e9cab; flex-shrink: 0; }
 .rdv-info-item strong {
@@ -507,6 +518,8 @@ onUnmounted(() => {
   padding: 0.25rem 0 1rem;
 }
 .rdv-preview-card {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -519,25 +532,61 @@ onUnmounted(() => {
   width: 100%;
   max-width: 360px;
   box-shadow: 0 8px 24px rgba(29,18,43,0.07);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.preview-ribbon {
+  position: absolute;
+  top: 18px;
+  right: -26px;
+  background: linear-gradient(135deg, #2e9cab, #5bc4d4);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 38px;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 8px rgba(46,154,171,0.35);
+}
+.rdv-preview-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(29,18,43,0.12);
+  border-width: 2px;
+  border-color: #2e9cab;
+}
+.rdv-preview-card:hover .rdv-preview-avatar {
+  transform: scale(1.06);
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .rdv-preview-avatar {
-  width: 3.6rem; height: 3.6rem;
+  width: 2.8rem; height: 2.8rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #2e9cab, #5bc4d4);
   color: #fff;
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(46,154,171,0.32);
+  box-shadow: 0 4px 14px rgba(46,154,171,0.32);
   flex-shrink: 0;
+  transition: transform 0.25s;
+}
+.rdv-preview-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
 }
 .rdv-preview-name {
-  font-size: 0.82rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: #4f6570;
-  margin-top: -0.2rem;
 }
 .rdv-preview-event {
   font-size: 1.15rem;
@@ -545,6 +594,7 @@ onUnmounted(() => {
   color: #1b2f39;
   letter-spacing: -0.02em;
   line-height: 1.25;
+  margin-top: 1.1rem;
 }
 .rdv-preview-meta {
   display: flex;
