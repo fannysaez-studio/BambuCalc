@@ -310,10 +310,8 @@
 .tab-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 0.4rem;
   padding: 0.48rem 1rem;
-  min-width: 7rem;
   border-radius: 10px;
   border: 1.5px solid rgba(124, 58, 237, 0.18);
   background: rgba(255, 255, 255, 0.88);

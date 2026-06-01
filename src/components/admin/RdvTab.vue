@@ -91,12 +91,12 @@
                 class="rdv-action-btn rdv-action-btn--cancel"
                 title="Annuler le RDV"
                 @click="cancelAppointment(a)"
-              >Annuler</button>
+              ><XCircle :size="15" /></button>
               <button
                 class="rdv-action-btn rdv-action-btn--delete"
-                title="Supprimer"
+                title="Supprimer définitivement"
                 @click="deleteAppointment(a)"
-              >✕</button>
+              ><Trash2 :size="15" /></button>
             </td>
           </tr>
         </tbody>
@@ -107,7 +107,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { CalendarOff } from 'lucide-vue-next'
+import { CalendarOff, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 const props = defineProps({
@@ -245,8 +245,8 @@ onMounted(load)
 .td-actions { white-space: nowrap; text-align: right; }
 .rdv-action-btn {
   border: none; border-radius: 6px; cursor: pointer;
-  font-size: 0.7rem; font-weight: 600; font-family: inherit;
-  padding: 0.2rem 0.55rem; transition: all 0.15s;
+  padding: 0.25rem; display: inline-flex; align-items: center;
+  transition: all 0.15s;
 }
 .rdv-action-btn--cancel {
   background: rgba(234,179,8,0.1); color: #b45309;
