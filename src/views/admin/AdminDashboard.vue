@@ -100,6 +100,14 @@
             <Send class="burger-item-icon" />Gestion Devis
             <span class="burger-item-count">{{ manageCount }}</span>
           </button>
+          <button
+            class="burger-item"
+            :class="activeTab === 'archives' && 'burger-item--active'"
+            @click="activeTab = 'archives'; burgerOpen = false"
+          >
+            <Archive class="burger-item-icon" />Devis sauvegardés
+            <span class="burger-item-count">{{ archiveCount }}</span>
+          </button>
           <div class="burger-sep" />
           <button
             v-for="tab in tabs"
@@ -180,6 +188,14 @@
               <Send class="tab-dropdown-icon" />
               Gestion Devis
               <span class="tab-dropdown-count">{{ manageCount }}</span>
+            </button>
+            <button
+              :class="['tab-dropdown-item', activeTab === 'archives' && 'tab-dropdown-item--active']"
+              @click="activeTab = 'archives'; devisDropdownOpen = false"
+            >
+              <Archive class="tab-dropdown-icon" />
+              Devis sauvegardés
+              <span class="tab-dropdown-count">{{ archiveCount }}</span>
             </button>
           </div>
         </Transition>
@@ -494,9 +510,8 @@ const archiveCount = ref(0)
 const rdvCount = ref(0)
 
 const tabs = computed(() => [
-  { id: 'emails',   label: 'Gestion des Emails', icon: Mail },
-  { id: 'archives', label: 'Archives devis',      icon: Archive, count: archiveCount.value || 0 },
-  { id: 'rdv',      label: 'Rendez-vous',         icon: CalendarDays, count: rdvCount.value || undefined },
+  { id: 'emails', label: 'Gestion des Emails', icon: Mail },
+  { id: 'rdv',    label: 'Rendez-vous',        icon: CalendarDays, count: rdvCount.value || undefined },
 ])
 const currentTabIcon = computed(() => {
   if (activeTab.value === 'clients')   return Users
@@ -512,6 +527,7 @@ const currentTabLabel = computed(() => {
   if (activeTab.value === 'clients')   return 'Gestion des clients'
   if (activeTab.value === 'quotes')    return 'Tous les devis'
   if (activeTab.value === 'manage')    return 'Gestion des devis'
+  if (activeTab.value === 'archives')  return 'Devis sauvegardés'
   if (activeTab.value === 'stats')     return 'Statistiques'
   if (activeTab.value === 'settings')  return 'Paramètres'
   if (activeTab.value === 'catalogue') return 'Catalogue'
