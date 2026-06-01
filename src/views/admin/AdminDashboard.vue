@@ -1,7 +1,7 @@
 <template>
   <div
     class="admin-page"
-    @click="dossierDropdownOpen = false; burgerOpen = false"
+    @click="dossierDropdownOpen = false; outilsDropdownOpen = false; burgerOpen = false"
   >
     <!-- Bannière décorative admin -->
     <div class="admin-banner" aria-hidden="true"></div>
@@ -104,6 +104,22 @@
             {{ tab.label }}
             <span v-if="tab.count !== undefined" class="burger-item-count">{{ tab.count }}</span>
           </button>
+          <div class="burger-sep" />
+          <div class="burger-group-label">Outils</div>
+          <button
+            class="burger-item"
+            :class="activeTab === 'stats' && 'burger-item--active'"
+            @click="activeTab = 'stats'; burgerOpen = false"
+          >
+            <BarChart2 class="burger-item-icon" />Statistiques
+          </button>
+          <button
+            class="burger-item"
+            :class="activeTab === 'settings' && 'burger-item--active'"
+            @click="activeTab = 'settings'; burgerOpen = false"
+          >
+            <SlidersHorizontal class="burger-item-icon" />Paramètres
+          </button>
         </div>
       </Transition>
     </div>
@@ -154,6 +170,36 @@
         {{ tab.label }}
         <span v-if="tab.count !== undefined" class="tab-count">{{ tab.count }}</span>
       </button>
+
+      <!-- ── Dropdown "Outils" (Statistiques + Paramètres) ── -->
+      <div class="tab-dropdown-wrap" @click.stop>
+        <button
+          :class="['tab-btn', ['stats', 'settings'].includes(activeTab) && 'tab-btn--active']"
+          @click="outilsDropdownOpen = !outilsDropdownOpen"
+        >
+          <SlidersHorizontal class="tab-icon" />
+          Outils
+          <ChevronDown :class="['tab-chevron', outilsDropdownOpen && 'tab-chevron--open']" />
+        </button>
+        <Transition name="dropdown">
+          <div v-if="outilsDropdownOpen" class="tab-dropdown tab-dropdown--right">
+            <button
+              :class="['tab-dropdown-item', activeTab === 'stats' && 'tab-dropdown-item--active']"
+              @click="activeTab = 'stats'; outilsDropdownOpen = false"
+            >
+              <BarChart2 class="tab-dropdown-icon" />
+              Statistiques
+            </button>
+            <button
+              :class="['tab-dropdown-item', activeTab === 'settings' && 'tab-dropdown-item--active']"
+              @click="activeTab = 'settings'; outilsDropdownOpen = false"
+            >
+              <SlidersHorizontal class="tab-dropdown-icon" />
+              Paramètres
+            </button>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- ── Onglet Clients ── -->
@@ -405,6 +451,7 @@ const attachPdfAuto = ref(saved.attachPdfAuto ?? true)
 const sendTarget = ref(null)
 const isSending = ref(false)
 const dossierDropdownOpen = ref(false)
+const outilsDropdownOpen = ref(false)
 const burgerOpen = ref(false)
 const catalogueCount = ref(0)
 const manageCount = ref(0)
@@ -416,19 +463,21 @@ const tabs = computed(() => [
   { id: 'emails', label: 'Emails', icon: Mail },
   { id: 'archives', label: 'Archives', icon: Archive, count: archiveCount.value || 0 },
   { id: 'rdv', label: 'RDV', icon: CalendarDays, count: rdvCount.value || undefined },
-  { id: 'stats', label: 'Statistiques', icon: BarChart2 },
   { id: 'catalogue', label: 'Catalogue', icon: Package, count: catalogueCount.value || 0 },
-  { id: 'settings', label: 'Paramètres', icon: SlidersHorizontal },
 ])
 const currentTabIcon = computed(() => {
   if (activeTab.value === 'clients') return Users
   if (activeTab.value === 'quotes') return FileText
+  if (activeTab.value === 'stats') return BarChart2
+  if (activeTab.value === 'settings') return SlidersHorizontal
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.icon : ChevronDown
 })
 const currentTabLabel = computed(() => {
   if (activeTab.value === 'clients') return 'Liste des clients'
   if (activeTab.value === 'quotes') return 'Tous les devis'
+  if (activeTab.value === 'stats') return 'Statistiques'
+  if (activeTab.value === 'settings') return 'Paramètres'
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.label : ''
 })
