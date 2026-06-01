@@ -23,20 +23,6 @@
 
       <div class="rdv-info-list">
         <div class="rdv-info-item">
-          <Clock class="ri-icon" />
-          <div>
-            <strong>Durée</strong>
-            <span>30 minutes</span>
-          </div>
-        </div>
-        <div class="rdv-info-item">
-          <Video class="ri-icon" />
-          <div>
-            <strong>Format</strong>
-            <span>Visioconférence</span>
-          </div>
-        </div>
-        <div class="rdv-info-item">
           <MapPin class="ri-icon" />
           <div>
             <strong>Lieu</strong>
@@ -50,19 +36,24 @@
             <span>Distanciel</span>
           </div>
         </div>
+        <div class="rdv-info-item">
+          <Gift class="ri-icon" />
+          <div>
+            <strong>1er RDV</strong>
+            <span>Offert</span>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- ── Panneau Calendly droite ── -->
+    <!-- ── Panneau droit ── -->
     <section class="rdv-panel">
       <div class="rdv-card">
 
-        <!-- Home -->
         <router-link to="/" class="rdv-home-link" aria-label="Page d'accueil">
           <Home class="rdv-home-icon" />
         </router-link>
 
-        <!-- Retour contact -->
         <router-link to="/contact" class="rdv-back-link" title="Retour contact">
           <ArrowLeft class="rdv-back-icon" />
         </router-link>
@@ -72,16 +63,73 @@
           <p>Sélectionnez une date et une heure disponible.</p>
         </div>
 
-        <!-- Calendly inline widget -->
-        <div class="rdv-cal-wrap">
-          <div
-            class="calendly-inline-widget"
-            data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=1a6b7a&locale=fr"
-          ></div>
+        <!-- Étapes style cercles connectés -->
+        <div class="rdv-steps">
+          <div class="step-item step-active">
+            <div class="step-circle">1</div>
+            <div class="step-lbl">Votre créneau</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-item">
+            <div class="step-circle">2</div>
+            <div class="step-lbl">Vos infos</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-item">
+            <div class="step-circle">3</div>
+            <div class="step-lbl">Confirmation</div>
+          </div>
+        </div>
+
+        <!-- Aperçu event + CTA -->
+        <div class="rdv-preview">
+          <div class="rdv-preview-card">
+            <div class="rdv-preview-avatar">FS</div>
+            <div class="rdv-preview-name">Fanny Saez</div>
+            <div class="rdv-preview-event">Découverte de l'impression 3D</div>
+            <div class="rdv-preview-meta">
+              <span class="rdv-meta-item">
+                <Clock class="pm-icon" />
+                <span>30 min</span>
+              </span>
+              <span class="rdv-meta-item">
+                <Video class="pm-icon" />
+                <span>Visioconférence</span>
+              </span>
+            </div>
+            <p class="rdv-preview-desc">
+              Un échange de 30 min pour poser tes questions et avancer sur ton projet d'impression 3D.
+            </p>
+            <button class="rdv-cta-btn" @click="bookingOpen = true">
+              Voir les disponibilités
+            </button>
+          </div>
         </div>
 
       </div>
     </section>
+
+    <!-- ── Modale Calendly (toujours dans le DOM, opacity-based) ── -->
+    <div
+      class="booking-backdrop"
+      :class="{ 'is-open': bookingOpen }"
+      role="dialog"
+      :aria-hidden="!bookingOpen"
+      @click.self="bookingOpen = false"
+    >
+      <div class="booking-modal">
+        <!-- Croix à l'intérieur de la modale, au-dessus du widget -->
+        <button class="booking-close-btn" aria-label="Fermer" @click="bookingOpen = false">
+          <X class="booking-close-icon" />
+        </button>
+        <div class="booking-cal-wrap">
+          <div
+            class="calendly-inline-widget"
+            data-url="https://calendly.com/fannysaez-pro/30min?hide_gdpr_banner=1&primary_color=1a6b7a&locale=fr"
+          ></div>
+        </div>
+      </div>
+    </div>
 
     <!-- ── Modale de confirmation ── -->
     <Transition name="modal">
@@ -109,34 +157,42 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Home, ArrowLeft, Clock, Video, MapPin, Globe } from 'lucide-vue-next'
+import { Home, ArrowLeft, Clock, Video, MapPin, Globe, X, Gift } from 'lucide-vue-next'
 
 const router = useRouter()
-let script = null
+let calScript = null
 const confirmed = ref(false)
+const bookingOpen = ref(false)
 
-function closeModal() { router.push('/') }
+watch(bookingOpen, (val) => {
+  document.body.style.overflow = val ? 'hidden' : ''
+})
+
+function closeModal() {
+  document.body.style.overflow = ''
+  router.push('/')
+}
 
 function handleCalendlyEvent(e) {
   if (e.data?.event === 'calendly.event_scheduled') {
+    bookingOpen.value = false
     confirmed.value = true
   }
 }
 
 onMounted(() => {
-  script = document.createElement('script')
-  script.src = 'https://assets.calendly.com/assets/external/widget.js'
-  script.async = true
-  document.head.appendChild(script)
+  calScript = document.createElement('script')
+  calScript.src = 'https://assets.calendly.com/assets/external/widget.js'
+  calScript.async = true
+  document.head.appendChild(calScript)
   window.addEventListener('message', handleCalendlyEvent)
 })
 
 onUnmounted(() => {
-  if (script && document.head.contains(script)) {
-    document.head.removeChild(script)
-  }
+  document.body.style.overflow = ''
+  if (calScript && document.head.contains(calScript)) document.head.removeChild(calScript)
   window.removeEventListener('message', handleCalendlyEvent)
 })
 </script>
@@ -158,7 +214,6 @@ onUnmounted(() => {
   position: relative;
   overflow-x: hidden;
 }
-
 .rdv-page::before {
   content: '';
   position: absolute;
@@ -181,7 +236,6 @@ onUnmounted(() => {
   isolation: isolate;
   z-index: 2;
 }
-
 .rdv-visual::before {
   content: '';
   position: absolute;
@@ -192,7 +246,6 @@ onUnmounted(() => {
   border-radius: 28px 0 0 28px;
   pointer-events: none;
 }
-
 .rdv-visual::after {
   content: '';
   position: absolute;
@@ -202,11 +255,10 @@ onUnmounted(() => {
   pointer-events: none;
   z-index: 2;
 }
-
-.visual-badge,
-.visual-copy,
-.visual-illustration,
-.rdv-info-list { position: relative; z-index: 1; }
+.visual-badge, .visual-copy, .visual-illustration, .rdv-info-list {
+  position: relative;
+  z-index: 1;
+}
 
 .visual-badge {
   width: fit-content;
@@ -218,7 +270,6 @@ onUnmounted(() => {
   letter-spacing: 0.02em;
   text-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
-
 .badge-mark {
   width: 1.9rem; height: 1.9rem;
   border-radius: 0.65rem;
@@ -245,10 +296,7 @@ onUnmounted(() => {
   transform: rotate(-32deg);
 }
 
-.visual-copy {
-  margin-top: 2rem;
-  text-align: center;
-}
+.visual-copy { margin-top: 2rem; text-align: center; }
 .visual-copy h1 {
   margin: 0;
   font-size: clamp(1.2rem, 1.9vw, 2rem);
@@ -262,7 +310,6 @@ onUnmounted(() => {
   margin: 0.85rem 0 0;
   font-size: 1rem;
   line-height: 1.45;
-  text-align: center;
   color: rgba(255,255,255,0.9);
   text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
@@ -294,11 +341,10 @@ onUnmounted(() => {
   z-index: 1;
 }
 
-/* Infos bas gauche */
 .rdv-info-list {
   display: flex;
   justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.6rem;
   margin-top: auto;
   padding-top: 1.5rem;
   border-top: 1px solid rgba(255,255,255,0.2);
@@ -335,11 +381,9 @@ onUnmounted(() => {
 .rdv-panel {
   display: flex;
   align-items: stretch;
-  justify-content: stretch;
   position: relative;
   z-index: 1;
 }
-
 .rdv-card {
   width: 100%;
   position: relative;
@@ -353,7 +397,6 @@ onUnmounted(() => {
   overflow-y: auto;
 }
 
-/* Boutons top */
 .rdv-home-link, .rdv-back-link {
   position: absolute;
   top: 1.05rem;
@@ -380,11 +423,9 @@ onUnmounted(() => {
 }
 .rdv-home-icon, .rdv-back-icon { width: 1.05rem; height: 1.05rem; flex-shrink: 0; }
 
-/* Header */
 .rdv-card-header {
   text-align: center;
-  margin-bottom: 1.25rem;
-  margin-top: 0;
+  margin-bottom: 0;
   padding: 0 3.5rem;
   min-height: 2.5rem;
   display: flex;
@@ -404,41 +445,240 @@ onUnmounted(() => {
   font-size: 0.92rem;
 }
 
-/* Calendly */
-.rdv-cal-wrap {
+/* ── Étapes cercles connectés ── */
+.rdv-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 1.75rem 0 1.5rem;
+  padding: 0 0.25rem;
+}
+.step-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.step-circle {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid rgba(46,154,171,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(46,154,171,0.65);
+  background: transparent;
+  transition: all 0.2s;
+}
+.step-active .step-circle {
+  background: #2e9cab;
+  border-color: #2e9cab;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(46,154,171,0.3);
+}
+.step-lbl {
+  font-size: 0.71rem;
+  color: #7a9aaa;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.step-active .step-lbl {
+  color: #2e9cab;
+  font-weight: 600;
+}
+.step-connector {
+  flex: 1;
+  height: 2px;
+  background: rgba(46,154,171,0.3);
+  margin-top: 1rem;
+  border-radius: 999px;
+}
+
+/* ── Aperçu event ── */
+.rdv-preview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0 1rem;
+}
+.rdv-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  text-align: center;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(46,154,171,0.15);
+  border-radius: 20px;
+  padding: 2.25rem 2.25rem 2rem;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 8px 24px rgba(29,18,43,0.07);
+}
+.rdv-preview-avatar {
+  width: 3.6rem; height: 3.6rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2e9cab, #5bc4d4);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(46,154,171,0.32);
+  flex-shrink: 0;
+}
+.rdv-preview-name {
+  font-size: 0.82rem;
+  color: #4f6570;
+  margin-top: -0.2rem;
+}
+.rdv-preview-event {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1b2f39;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+.rdv-preview-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.rdv-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  color: #4f6570;
+}
+.pm-icon { width: 0.85rem; height: 0.85rem; color: #2e9cab; flex-shrink: 0; }
+.rdv-preview-desc {
+  font-size: 0.84rem;
+  color: #4f6570;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0.5rem 0 0;
+  border-top: 1px solid rgba(46,154,171,0.12);
+  width: 100%;
+}
+.rdv-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.35rem;
+  padding: 0.85rem 2.25rem;
+  background: #2e9cab;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.96rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 16px rgba(46,154,171,0.32);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  width: 100%;
+}
+.rdv-cta-btn:hover {
+  background: #1f7f97;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(46,154,171,0.4);
+}
+
+/* ── Modale Calendly ── */
+.booking-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(18, 85, 98, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.booking-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.booking-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  width: min(1100px, 98vw);
+  height: min(760px, 96vh);
+  overflow: hidden;
+  box-shadow: 0 32px 64px rgba(15,25,35,0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Croix à l'intérieur de la modale, z-index au-dessus du widget */
+.booking-close-btn {
+  position: absolute;
+  top: 0.8rem;
+  right: 0.8rem;
+  z-index: 10;
+  width: 2.5rem; height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  border: 1.5px solid rgba(200,197,201,0.5);
+  color: #1f7f97;
+  box-shadow: 0 4px 12px rgba(29,18,43,0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.booking-close-btn:hover {
+  background: rgba(46,154,171,0.15);
+  color: #2e9cab;
+  border-color: #2e9cab;
+  transform: translateY(-1px);
+}
+.booking-close-icon { width: 1.05rem; height: 1.05rem; flex-shrink: 0; }
+
+.booking-cal-wrap {
   flex: 1;
   min-height: 0;
-  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
 }
-.calendly-inline-widget {
-  min-width: 280px;
-  height: 100%;
-  min-height: 560px;
+.booking-cal-wrap .calendly-inline-widget {
+  display: block;
+  width: 100%;
+  min-width: 900px;
+  height: 720px;
+  min-height: 720px;
 }
 
 /* ── Desktop fixe ── */
 @media (min-width: 1101px) {
-  .rdv-page {
-    width: 100%;
-    height: 100dvh;
-    min-height: unset;
-    overflow: hidden;
-  }
+  .rdv-page { width: 100%; height: 100dvh; min-height: unset; overflow: hidden; }
   .rdv-visual, .rdv-panel { min-height: 0; }
   .rdv-card { justify-content: flex-start; }
-  .rdv-card-header { margin-top: 0; }
   br.title-br { display: none; }
   .visual-copy h1 { font-size: clamp(1.9rem, 2.5vw, 2.6rem); }
-  .rdv-info-list { gap: 0.7rem; }
-  .rdv-info-item { flex: 1 1 0; }
+  .rdv-info-item { flex: 0 1 200px; }
 }
 
-/* ── Tablette : 769px – 1100px (calqué sur Contact) ── */
+/* ── Tablette ── */
 @media (max-width: 1100px) and (min-width: 769px) {
   .rdv-page {
-    width: 100%;
     grid-template-columns: 1fr;
     grid-template-rows: 44fr 56fr;
     height: 100dvh;
@@ -450,59 +690,42 @@ onUnmounted(() => {
   .rdv-visual, .rdv-card { border-radius: 20px; }
   .rdv-visual::before, .rdv-visual::after { border-radius: 20px; }
   .rdv-visual, .rdv-panel { min-height: 0; }
-  .rdv-visual {
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 1.75rem 2rem 1.25rem;
-  }
-  .visual-copy { margin-top: 0; text-align: center; }
-  .visual-copy h1 { font-size: clamp(1.5rem, 2.8vw, 2rem); white-space: normal; }
+  .rdv-visual { flex-direction: column; justify-content: space-between; padding: 1.75rem 2rem 1.25rem; }
+  .visual-copy { margin-top: 0; }
+  .visual-copy h1 { font-size: clamp(1.5rem, 2.8vw, 2rem); }
   .visual-copy p { margin-top: 0.4rem; font-size: 0.88rem; }
   .visual-illustration { flex: 1; min-height: 0; }
   .visual-illustration img { width: min(100%, 160px); max-width: 160px; }
-  .rdv-info-list { flex-direction: row; justify-content: space-between; gap: 0.5rem; margin-top: 0; padding-top: 0.85rem; }
-  .rdv-info-item { flex: 1 1 0; }
+  .rdv-info-list { gap: 1rem; margin-top: 0; padding-top: 0.85rem; }
   .rdv-card { padding: 3rem 2.5rem 1.5rem; overflow-y: auto; }
-  .calendly-inline-widget { min-height: 100%; height: 100%; }
+  .booking-modal { width: min(960px, 98vw); }
+  .booking-cal-wrap .calendly-inline-widget { min-width: 860px; }
 }
 
-/* ── Mobile : ≤ 768px (calqué sur Contact) ── */
+/* ── Mobile ── */
 @media (max-width: 768px) {
-  .rdv-page {
-    width: 100%;
-    grid-template-columns: 1fr;
-    padding: 0.5rem;
-    gap: 0.5rem;
-    height: auto;
-    overflow-x: hidden;
-  }
+  .rdv-page { grid-template-columns: 1fr; padding: 0.5rem; gap: 0.5rem; height: auto; overflow-x: hidden; }
   .rdv-visual, .rdv-card { border-radius: 18px; }
   .rdv-visual::before, .rdv-visual::after { border-radius: 18px; }
-  .rdv-visual {
-    min-height: calc(100dvh - 1.5rem);
-    padding: 1.5rem 1.25rem 4rem;
-    justify-content: space-between;
-  }
+  .rdv-visual { min-height: calc(100dvh - 1.5rem); padding: 1.5rem 1.25rem 4rem; justify-content: space-between; }
   br.title-br { display: none; }
-  .visual-copy { margin-top: 2.5rem; text-align: center; }
-  .visual-copy h1 { font-size: clamp(1.5rem, 6.5vw, 2rem); white-space: normal; }
+  .visual-copy { margin-top: 2.5rem; }
+  .visual-copy h1 { font-size: clamp(1.5rem, 6.5vw, 2rem); }
   .visual-copy p { font-size: 0.84rem; margin-top: 0.5rem; }
   .visual-illustration { flex: 1; min-height: 0; align-items: center; }
   .visual-illustration img { width: min(100%, 280px); max-width: 280px; }
-  .rdv-info-list {
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 0.3rem;
-    margin-top: 0;
-    padding-top: 0.75rem;
-  }
-  .rdv-info-item { padding: 0.45rem 0.15rem; gap: 0.25rem; border-radius: 10px; }
+  .rdv-info-list { gap: 0.75rem; justify-content: center; margin-top: 0; padding-top: 0.75rem; }
+  .rdv-info-item { flex: 0 1 140px; padding: 0.6rem 0.4rem; }
   .ri-icon { width: 0.85rem; height: 0.85rem; }
   .rdv-info-item strong { font-size: 0.5rem; }
   .rdv-info-item span { font-size: 0.65rem; }
   .rdv-panel { min-height: calc(100dvh - 1.5rem); display: flex; flex-direction: column; }
-  .rdv-card { flex: 1; padding: 4rem 1.5rem 3rem; overflow-y: visible; }
-  .calendly-inline-widget { min-height: 640px; }
+  .rdv-card { flex: 1; padding: 4rem 1.5rem 2rem; overflow-y: auto; }
+  .rdv-preview-card { padding: 1.5rem 1.25rem; }
+  .rdv-steps { margin: 1.25rem 0 1.25rem; }
+  .step-lbl { font-size: 0.65rem; }
+  .booking-modal { width: 100%; height: 92vh; border-radius: 16px; }
+  .booking-cal-wrap .calendly-inline-widget { min-width: unset; width: 100%; height: 580px; min-height: 580px; }
 }
 
 /* ── Modale confirmation ── */
@@ -527,16 +750,11 @@ onUnmounted(() => {
   overflow: hidden;
   box-shadow: 0 32px 64px rgba(15,25,35,0.16), 0 4px 16px rgba(15,25,35,0.06);
 }
-.modal-accent {
-  height: 5px;
-  background: linear-gradient(90deg, #2e9cab, #5bc4d4);
-}
+.modal-accent { height: 5px; background: linear-gradient(90deg, #2e9cab, #5bc4d4); }
 .modal-close {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 1.8rem;
-  height: 1.8rem;
+  top: 0.75rem; right: 0.75rem;
+  width: 1.8rem; height: 1.8rem;
   border: none;
   background: #f1f5f9;
   color: #94a3b8;
@@ -559,8 +777,7 @@ onUnmounted(() => {
   text-align: center;
 }
 .modal-icon-wrap {
-  width: 2.8rem;
-  height: 2.8rem;
+  width: 2.8rem; height: 2.8rem;
   border-radius: 50%;
   background: linear-gradient(135deg, #2e9cab, #5bc4d4);
   display: flex;
@@ -569,23 +786,9 @@ onUnmounted(() => {
   box-shadow: 0 6px 16px rgba(46,154,171,0.35);
   flex-shrink: 0;
 }
-.modal-icon-wrap svg {
-  width: 1.3rem;
-  height: 1.3rem;
-}
-.modal-card h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: #1b2f39;
-  letter-spacing: -0.02em;
-}
-.modal-card p {
-  margin: 0;
-  color: #4f6570;
-  font-size: 0.88rem;
-  line-height: 1.6;
-}
+.modal-icon-wrap svg { width: 1.3rem; height: 1.3rem; }
+.modal-card h2 { margin: 0; font-size: 1.3rem; font-weight: 800; color: #1b2f39; letter-spacing: -0.02em; }
+.modal-card p { margin: 0; color: #4f6570; font-size: 0.88rem; line-height: 1.6; }
 .modal-btn {
   display: inline-flex;
   align-items: center;
@@ -601,13 +804,8 @@ onUnmounted(() => {
   box-shadow: 0 4px 14px rgba(46,154,171,0.3);
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
 }
-.modal-btn:hover {
-  background: #1f7f97;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(46,154,171,0.38);
-}
+.modal-btn:hover { background: #1f7f97; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46,154,171,0.38); }
 
-/* Transition Vue */
 .modal-enter-active { animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .modal-leave-active { animation: modalOut 0.2s ease; }
 @keyframes modalIn {
