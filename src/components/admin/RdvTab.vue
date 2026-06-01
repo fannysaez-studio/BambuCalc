@@ -22,8 +22,8 @@
           <h3 class="confirm-title">{{ dialog.title }}</h3>
           <p class="confirm-msg">{{ dialog.message }}</p>
           <div class="confirm-actions">
-            <button class="confirm-btn confirm-btn--neutral" @click="dialog.resolve(false)">Annuler</button>
-            <button :class="['confirm-btn', `confirm-btn--${dialog.type}`]" @click="dialog.resolve(true)">Confirmer</button>
+            <button class="confirm-btn confirm-btn--neutral" @click="cancelDialog">Annuler</button>
+            <button :class="['confirm-btn', `confirm-btn--${dialog.type}`]" @click="confirmDialog">Confirmer</button>
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, reactive } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { CalendarOff, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
@@ -159,17 +159,17 @@ const filter = ref('upcoming')
 const editingId = ref(null)
 const noteRefs = ref({})
 
-const dialog = reactive({ visible: false, title: '', message: '', type: 'delete', resolve: null })
+const dialog = ref({ visible: false, title: '', message: '', type: 'delete' })
+let dialogResolve = null
 
 function askConfirm(title, message, type = 'delete') {
   return new Promise(resolve => {
-    dialog.title = title
-    dialog.message = message
-    dialog.type = type
-    dialog.visible = true
-    dialog.resolve = (val) => { dialog.visible = false; resolve(val) }
+    dialog.value = { visible: true, title, message, type }
+    dialogResolve = resolve
   })
 }
+function confirmDialog() { dialog.value.visible = false; dialogResolve?.(true) }
+function cancelDialog()  { dialog.value.visible = false; dialogResolve?.(false) }
 
 const ONLINE_TYPES = ['google_conference', 'zoom', 'teams', 'gotomeeting', 'webex', 'microsoft_teams', 'google_meet']
 
