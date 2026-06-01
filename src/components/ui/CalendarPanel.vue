@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { CalendarDays, CalendarOff } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
@@ -106,6 +106,8 @@ function markSeen() {
   localStorage.setItem(SEEN_KEY, now)
   lastSeen.value = now
 }
+
+watch(open, (val) => { if (val) load() })
 
 function handleOutside(e) {
   if (calWrap.value && !calWrap.value.contains(e.target)) open.value = false
