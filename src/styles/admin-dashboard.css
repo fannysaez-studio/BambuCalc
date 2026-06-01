@@ -302,11 +302,14 @@
   display: flex;
   gap: 0.4rem;
   margin-bottom: 0.5rem;
-  padding-left: 1.5rem;
+  padding-left: 0;
   padding-right: 1.5rem;
   flex-shrink: 0;
   flex-wrap: wrap;
 }
+.tabs-bar > .tab-btn,
+.tabs-bar > .tab-dropdown-wrap { flex: 1 1 0; }
+.tabs-bar > .tab-dropdown-wrap > .tab-btn { width: 100%; justify-content: center; }
 .tab-btn {
   display: inline-flex;
   align-items: center;
