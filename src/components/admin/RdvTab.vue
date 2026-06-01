@@ -293,26 +293,16 @@ onMounted(load)
   50%       { opacity: 0.4; }
 }
 
-/* ── Select badge (Format + Présence) ── */
+/* ── Select (style identique cat-select Catalogue) ── */
 .rdv-select {
-  padding: 0.22rem 0.55rem;
-  border-radius: 999px;
-  font-size: 0.7rem; font-weight: 700;
-  border: 1.5px solid;
-  cursor: pointer; font-family: inherit; outline: none;
-  appearance: none; -webkit-appearance: none;
-  text-align: center; transition: all 0.15s;
+  padding: 0.26rem 0.32rem;
+  border: 1px solid #e2e8f0; border-radius: 7px;
+  font-size: 0.72rem; font-family: inherit; color: #2d3748;
+  background: #fff; cursor: pointer;
+  min-width: 90px;
 }
+.rdv-select:focus { outline: none; border-color: #a78bfa; }
 .rdv-select:disabled { opacity: 0.45; cursor: not-allowed; }
-
-/* Format */
-.rdv-select--online   { background: rgba(66,153,225,0.1); color: #2b6cb0; border-color: #90cdf4; }
-.rdv-select--inperson { background: rgba(72,187,120,0.1); color: #276749; border-color: #9ae6b4; }
-
-/* Présence */
-.rdv-select--unknown  { background: #f0f4f8; color: #718096; border-color: #e2e8f0; }
-.rdv-select--present  { background: rgba(72,187,120,0.12); color: #276749; border-color: #9ae6b4; }
-.rdv-select--absent   { background: rgba(229,62,62,0.1);   color: #c53030; border-color: #feb2b2; }
 
 /* ── Note ── */
 .td-note { min-width: 100px; }
