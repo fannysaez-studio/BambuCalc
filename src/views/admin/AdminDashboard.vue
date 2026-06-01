@@ -220,6 +220,14 @@
     <!-- ── Onglet Paramètres ── -->
     <SettingsTab v-if="activeTab === 'settings'" @go-to="activeTab = $event" />
 
+    <!-- ── Onglet RDV ── -->
+    <RdvTab
+      v-if="activeTab === 'rdv'"
+      :profiles="profiles"
+      @go-to-client="quotesFilterUserId = $event; activeTab = 'clients'"
+      @count-change="rdvCount = $event"
+    />
+
     <!-- ── Modal envoi devis ── -->
     <Teleport to="body">
       <Transition name="modal">
@@ -348,6 +356,7 @@ import ToastMessage from '@/components/ui/ToastMessage.vue'
 import NotificationBell from '@/components/ui/NotificationBell.vue'
 import CatalogueTab from '@/components/admin/CatalogueTab.vue'
 import SettingsTab from '@/components/admin/SettingsTab.vue'
+import RdvTab from '@/components/admin/RdvTab.vue'
 import GestionDevisTab from '@/components/admin/GestionDevisTab.vue'
 import EmailsTab from '@/components/admin/EmailsTab.vue'
 import ArchivesTab from '@/components/admin/ArchivesTab.vue'
@@ -366,6 +375,7 @@ import {
   BarChart2,
   SlidersHorizontal,
   Package,
+  CalendarDays,
   ChevronDown,
   Mail,
   Bell,
@@ -399,11 +409,13 @@ const burgerOpen = ref(false)
 const catalogueCount = ref(0)
 const manageCount = ref(0)
 const archiveCount = ref(0)
+const rdvCount = ref(0)
 
 const tabs = computed(() => [
   { id: 'manage', label: 'Gestion Devis', icon: Send, count: manageCount.value || 0 },
   { id: 'emails', label: 'Emails', icon: Mail },
   { id: 'archives', label: 'Archives', icon: Archive, count: archiveCount.value || 0 },
+  { id: 'rdv', label: 'RDV', icon: CalendarDays, count: rdvCount.value || undefined },
   { id: 'stats', label: 'Statistiques', icon: BarChart2 },
   { id: 'catalogue', label: 'Catalogue', icon: Package, count: catalogueCount.value || 0 },
   { id: 'settings', label: 'Paramètres', icon: SlidersHorizontal },
