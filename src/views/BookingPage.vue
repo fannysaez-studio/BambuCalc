@@ -508,26 +508,26 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgba(15, 25, 35, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(15, 25, 35, 0.25);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 .modal-card {
   background: #fff;
   border-radius: 24px;
-  padding: 2.5rem 2rem 2rem;
-  max-width: 420px;
+  padding: 2rem 2rem 1.75rem;
+  max-width: 380px;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
   text-align: center;
-  box-shadow: 0 24px 60px rgba(15, 25, 35, 0.22), 0 0 0 1px rgba(255,255,255,0.1);
+  box-shadow: 0 24px 60px rgba(15, 25, 35, 0.18);
 }
 .modal-icon {
-  width: 5rem;
-  height: 5rem;
+  width: 3rem;
+  height: 3rem;
 }
 .modal-icon svg {
   width: 100%;
