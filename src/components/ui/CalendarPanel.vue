@@ -188,7 +188,7 @@ onUnmounted(() => {
   top: 2px; right: 2px;
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #dc2626;
+  background: #2e9cab;
   border: 1.5px solid #fff;
   pointer-events: none;
 }
@@ -255,7 +255,7 @@ onUnmounted(() => {
 .cal-item-dot {
   position: absolute; top: -2px; right: -2px;
   width: 8px; height: 8px; border-radius: 50%;
-  background: #dc2626; border: 1.5px solid #fff;
+  background: #2e9cab; border: 1.5px solid #fff;
 }
 .cal-item-body { flex: 1; min-width: 0; }
 .cal-item-title { font-size: 0.78rem; font-weight: 700; color: #1b2f39; margin: 0 0 0.15rem; line-height: 1.35; }
