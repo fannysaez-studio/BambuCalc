@@ -52,13 +52,17 @@
               <span v-else class="text-muted-sm">{{ a.invitee_email || '—' }}</span>
             </td>
             <td class="td-duration">{{ duration(a.start_at, a.end_at) }}</td>
-            <td class="td-object">{{ getObjectRdv(a) }}</td>
+            <td class="td-object">
+              <span :title="getObjectRdv(a) !== '—' ? getObjectRdv(a) : ''">
+                {{ truncate(getObjectRdv(a), 32) }}
+              </span>
+            </td>
 
             <!-- Format : Présentiel / Distanciel -->
             <td class="td-format">
-              <span :class="['led-badge', `led-badge--${getFormat(a)}`]">
+              <span :class="['led-badge', `led-badge--${getFormat(a).type}`]" :title="getFormat(a).detail">
                 <span class="led-dot" />
-                {{ getFormat(a) === 'distanciel' ? 'Distanciel' : 'Présentiel' }}
+                {{ getFormat(a).label }}
               </span>
             </td>
 
@@ -144,6 +148,11 @@ function duration(start, end) {
   return `${min} min`
 }
 
+function truncate(str, n) {
+  if (!str || str === '—') return '—'
+  return str.length > n ? str.slice(0, n) + '…' : str
+}
+
 function getObjectRdv(a) {
   try {
     const qa = a.raw?.payload?.questions_and_answers
@@ -153,8 +162,18 @@ function getObjectRdv(a) {
 }
 
 function getFormat(a) {
-  const loc = a.raw?.payload?.scheduled_event?.location?.type ?? ''
-  return ONLINE_TYPES.some(t => loc.includes(t)) ? 'distanciel' : 'presentiel'
+  const loc = a.raw?.payload?.scheduled_event?.location ?? {}
+  const type = loc.type ?? ''
+  const isOnline = ONLINE_TYPES.some(t => type.includes(t))
+  if (isOnline) {
+    return { type: 'distanciel', label: 'En ligne', detail: loc.join_url ?? 'Visioconférence' }
+  }
+  const address = loc.location ?? loc.additional_info ?? ''
+  return {
+    type: 'presentiel',
+    label: 'En personne',
+    detail: address || 'Lieu à confirmer',
+  }
 }
 
 function presence(a) {
@@ -265,9 +284,10 @@ onMounted(load)
 .led-btn {
   display: inline-flex; align-items: center; gap: 0.35rem;
   font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.5rem;
-  border-radius: 999px; border: none; cursor: pointer;
+  border-radius: 999px; border: 1.5px solid transparent; cursor: pointer;
   font-family: inherit; transition: all 0.15s;
 }
+.led-btn:not(:disabled):hover { border-color: currentColor; opacity: 0.85; transform: scale(1.04); }
 .led-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .led-unknown { background: #f0f4f8; color: #718096; }
 .led-unknown .led-dot { background: #a0aec0; }
