@@ -73,11 +73,26 @@
         </div>
 
         <!-- Calendly inline widget -->
-        <div class="rdv-cal-wrap">
+        <div v-if="!confirmed" class="rdv-cal-wrap">
           <div
             class="calendly-inline-widget"
-            data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=2e9cab&locale=fr"
+            data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=1a6b7a&locale=fr"
           ></div>
+        </div>
+
+        <!-- Confirmation post-réservation -->
+        <div v-else class="rdv-confirmed">
+          <div class="confirmed-check">
+            <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="26" cy="26" r="25" stroke="#2e9cab" stroke-width="2"/>
+              <path d="M14 27l9 9 15-18" stroke="#2e9cab" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3>Rendez-vous confirmé !</h3>
+          <p>Un email de confirmation va vous être envoyé avec les détails de votre séance.</p>
+          <router-link to="/" class="rdv-confirm-btn">
+            Réserver mon accompagnement
+          </router-link>
         </div>
 
       </div>
@@ -87,22 +102,31 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { Home, ArrowLeft, Clock, Video, MapPin, Globe } from 'lucide-vue-next'
 
 let script = null
+const confirmed = ref(false)
+
+function handleCalendlyEvent(e) {
+  if (e.data?.event === 'calendly.event_scheduled') {
+    confirmed.value = true
+  }
+}
 
 onMounted(() => {
   script = document.createElement('script')
   script.src = 'https://assets.calendly.com/assets/external/widget.js'
   script.async = true
   document.head.appendChild(script)
+  window.addEventListener('message', handleCalendlyEvent)
 })
 
 onUnmounted(() => {
   if (script && document.head.contains(script)) {
     document.head.removeChild(script)
   }
+  window.removeEventListener('message', handleCalendlyEvent)
 })
 </script>
 
@@ -381,6 +405,62 @@ onUnmounted(() => {
   min-width: 280px;
   height: 100%;
   min-height: 560px;
+}
+
+/* ── Confirmation post-réservation ── */
+.rdv-confirmed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  text-align: center;
+  padding: 2rem 1rem;
+  animation: fadeInUp 0.4s ease both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.confirmed-check {
+  width: 3.5rem; height: 3.5rem;
+  flex-shrink: 0;
+}
+.confirmed-check svg { width: 100%; height: 100%; }
+.rdv-confirmed h3 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1b2f39;
+  letter-spacing: -0.02em;
+}
+.rdv-confirmed p {
+  margin: 0;
+  color: #4f6570;
+  font-size: 0.95rem;
+  max-width: 340px;
+  line-height: 1.55;
+}
+.rdv-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  background: #2e9cab;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(46,154,171,0.32);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.rdv-confirm-btn:hover {
+  background: #1f7f97;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(46,154,171,0.38);
 }
 
 /* ── Desktop fixe ── */
