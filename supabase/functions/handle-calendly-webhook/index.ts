@@ -7,7 +7,7 @@
  * - Crée une notification pour tous les admins
  *
  * Secrets requis :
- *   CALENDLY_SIGNING_KEY  — Calendly Dashboard → Webhooks → Signing key
+ *   CALENDLY_WEBHOOK_SECRET — token secret dans l'URL du webhook (?secret=...)
  *   SUPABASE_SERVICE_ROLE_KEY — déjà dispo dans Supabase
  *
  * Optionnel (pour récupérer l'heure du RDV) :
@@ -15,10 +15,10 @@
  */
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
 
-const SIGNING_KEY  = Deno.env.get('CALENDLY_SIGNING_KEY')       ?? ''
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')               ?? ''
-const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')  ?? ''
-const CAL_TOKEN    = Deno.env.get('CALENDLY_API_TOKEN')         ?? ''
+const WEBHOOK_SECRET = Deno.env.get('CALENDLY_WEBHOOK_SECRET')     ?? ''
+const SUPABASE_URL   = Deno.env.get('SUPABASE_URL')                ?? ''
+const SERVICE_KEY    = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')   ?? ''
+const CAL_TOKEN      = Deno.env.get('CALENDLY_API_TOKEN')          ?? ''
 
 const headers = (extra = {}) => ({
   'Content-Type': 'application/json',
@@ -26,21 +26,6 @@ const headers = (extra = {}) => ({
   Authorization: `Bearer ${SERVICE_KEY}`,
   ...extra,
 })
-
-// ── Validation signature HMAC-SHA256 Calendly ────────────────────────────────
-async function verifySignature(req: Request, body: string): Promise<boolean> {
-  if (!SIGNING_KEY) return true // pas de clé = dev local, on passe
-  const sig = req.headers.get('Calendly-Webhook-Signature') ?? ''
-  const [, t, v1] = sig.match(/t=(\d+),v1=([^,]+)/) ?? []
-  if (!t || !v1) return false
-  const key = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(SIGNING_KEY),
-    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'],
-  )
-  const mac = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${t}.${body}`))
-  const hex = Array.from(new Uint8Array(mac)).map(b => b.toString(16).padStart(2, '0')).join('')
-  return hex === v1
-}
 
 // ── Récupère les détails du scheduled_event via l'API Calendly ──────────────
 async function fetchEventDetails(eventUri: string) {
@@ -60,12 +45,15 @@ async function fetchEventDetails(eventUri: string) {
 serve(async (req) => {
   if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 })
 
-  const body = await req.text()
-
-  if (SIGNING_KEY && !(await verifySignature(req, body))) {
-    console.error('[CALENDLY] Signature invalide')
+  // Vérification du token secret dans l'URL (?secret=...)
+  const url = new URL(req.url)
+  const providedSecret = url.searchParams.get('secret') ?? ''
+  if (!WEBHOOK_SECRET || providedSecret !== WEBHOOK_SECRET) {
+    console.error('[CALENDLY] Token secret invalide')
     return new Response('Unauthorized', { status: 401 })
   }
+
+  const body = await req.text()
 
   let payload: Record<string, unknown>
   try { payload = JSON.parse(body) } catch {
