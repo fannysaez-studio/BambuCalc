@@ -37,7 +37,14 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   if (import.meta.env.VITE_MAINTENANCE_MODE === 'true' && to.name !== 'maintenance') {
-    return next({ name: 'maintenance' })
+    const previewSecret = import.meta.env.VITE_PREVIEW_SECRET
+    if (to.query.preview && previewSecret && to.query.preview === previewSecret) {
+      localStorage.setItem('preview_bypass', previewSecret)
+    }
+    const bypass = localStorage.getItem('preview_bypass')
+    if (!bypass || bypass !== previewSecret) {
+      return next({ name: 'maintenance' })
+    }
   }
 
   const { data } = await supabase.auth.getSession()
