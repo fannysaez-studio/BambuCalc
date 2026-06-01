@@ -52,7 +52,7 @@
 
       <span class="nav-sep" />
 
-      <CalendarPanel v-if="isAdminUser" class="nav-cal" />
+      <CalendarPanel v-if="isAuth" class="nav-cal" />
       <NotificationBell v-if="isAuth" :compact="true" :up="true" class="nav-bell" />
 
       <button
@@ -116,6 +116,8 @@
       <LogIn :size="21" />
       <span>Connexion</span>
     </router-link>
+
+    <CalendarPanel v-if="isAuth" :tab="true" />
 
     <button
       v-if="isAuth"

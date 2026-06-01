@@ -102,30 +102,38 @@ serve(async (req) => {
   if (!upsertRes.ok) {
     const err = await upsertRes.text()
     console.error('[APPOINTMENTS] Upsert failed:', err)
-    return new Response('DB error', { status: 500 })
+    return new Response(err, { status: 500 })
   }
 
   // ── Notification aux admins (uniquement à la création) ────────────────────
   if (!isCanceled) {
-    const adminsRes = await fetch(`${SUPABASE_URL}/rest/v1/admins?select=user_id`, {
-      headers: headers(),
-    })
-    const admins: { user_id: string }[] = await adminsRes.json()
-
-    const notifs = admins.map(a => ({
-      user_id:  a.user_id,
-      type:     'rdv_booked',
-      title:    'Nouveau rendez-vous',
-      message:  `${inviteeName || 'Un client'}${startAt ? ' · ' + new Date(startAt).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : ''}`,
-      quote_id: null,
-    }))
-
-    if (notifs.length > 0) {
-      await fetch(`${SUPABASE_URL}/rest/v1/notifications`, {
-        method:  'POST',
-        headers: headers({ Prefer: 'return=minimal' }),
-        body:    JSON.stringify(notifs),
+    try {
+      const adminsRes = await fetch(`${SUPABASE_URL}/rest/v1/admins?select=user_id`, {
+        headers: headers(),
       })
+      const adminsData = await adminsRes.json()
+      const admins: { user_id: string }[] = Array.isArray(adminsData) ? adminsData : []
+
+      if (!adminsRes.ok) console.error('[ADMINS] Erreur:', JSON.stringify(adminsData))
+
+      const notifs = admins.map(a => ({
+        user_id:  a.user_id,
+        type:     'rdv_booked',
+        title:    'Nouveau rendez-vous',
+        message:  `${inviteeName || 'Un client'}${startAt ? ' · ' + new Date(startAt).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : ''}`,
+        quote_id: null,
+      }))
+
+      if (notifs.length > 0) {
+        const notifRes = await fetch(`${SUPABASE_URL}/rest/v1/notifications`, {
+          method:  'POST',
+          headers: headers({ Prefer: 'return=minimal' }),
+          body:    JSON.stringify(notifs),
+        })
+        if (!notifRes.ok) console.error('[NOTIFS] Erreur:', await notifRes.text())
+      }
+    } catch (e) {
+      console.error('[NOTIFS] Exception:', e)
     }
   }
 
