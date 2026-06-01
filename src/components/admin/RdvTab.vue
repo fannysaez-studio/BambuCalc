@@ -266,7 +266,7 @@ onMounted(load)
 .td-name     { display: block; font-size: 0.8rem; font-weight: 600; color: #1b2f39; }
 .td-duration { display: block; font-size: 0.7rem; color: #a0aec0; margin-top: 1px; }
 .td-email    { font-size: 0.72rem; max-width: 150px; }
-.td-object   { font-size: 0.75rem; color: #4a5568; max-width: 130px; }
+.td-object   { font-size: 0.75rem; color: #4a5568; max-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .td-format, .td-presence { white-space: nowrap; }
 
 .td-client-link { color: #2e9cab; text-decoration: none; }
