@@ -303,6 +303,8 @@ async function savePresence(a, val) {
   await supabase.from('appointments').update({ presence: v }).eq('id', a.id)
 }
 
+const broadcastChannel = supabase.channel('admin-appointments-bus')
+
 async function adminAction(action, id) {
   const { data: { session } } = await supabase.auth.getSession()
   const jwt = session?.access_token
@@ -315,6 +317,7 @@ async function adminAction(action, id) {
     body: JSON.stringify({ action, id }),
   })
   if (!res.ok) { console.error('admin-appointments error:', res.status, await res.text()); return false }
+  broadcastChannel.send({ type: 'broadcast', event: 'appointments-changed', payload: {} })
   return true
 }
 
