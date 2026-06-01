@@ -1,7 +1,7 @@
 <template>
   <div
     class="admin-page"
-    @click="dossierDropdownOpen = false; outilsDropdownOpen = false; burgerOpen = false"
+    @click="devisDropdownOpen = false; outilsDropdownOpen = false; burgerOpen = false"
   >
     <!-- Bannière décorative admin -->
     <div class="admin-banner" aria-hidden="true"></div>
@@ -75,22 +75,30 @@
       </button>
       <Transition name="dropdown">
         <div v-if="burgerOpen" class="burger-menu">
-          <div class="burger-group-label">Clients &amp; Devis</div>
           <button
             class="burger-item"
             :class="activeTab === 'clients' && 'burger-item--active'"
-            @click="activeTab = 'clients'; burgerOpen = false; dossierDropdownOpen = false"
+            @click="activeTab = 'clients'; burgerOpen = false"
           >
-            <Users class="burger-item-icon" />Liste des clients
+            <Users class="burger-item-icon" />Gestion des clients
             <span class="burger-item-count">{{ clientCount }}</span>
           </button>
+          <div class="burger-group-label">Gestion des devis</div>
           <button
             class="burger-item"
             :class="activeTab === 'quotes' && 'burger-item--active'"
-            @click="activeTab = 'quotes'; burgerOpen = false; dossierDropdownOpen = false"
+            @click="activeTab = 'quotes'; burgerOpen = false"
           >
             <FileText class="burger-item-icon" />Tous les devis
             <span class="burger-item-count">{{ quotes.length }}</span>
+          </button>
+          <button
+            class="burger-item"
+            :class="activeTab === 'manage' && 'burger-item--active'"
+            @click="activeTab = 'manage'; burgerOpen = false"
+          >
+            <Send class="burger-item-icon" />Gestion Devis
+            <span class="burger-item-count">{{ manageCount }}</span>
           </button>
           <div class="burger-sep" />
           <button
@@ -98,7 +106,7 @@
             :key="tab.id"
             class="burger-item"
             :class="activeTab === tab.id && 'burger-item--active'"
-            @click="activeTab = tab.id; burgerOpen = false; dossierDropdownOpen = false"
+            @click="activeTab = tab.id; burgerOpen = false; devisDropdownOpen = false"
           >
             <component :is="tab.icon" class="burger-item-icon" />
             {{ tab.label }}
@@ -134,34 +142,44 @@
 
     <!-- Onglets -->
     <div class="tabs-bar">
-      <!-- ── Dropdown "Clients & Devis" ── -->
+      <!-- ── Gestion des clients (direct) ── -->
+      <button
+        :class="['tab-btn', activeTab === 'clients' && 'tab-btn--active']"
+        @click="activeTab = 'clients'"
+      >
+        <Users class="tab-icon" />
+        Gestion des clients
+        <span class="tab-count">{{ clientCount }}</span>
+      </button>
+
+      <!-- ── Dropdown "Gestion des devis" ── -->
       <div class="tab-dropdown-wrap" @click.stop>
         <button
-          :class="['tab-btn', ['clients', 'quotes'].includes(activeTab) && 'tab-btn--active']"
-          @click="dossierDropdownOpen = !dossierDropdownOpen"
+          :class="['tab-btn', ['quotes', 'manage'].includes(activeTab) && 'tab-btn--active']"
+          @click="devisDropdownOpen = !devisDropdownOpen"
         >
-          <Users class="tab-icon" />
-          Clients & Devis
-          <span class="tab-count">{{ clientCount + quotes.length }}</span>
-          <ChevronDown :class="['tab-chevron', dossierDropdownOpen && 'tab-chevron--open']" />
+          <FileText class="tab-icon" />
+          Gestion des devis
+          <span class="tab-count">{{ quotes.length }}</span>
+          <ChevronDown :class="['tab-chevron', devisDropdownOpen && 'tab-chevron--open']" />
         </button>
         <Transition name="dropdown">
-          <div v-if="dossierDropdownOpen" class="tab-dropdown">
-            <button
-              :class="['tab-dropdown-item', activeTab === 'clients' && 'tab-dropdown-item--active']"
-              @click="activeTab = 'clients'; dossierDropdownOpen = false"
-            >
-              <Users class="tab-dropdown-icon" />
-              Liste des clients
-              <span class="tab-dropdown-count">{{ clientCount }}</span>
-            </button>
+          <div v-if="devisDropdownOpen" class="tab-dropdown">
             <button
               :class="['tab-dropdown-item', activeTab === 'quotes' && 'tab-dropdown-item--active']"
-              @click="activeTab = 'quotes'; dossierDropdownOpen = false"
+              @click="activeTab = 'quotes'; devisDropdownOpen = false"
             >
               <FileText class="tab-dropdown-icon" />
               Tous les devis
               <span class="tab-dropdown-count">{{ quotes.length }}</span>
+            </button>
+            <button
+              :class="['tab-dropdown-item', activeTab === 'manage' && 'tab-dropdown-item--active']"
+              @click="activeTab = 'manage'; devisDropdownOpen = false"
+            >
+              <Send class="tab-dropdown-icon" />
+              Gestion Devis
+              <span class="tab-dropdown-count">{{ manageCount }}</span>
             </button>
           </div>
         </Transition>
@@ -467,7 +485,7 @@ const emailIntroClient = ref(saved.emailIntroClient || '')
 const attachPdfAuto = ref(saved.attachPdfAuto ?? true)
 const sendTarget = ref(null)
 const isSending = ref(false)
-const dossierDropdownOpen = ref(false)
+const devisDropdownOpen = ref(false)
 const outilsDropdownOpen = ref(false)
 const burgerOpen = ref(false)
 const catalogueCount = ref(0)
@@ -476,27 +494,26 @@ const archiveCount = ref(0)
 const rdvCount = ref(0)
 
 const tabs = computed(() => [
-  { id: 'manage', label: 'Gestion Devis', icon: Send, count: manageCount.value || 0 },
-  { id: 'emails', label: 'Gestion des Emails', icon: Mail },
-  { id: 'archives', label: 'Archives devis', icon: Archive, count: archiveCount.value || 0 },
-  { id: 'rdv', label: 'Rendez-vous', icon: CalendarDays, count: rdvCount.value || undefined },
+  { id: 'emails',   label: 'Gestion des Emails', icon: Mail },
+  { id: 'archives', label: 'Archives devis',      icon: Archive, count: archiveCount.value || 0 },
+  { id: 'rdv',      label: 'Rendez-vous',         icon: CalendarDays, count: rdvCount.value || undefined },
 ])
 const currentTabIcon = computed(() => {
-  if (activeTab.value === 'clients') return Users
-  if (activeTab.value === 'quotes') return FileText
-  if (activeTab.value === 'stats') return BarChart2
-  if (activeTab.value === 'settings') return SlidersHorizontal
+  if (activeTab.value === 'clients')   return Users
+  if (activeTab.value === 'quotes')    return FileText
+  if (activeTab.value === 'manage')    return Send
+  if (activeTab.value === 'stats')     return BarChart2
+  if (activeTab.value === 'settings')  return SlidersHorizontal
   if (activeTab.value === 'catalogue') return Package
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.icon : ChevronDown
 })
 const currentTabLabel = computed(() => {
-  if (activeTab.value === 'clients') return 'Liste des clients'
-  if (activeTab.value === 'quotes') return 'Tous les devis'
-  if (activeTab.value === 'stats') return 'Statistiques'
-  if (activeTab.value === 'settings') return 'Paramètres'
-  if (activeTab.value === 'emails') return 'Gestion des Emails'
-  if (activeTab.value === 'archives') return 'Archives devis'
+  if (activeTab.value === 'clients')   return 'Gestion des clients'
+  if (activeTab.value === 'quotes')    return 'Tous les devis'
+  if (activeTab.value === 'manage')    return 'Gestion des devis'
+  if (activeTab.value === 'stats')     return 'Statistiques'
+  if (activeTab.value === 'settings')  return 'Paramètres'
   if (activeTab.value === 'catalogue') return 'Catalogue'
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.label : ''
