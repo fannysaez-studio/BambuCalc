@@ -23,12 +23,11 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Heure</th>
+            <th>Date &amp; Heure</th>
             <th>Client</th>
             <th>Email</th>
             <th>Durée</th>
-            <th>Objet du RDV</th>
+            <th>Objet</th>
             <th>Format</th>
             <th>Présence</th>
             <th>Note admin</th>
@@ -41,9 +40,14 @@
             :key="a.id"
             :class="{ 'tr--canceled': a.status === 'canceled', 'tr--past': isPast(a) && a.status !== 'canceled', 'tr--editing': editingId === a.id }"
           >
-            <td class="td-date">{{ fmtDate(a.start_at) }}</td>
-            <td class="td-time">{{ fmtTime(a.start_at) }}</td>
+            <!-- Date & Heure fusionnés -->
+            <td class="td-datetime">
+              <span class="td-date">{{ fmtDate(a.start_at) }}</span>
+              <span class="td-time">{{ fmtTime(a.start_at) }}</span>
+            </td>
+
             <td class="td-name">{{ a.invitee_name || '—' }}</td>
+
             <td class="td-email">
               <a v-if="clientByEmail[a.invitee_email]" class="td-client-link" href="#"
                 @click.prevent="$emit('go-to-client', clientByEmail[a.invitee_email])">
@@ -51,32 +55,40 @@
               </a>
               <span v-else class="text-muted-sm">{{ a.invitee_email || '—' }}</span>
             </td>
+
             <td class="td-duration">{{ duration(a.start_at, a.end_at) }}</td>
+
             <td class="td-object">
               <span :title="getObjectRdv(a) !== '—' ? getObjectRdv(a) : ''">
-                {{ truncate(getObjectRdv(a), 32) }}
+                {{ truncate(getObjectRdv(a), 30) }}
               </span>
             </td>
 
-            <!-- Format : Présentiel / Distanciel -->
+            <!-- Format : select badge LED -->
             <td class="td-format">
-              <span :class="['led-badge', `led-badge--${getFormat(a).type}`]" :title="getFormat(a).detail">
-                <span class="led-dot" />
-                {{ getFormat(a).label }}
-              </span>
+              <select
+                :class="['rdv-select', `rdv-select--${resolvedFormat(a)}`]"
+                :value="resolvedFormat(a)"
+                :disabled="a.status === 'canceled'"
+                @change="saveFormat(a, $event.target.value)"
+              >
+                <option value="online">🔵 En ligne</option>
+                <option value="inperson">🟢 Extérieur</option>
+              </select>
             </td>
 
-            <!-- Présence : cycle ⚫ → 🟢 → 🔴 -->
+            <!-- Présence : select badge LED -->
             <td class="td-presence">
-              <button
-                :class="['led-btn', presence(a)]"
-                :title="presenceLabel(a)"
+              <select
+                :class="['rdv-select', `rdv-select--${resolvedPresence(a)}`]"
+                :value="a.presence ?? ''"
                 :disabled="a.status === 'canceled'"
-                @click="cyclePresence(a)"
+                @change="savePresence(a, $event.target.value)"
               >
-                <span class="led-dot" />
-                {{ presenceLabel(a) }}
-              </button>
+                <option value="">⚫ À confirmer</option>
+                <option value="present">🟢 Présent(e)</option>
+                <option value="absent">🔴 Absent(e)</option>
+              </select>
             </td>
 
             <td class="td-note">
@@ -139,7 +151,7 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
 function fmtTime(iso) {
-  if (!iso) return '—'
+  if (!iso) return ''
   return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
 function duration(start, end) {
@@ -147,7 +159,6 @@ function duration(start, end) {
   const min = Math.round((new Date(end) - new Date(start)) / 60000)
   return `${min} min`
 }
-
 function truncate(str, n) {
   if (!str || str === '—') return '—'
   return str.length > n ? str.slice(0, n) + '…' : str
@@ -161,30 +172,16 @@ function getObjectRdv(a) {
   return '—'
 }
 
-function getFormat(a) {
-  const loc = a.raw?.payload?.scheduled_event?.location ?? {}
-  const type = loc.type ?? ''
-  const isOnline = ONLINE_TYPES.some(t => type.includes(t))
-  if (isOnline) {
-    return { type: 'distanciel', label: 'En ligne', detail: loc.join_url ?? 'Visioconférence' }
-  }
-  const address = loc.location ?? loc.additional_info ?? ''
-  return {
-    type: 'presentiel',
-    label: 'En personne',
-    detail: address || 'Lieu à confirmer',
-  }
+function resolvedFormat(a) {
+  if (a.format) return a.format
+  const loc = a.raw?.payload?.scheduled_event?.location?.type ?? ''
+  return ONLINE_TYPES.some(t => loc.includes(t)) ? 'online' : 'inperson'
 }
 
-function presence(a) {
-  if (a.presence === 'present') return 'led-present'
-  if (a.presence === 'absent')  return 'led-absent'
-  return 'led-unknown'
-}
-function presenceLabel(a) {
-  if (a.presence === 'present') return 'Présent(e)'
-  if (a.presence === 'absent')  return 'Absent(e)'
-  return 'À confirmer'
+function resolvedPresence(a) {
+  if (a.presence === 'present') return 'present'
+  if (a.presence === 'absent')  return 'absent'
+  return 'unknown'
 }
 
 const filters = computed(() => [
@@ -205,7 +202,7 @@ async function load() {
   loading.value = true
   const { data } = await supabase
     .from('appointments')
-    .select('id, event_name, invitee_name, invitee_email, start_at, end_at, status, attended, presence, admin_note, raw, created_at')
+    .select('id, event_name, invitee_name, invitee_email, start_at, end_at, status, presence, format, admin_note, raw, created_at')
     .order('start_at', { ascending: false, nullsFirst: true })
   appointments.value = data ?? []
   emit('count-change', appointments.value.filter(a => !isPast(a) && a.status === 'active').length)
@@ -217,10 +214,15 @@ function startEdit(a) {
   nextTick(() => { noteRefs.value[a.id]?.focus() })
 }
 
-async function cyclePresence(a) {
-  const next = a.presence === null ? 'present' : a.presence === 'present' ? 'absent' : null
-  a.presence = next
-  await supabase.from('appointments').update({ presence: next }).eq('id', a.id)
+async function saveFormat(a, val) {
+  a.format = val
+  await supabase.from('appointments').update({ format: val }).eq('id', a.id)
+}
+
+async function savePresence(a, val) {
+  const v = val === '' ? null : val
+  a.presence = v
+  await supabase.from('appointments').update({ presence: v }).eq('id', a.id)
 }
 
 async function cancelAppointment(a) {
@@ -251,50 +253,39 @@ onMounted(load)
 .rdv-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
 /* ── Cellules ── */
-.td-date   { white-space: nowrap; font-size: 0.78rem; font-weight: 600; color: #1b2f39; }
-.td-time   { white-space: nowrap; font-size: 0.78rem; color: #2e9cab; font-weight: 600; }
-.td-name   { font-size: 0.8rem; font-weight: 600; color: #1b2f39; white-space: nowrap; }
-.td-email  { font-size: 0.72rem; max-width: 160px; }
+.td-datetime { white-space: nowrap; }
+.td-date { display: block; font-size: 0.78rem; font-weight: 600; color: #1b2f39; }
+.td-time { display: block; font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
+.td-name     { font-size: 0.8rem; font-weight: 600; color: #1b2f39; white-space: nowrap; }
+.td-email    { font-size: 0.72rem; max-width: 150px; }
 .td-duration { font-size: 0.75rem; color: #718096; white-space: nowrap; }
-.td-object { font-size: 0.78rem; color: #4a5568; max-width: 110px; }
+.td-object   { font-size: 0.75rem; color: #4a5568; max-width: 130px; }
 .td-format, .td-presence { white-space: nowrap; }
 
 .td-client-link { color: #2e9cab; text-decoration: none; }
 .td-client-link:hover { text-decoration: underline; }
 .text-muted-sm { color: #a0aec0; font-size: 0.72rem; }
 
-/* ── LED badges (Format) ── */
-.led-badge {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.5rem;
+/* ── Select badge (Format + Présence) ── */
+.rdv-select {
+  padding: 0.22rem 0.55rem;
   border-radius: 999px;
+  font-size: 0.7rem; font-weight: 700;
+  border: 1.5px solid;
+  cursor: pointer; font-family: inherit; outline: none;
+  appearance: none; -webkit-appearance: none;
+  text-align: center; transition: all 0.15s;
 }
-.led-badge--presentiel { background: rgba(72,187,120,0.1); color: #276749; }
-.led-badge--distanciel { background: rgba(66,153,225,0.12); color: #2b6cb0; }
+.rdv-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
-/* ── LED dot ── */
-.led-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-  box-shadow: 0 0 4px currentColor;
-}
-.led-badge--presentiel .led-dot { background: #48bb78; }
-.led-badge--distanciel .led-dot { background: #63b3ed; }
+/* Format */
+.rdv-select--online   { background: rgba(66,153,225,0.1); color: #2b6cb0; border-color: #90cdf4; }
+.rdv-select--inperson { background: rgba(72,187,120,0.1); color: #276749; border-color: #9ae6b4; }
 
-/* ── LED bouton Présence ── */
-.led-btn {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.5rem;
-  border-radius: 999px; border: 1.5px solid transparent; cursor: pointer;
-  font-family: inherit; transition: all 0.15s;
-}
-.led-btn:not(:disabled):hover { border-color: currentColor; opacity: 0.85; transform: scale(1.04); }
-.led-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.led-unknown { background: #f0f4f8; color: #718096; }
-.led-unknown .led-dot { background: #a0aec0; }
-.led-present { background: rgba(72,187,120,0.12); color: #276749; }
-.led-present .led-dot { background: #48bb78; box-shadow: 0 0 6px #48bb78; }
-.led-absent  { background: rgba(229,62,62,0.1); color: #c53030; }
-.led-absent  .led-dot { background: #fc8181; box-shadow: 0 0 6px #fc8181; }
+/* Présence */
+.rdv-select--unknown  { background: #f0f4f8; color: #718096; border-color: #e2e8f0; }
+.rdv-select--present  { background: rgba(72,187,120,0.12); color: #276749; border-color: #9ae6b4; }
+.rdv-select--absent   { background: rgba(229,62,62,0.1);   color: #c53030; border-color: #feb2b2; }
 
 /* ── Note ── */
 .td-note { min-width: 100px; }
