@@ -177,7 +177,7 @@
           :class="['tab-btn', ['stats', 'settings'].includes(activeTab) && 'tab-btn--active']"
           @click="outilsDropdownOpen = !outilsDropdownOpen"
         >
-          <SlidersHorizontal class="tab-icon" />
+          <Wrench class="tab-icon" />
           Outils
           <ChevronDown :class="['tab-chevron', outilsDropdownOpen && 'tab-chevron--open']" />
         </button>
@@ -422,6 +422,7 @@ import {
   SlidersHorizontal,
   Package,
   CalendarDays,
+  Wrench,
   ChevronDown,
   Mail,
   Bell,

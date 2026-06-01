@@ -390,6 +390,8 @@
 .tab-dropdown--right {
   left: auto;
   right: 0;
+  min-width: unset;
+  width: max-content;
 }
 .tab-dropdown-item {
   display: flex;
