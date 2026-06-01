@@ -111,11 +111,20 @@ function handleOutside(e) {
   if (calWrap.value && !calWrap.value.contains(e.target)) open.value = false
 }
 
+let realtimeChannel = null
+
 onMounted(async () => {
   await load()
   document.addEventListener('click', handleOutside)
+  realtimeChannel = supabase
+    .channel('calendar-appointments')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => load())
+    .subscribe()
 })
-onUnmounted(() => document.removeEventListener('click', handleOutside))
+onUnmounted(() => {
+  document.removeEventListener('click', handleOutside)
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+})
 </script>
 
 <style scoped>

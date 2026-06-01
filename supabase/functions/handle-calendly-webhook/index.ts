@@ -105,37 +105,7 @@ serve(async (req) => {
     return new Response(err, { status: 500 })
   }
 
-  // ── Notification aux admins (uniquement à la création) ────────────────────
-  if (!isCanceled) {
-    try {
-      const adminsRes = await fetch(`${SUPABASE_URL}/rest/v1/admins?select=user_id`, {
-        headers: headers(),
-      })
-      const adminsData = await adminsRes.json()
-      const admins: { user_id: string }[] = Array.isArray(adminsData) ? adminsData : []
-
-      if (!adminsRes.ok) console.error('[ADMINS] Erreur:', JSON.stringify(adminsData))
-
-      const notifs = admins.map(a => ({
-        user_id:  a.user_id,
-        type:     'rdv_booked',
-        title:    'Nouveau rendez-vous',
-        message:  `${inviteeName || 'Un client'}${startAt ? ' · ' + new Date(startAt).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }) : ''}`,
-        quote_id: null,
-      }))
-
-      if (notifs.length > 0) {
-        const notifRes = await fetch(`${SUPABASE_URL}/rest/v1/notifications`, {
-          method:  'POST',
-          headers: headers({ Prefer: 'return=minimal' }),
-          body:    JSON.stringify(notifs),
-        })
-        if (!notifRes.ok) console.error('[NOTIFS] Erreur:', await notifRes.text())
-      }
-    } catch (e) {
-      console.error('[NOTIFS] Exception:', e)
-    }
-  }
+  // Pas de notification dans la cloche — le CalendarPanel gère l'affichage des RDV
 
   console.log(`[CALENDLY] ${eventType} — ${inviteeName} (${inviteeEmail})`)
   return new Response(JSON.stringify({ ok: true }), { status: 200 })
