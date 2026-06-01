@@ -108,6 +108,14 @@
           <div class="burger-group-label">Outils</div>
           <button
             class="burger-item"
+            :class="activeTab === 'catalogue' && 'burger-item--active'"
+            @click="activeTab = 'catalogue'; burgerOpen = false"
+          >
+            <Package class="burger-item-icon" />Catalogue
+            <span class="burger-item-count">{{ catalogueCount }}</span>
+          </button>
+          <button
+            class="burger-item"
             :class="activeTab === 'stats' && 'burger-item--active'"
             @click="activeTab = 'stats'; burgerOpen = false"
           >
@@ -183,6 +191,14 @@
         </button>
         <Transition name="dropdown">
           <div v-if="outilsDropdownOpen" class="tab-dropdown tab-dropdown--right">
+            <button
+              :class="['tab-dropdown-item', activeTab === 'catalogue' && 'tab-dropdown-item--active']"
+              @click="activeTab = 'catalogue'; outilsDropdownOpen = false"
+            >
+              <Package class="tab-dropdown-icon" />
+              Catalogue
+              <span v-if="catalogueCount" class="tab-dropdown-count">{{ catalogueCount }}</span>
+            </button>
             <button
               :class="['tab-dropdown-item', activeTab === 'stats' && 'tab-dropdown-item--active']"
               @click="activeTab = 'stats'; outilsDropdownOpen = false"
@@ -464,13 +480,13 @@ const tabs = computed(() => [
   { id: 'emails', label: 'Emails', icon: Mail },
   { id: 'archives', label: 'Archives', icon: Archive, count: archiveCount.value || 0 },
   { id: 'rdv', label: 'Rendez-vous', icon: CalendarDays, count: rdvCount.value || undefined },
-  { id: 'catalogue', label: 'Catalogue', icon: Package, count: catalogueCount.value || 0 },
 ])
 const currentTabIcon = computed(() => {
   if (activeTab.value === 'clients') return Users
   if (activeTab.value === 'quotes') return FileText
   if (activeTab.value === 'stats') return BarChart2
   if (activeTab.value === 'settings') return SlidersHorizontal
+  if (activeTab.value === 'catalogue') return Package
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.icon : ChevronDown
 })
@@ -479,6 +495,7 @@ const currentTabLabel = computed(() => {
   if (activeTab.value === 'quotes') return 'Tous les devis'
   if (activeTab.value === 'stats') return 'Statistiques'
   if (activeTab.value === 'settings') return 'Paramètres'
+  if (activeTab.value === 'catalogue') return 'Catalogue'
   const t = tabs.value.find((t) => t.id === activeTab.value)
   return t ? t.label : ''
 })

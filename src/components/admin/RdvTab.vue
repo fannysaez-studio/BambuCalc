@@ -88,15 +88,15 @@
             <td class="td-actions">
               <button
                 v-if="a.status === 'active'"
-                class="rdv-action-btn rdv-action-btn--cancel"
+                class="btn-action btn-cancel"
                 title="Annuler le RDV"
                 @click="cancelAppointment(a)"
-              ><XCircle :size="15" /></button>
+              ><XCircle class="action-icon" /></button>
               <button
-                class="rdv-action-btn rdv-action-btn--delete"
+                class="btn-action btn-del"
                 title="Supprimer définitivement"
                 @click="deleteAppointment(a)"
-              ><Trash2 :size="15" /></button>
+              ><Trash2 class="action-icon" /></button>
             </td>
           </tr>
         </tbody>
@@ -242,19 +242,13 @@ onMounted(load)
 .tr--canceled td { opacity: 0.55; }
 .tr--past .td-name { color: #718096; }
 
-.td-actions { white-space: nowrap; text-align: right; }
-.rdv-action-btn {
-  border: none; border-radius: 6px; cursor: pointer;
-  padding: 0.25rem; display: inline-flex; align-items: center;
-  transition: all 0.15s;
+.td-actions { white-space: nowrap; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 0.2rem; }
+.btn-action {
+  width: 1.9rem; height: 1.9rem; border: none; background: none; border-radius: 8px;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  color: #cbd5e0; transition: background 0.15s ease, color 0.15s ease;
 }
-.rdv-action-btn--cancel {
-  background: rgba(234,179,8,0.1); color: #b45309;
-  margin-right: 0.3rem;
-}
-.rdv-action-btn--cancel:hover { background: rgba(234,179,8,0.2); }
-.rdv-action-btn--delete {
-  background: rgba(229,62,62,0.08); color: #e53e3e;
-}
-.rdv-action-btn--delete:hover { background: rgba(229,62,62,0.15); }
+.action-icon { width: 0.9rem; height: 0.9rem; }
+.btn-cancel:hover { background: #fef3c7; color: #d97706; }
+.btn-del:hover    { background: #fff5f5; color: #e53e3e; }
 </style>
