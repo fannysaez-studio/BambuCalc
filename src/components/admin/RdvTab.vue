@@ -262,6 +262,21 @@ async function savePresence(a, val) {
   await supabase.from('appointments').update({ presence: v }).eq('id', a.id)
 }
 
+async function adminAction(action, id) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwt = session?.access_token
+  if (!jwt) { console.error('Non authentifié'); return false }
+
+  const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-appointments`
+  const res = await fetch(fnUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+    body: JSON.stringify({ action, id }),
+  })
+  if (!res.ok) { console.error('admin-appointments error:', res.status, await res.text()); return false }
+  return true
+}
+
 async function cancelAppointment(a) {
   const ok = await askConfirm(
     'Annuler ce rendez-vous ?',
@@ -269,14 +284,9 @@ async function cancelAppointment(a) {
     'cancel'
   )
   if (!ok) return
-  const prev = a.status
+  const done = await adminAction('cancel', a.id)
+  if (!done) return
   a.status = 'canceled'
-  const { error } = await supabase.from('appointments').update({ status: 'canceled' }).eq('id', a.id)
-  if (error) {
-    console.error('Annulation échouée :', error)
-    a.status = prev
-    return
-  }
   emit('count-change', appointments.value.filter(x => !isPast(x) && x.status === 'active').length)
 }
 
@@ -287,11 +297,8 @@ async function deleteAppointment(a) {
     'delete'
   )
   if (!ok) return
-  const { error } = await supabase.from('appointments').delete().eq('id', a.id)
-  if (error) {
-    console.error('Suppression échouée :', error)
-    return
-  }
+  const done = await adminAction('delete', a.id)
+  if (!done) return
   appointments.value = appointments.value.filter(x => x.id !== a.id)
   emit('count-change', appointments.value.filter(x => !isPast(x) && x.status === 'active').length)
 }
