@@ -73,30 +73,35 @@
         </div>
 
         <!-- Calendly inline widget -->
-        <div v-if="!confirmed" class="rdv-cal-wrap">
+        <div class="rdv-cal-wrap">
           <div
             class="calendly-inline-widget"
             data-url="https://calendly.com/fannysaez-pro/30min?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=1a6b7a&locale=fr"
           ></div>
         </div>
 
-        <!-- Confirmation post-réservation -->
-        <div v-else class="rdv-confirmed">
-          <div class="confirmed-check">
-            <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <circle cx="26" cy="26" r="25" stroke="#2e9cab" stroke-width="2"/>
-              <path d="M14 27l9 9 15-18" stroke="#2e9cab" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </div>
+    </section>
+
+    <!-- ── Modale de confirmation ── -->
+    <Transition name="modal">
+      <div v-if="confirmed" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-card">
+          <div class="modal-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="32" cy="32" r="31" stroke="#2e9cab" stroke-width="2"/>
+              <circle cx="32" cy="32" r="31" stroke="#2e9cab" stroke-width="2" stroke-dasharray="195" stroke-dashoffset="0" class="circle-draw"/>
+              <path d="M18 33l11 11 17-22" stroke="#2e9cab" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="check-draw"/>
             </svg>
           </div>
-          <h3>Rendez-vous confirmé !</h3>
-          <p>Un email de confirmation va vous être envoyé avec les détails de votre séance.</p>
-          <router-link to="/" class="rdv-confirm-btn">
+          <h2 id="modal-title">Rendez-vous confirmé !</h2>
+          <p>Un email de confirmation vient de vous être envoyé avec tous les détails de votre séance.</p>
+          <router-link to="/" class="modal-btn">
             Réserver mon accompagnement
           </router-link>
         </div>
-
       </div>
-    </section>
+    </Transition>
 
   </div>
 </template>
@@ -407,62 +412,6 @@ onUnmounted(() => {
   min-height: 560px;
 }
 
-/* ── Confirmation post-réservation ── */
-.rdv-confirmed {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  text-align: center;
-  padding: 2rem 1rem;
-  animation: fadeInUp 0.4s ease both;
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.confirmed-check {
-  width: 3.5rem; height: 3.5rem;
-  flex-shrink: 0;
-}
-.confirmed-check svg { width: 100%; height: 100%; }
-.rdv-confirmed h3 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #1b2f39;
-  letter-spacing: -0.02em;
-}
-.rdv-confirmed p {
-  margin: 0;
-  color: #4f6570;
-  font-size: 0.95rem;
-  max-width: 340px;
-  line-height: 1.55;
-}
-.rdv-confirm-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 0.5rem;
-  padding: 0.85rem 1.75rem;
-  background: #2e9cab;
-  color: #fff;
-  border-radius: 999px;
-  font-size: 1rem;
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: 0 6px 20px rgba(46,154,171,0.32);
-  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-}
-.rdv-confirm-btn:hover {
-  background: #1f7f97;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(46,154,171,0.38);
-}
-
 /* ── Desktop fixe ── */
 @media (min-width: 1101px) {
   .rdv-page {
@@ -548,5 +497,102 @@ onUnmounted(() => {
   .rdv-panel { min-height: calc(100dvh - 1.5rem); display: flex; flex-direction: column; }
   .rdv-card { flex: 1; padding: 4rem 1.5rem 3rem; overflow-y: visible; }
   .calendly-inline-widget { min-height: 640px; }
+}
+
+/* ── Modale confirmation ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 25, 35, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.modal-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.5rem 2rem 2rem;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(15, 25, 35, 0.22), 0 0 0 1px rgba(255,255,255,0.1);
+}
+.modal-icon {
+  width: 5rem;
+  height: 5rem;
+}
+.modal-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.circle-draw {
+  animation: drawCircle 0.6s ease-out forwards;
+  stroke-dasharray: 195;
+  stroke-dashoffset: 195;
+}
+.check-draw {
+  animation: drawCheck 0.4s 0.5s ease-out forwards;
+  stroke-dasharray: 50;
+  stroke-dashoffset: 50;
+}
+@keyframes drawCircle {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+.modal-card h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1b2f39;
+  letter-spacing: -0.02em;
+}
+.modal-card p {
+  margin: 0;
+  color: #4f6570;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 320px;
+}
+.modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding: 0.9rem 1.75rem;
+  background: #2e9cab;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(46,154,171,0.32);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.modal-btn:hover {
+  background: #1f7f97;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(46,154,171,0.38);
+}
+
+/* Transition Vue */
+.modal-enter-active { animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal-leave-active { animation: modalOut 0.2s ease; }
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes modalOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 </style>
