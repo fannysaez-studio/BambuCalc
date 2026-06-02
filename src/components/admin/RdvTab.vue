@@ -165,6 +165,7 @@
 import { ref, computed, onMounted, nextTick, reactive } from 'vue'
 import { CalendarOff, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
+import { deriveFormat, ledPresence, getObjectRdv, fmtDate, fmtTime, duration } from '@/utils/rdvUtils'
 
 const props = defineProps({ profiles: { type: Array, default: () => [] } })
 const emit = defineEmits(['go-to-client', 'count-change'])
@@ -212,8 +213,6 @@ function askConfirm(title, message, type = 'delete') {
 function confirmDialog() { dialogVisible.value = false; dialogResolve?.(true) }
 function cancelDialog()  { dialogVisible.value = false; dialogResolve?.(false) }
 
-const ONLINE_TYPES = ['google_conference', 'zoom', 'teams', 'gotomeeting', 'webex', 'microsoft_teams', 'google_meet']
-
 const clientByEmail = computed(() => {
   const map = {}
   props.profiles.forEach(p => { if (p.email) map[p.email] = p.id })
@@ -221,43 +220,6 @@ const clientByEmail = computed(() => {
 })
 
 function isPast(a) { return a.start_at && new Date(a.start_at) < new Date() }
-
-function fmtDate(iso) {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-}
-function fmtTime(iso) {
-  if (!iso) return ''
-  return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-}
-function duration(start, end) {
-  if (!start || !end) return '—'
-  const min = Math.round((new Date(end) - new Date(start)) / 60000)
-  return `${min} min`
-}
-function truncate(str, n) {
-  if (!str || str === '—') return '—'
-  return str.length > n ? str.slice(0, n) + '…' : str
-}
-
-function getObjectRdv(a) {
-  try {
-    const qa = a.raw?.payload?.questions_and_answers
-    if (Array.isArray(qa) && qa.length > 0 && qa[0].answer?.trim()) return qa[0].answer.trim()
-  } catch { /* */ }
-  return '—'
-}
-
-function deriveFormat(a) {
-  const loc = a.raw?.payload?.scheduled_event?.location?.type ?? ''
-  return ONLINE_TYPES.some(t => loc.includes(t)) ? 'online' : 'inperson'
-}
-
-function ledPresence(a) {
-  if (a.presence === 'present') return 'present'
-  if (a.presence === 'absent')  return 'absent'
-  return 'unknown'
-}
 
 const filters = computed(() => [
   { id: 'upcoming', label: 'À venir',  count: appointments.value.filter(a => !isPast(a) && a.status === 'active').length },
