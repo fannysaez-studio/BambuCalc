@@ -112,6 +112,7 @@
               </div>
 
               <div class="bs-sep" />
+              <div class="bs-group-label bs-group-label--grey">Emails & Communication</div>
               <div class="bs-item"
                 v-for="tab in tabs"
                 :key="tab.id"
