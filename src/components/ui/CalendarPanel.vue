@@ -41,6 +41,9 @@
                 <span v-if="a.status === 'canceled'" class="cal-item-canceled">Annulé</span>
               </div>
             </div>
+            <div class="cal-bs-footer">
+              <a href="/rdv" class="cal-bs-cta" @click="open = false">+ Prendre un rendez-vous</a>
+            </div>
           </div>
         </div>
       </Transition>
@@ -301,4 +304,24 @@ onUnmounted(() => {
 @media (max-width: 640px) {
   .cal-panel { left: 8px; right: 8px; width: auto; bottom: 72px; }
 }
+.cal-bs-footer {
+  padding: 0.85rem 1rem;
+  border-top: 1px solid #f0f4f8;
+  flex-shrink: 0;
+}
+.cal-bs-cta {
+  display: block;
+  text-align: center;
+  padding: 0.7rem;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  box-shadow: 0 4px 12px rgba(46,156,171,0.28);
+  transition: filter 0.2s;
+}
+.cal-bs-cta:hover { filter: brightness(1.07); }
 </style>
