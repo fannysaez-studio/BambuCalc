@@ -387,8 +387,8 @@ onMounted(load)
 .td-duration { display: block; font-size: 0.7rem; color: #a0aec0; margin-top: 1px; }
 .td-email    { font-size: 0.72rem; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .td-object   { font-size: 0.75rem; color: #4a5568; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.td-devis   { min-width: 90px; }
-.devis-list { display: flex; flex-direction: column; gap: 3px; }
+.td-devis   { min-width: 90px; white-space: nowrap; }
+.devis-list { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 4px; }
 .devis-none { color: #a0aec0; font-size: 0.72rem; }
 .td-format, .td-presence { white-space: nowrap; }
 

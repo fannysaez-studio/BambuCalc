@@ -212,6 +212,105 @@
       </template>
     </div>
 
+    <!-- ── Section Mes rendez-vous ── -->
+    <div v-if="!isAnonymous" class="rdv-section-card">
+      <div class="rdv-section-header">
+        <div class="rdv-section-title-wrap">
+          <Calendar class="rdv-section-icon" />
+          <h2 class="rdv-section-title">Mes rendez-vous</h2>
+        </div>
+        <div class="rdv-tabs">
+          <button
+            v-for="tab in rdvTabs"
+            :key="tab.id"
+            :class="['rdv-tab', rdvFilter === tab.id && 'rdv-tab--active']"
+            @click="rdvFilter = tab.id"
+          >
+            {{ tab.label }}
+            <span v-if="tab.count > 0" class="rdv-tab-count">{{ tab.count }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div v-if="loadingRdv" class="empty-state">
+        <div class="spinner" />
+        <p>Chargement…</p>
+      </div>
+
+      <div v-else-if="filteredRdv.length === 0" class="empty-state">
+        <Calendar class="empty-icon" />
+        <p class="empty-title">Aucun rendez-vous</p>
+        <p v-if="rdvFilter === 'upcoming'" class="empty-sub">Prends rendez-vous pour démarrer ton projet.</p>
+      </div>
+
+      <template v-else>
+        <!-- Desktop (≥641px) -->
+        <div class="dq-table-view">
+          <table class="quotes-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Format</th>
+                <th>Objet</th>
+                <th>Devis lié</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="a in filteredRdv" :key="a.id" :class="{ 'tr--rdv-canceled': a.status === 'canceled' }">
+                <td class="td-date">{{ fmtDate(a.start_at) }}</td>
+                <td>
+                  <span class="rdv-time">{{ fmtTime(a.start_at) }}</span>
+                  <span class="rdv-dur">{{ duration(a.start_at, a.end_at) }}</span>
+                </td>
+                <td>
+                  <span :class="['rdv-fmt-badge', `rdv-fmt-badge--${a.format}`]">
+                    {{ a.format === 'online' ? 'En ligne' : 'Extérieur' }}
+                  </span>
+                </td>
+                <td class="td-rdv-obj">{{ getObjectRdv(a) }}</td>
+                <td class="td-rdv-devis">
+                  <template v-if="linkedQuotes.length">
+                    <span
+                      v-for="q in linkedQuotes"
+                      :key="q.id"
+                      :class="['status-badge', 'status-' + (q.status || 'pending')]"
+                      style="font-size:0.68rem"
+                    >#{{ q.quote_number }}</span>
+                  </template>
+                  <span v-else class="rdv-none">—</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile (≤640px) -->
+        <div class="dq-cards-view">
+          <div v-for="a in filteredRdv" :key="a.id" class="rdv-mcard" :class="{ 'rdv-mcard--canceled': a.status === 'canceled' }">
+            <div class="rdv-mcard-top">
+              <div>
+                <p class="rdv-mcard-date">{{ fmtDate(a.start_at) }}</p>
+                <p class="rdv-mcard-time">{{ fmtTime(a.start_at) }} · {{ duration(a.start_at, a.end_at) }}</p>
+              </div>
+              <span :class="['rdv-fmt-badge', `rdv-fmt-badge--${a.format}`]">
+                {{ a.format === 'online' ? 'En ligne' : 'Extérieur' }}
+              </span>
+            </div>
+            <p v-if="getObjectRdv(a) !== '—'" class="rdv-mcard-obj">{{ getObjectRdv(a) }}</p>
+            <div v-if="linkedQuotes.length" class="rdv-mcard-devis">
+              <span
+                v-for="q in linkedQuotes"
+                :key="q.id"
+                :class="['status-badge', 'status-' + (q.status || 'pending')]"
+                style="font-size:0.68rem"
+              >#{{ q.quote_number }}</span>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
     <!-- ── Section Archives ── -->
     <div v-if="archivedCount > 0" class="archives-block">
       <button class="btn-archives-toggle" @click="toggleArchives">
@@ -328,15 +427,20 @@ import { supabase } from '@/lib/supabase'
 import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import { fmtEur } from '@/utils/formatters'
+import { deriveFormat, getObjectRdv, fmtTime, duration } from '@/utils/rdvUtils'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import NotificationBell from '@/components/ui/NotificationBell.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
-import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye } from 'lucide-vue-next'
+import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar } from 'lucide-vue-next'
 
 // ── State ──
 const displayName = ref('')
 const isAnonymous = ref(false)
+const userEmail = ref('')
 const quotes = ref([])
+const appointments = ref([])
+const loadingRdv = ref(false)
+const rdvFilter = ref('upcoming')
 const loading = ref(true)
 const archiveTarget = ref(null)
 const archiving = ref(false)
@@ -372,6 +476,25 @@ const topMaterial = computed(() => {
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
 })
 
+// ── RDV computed ──
+function isPastRdv(a) { return a.start_at && new Date(a.start_at) < new Date() }
+
+const rdvTabs = computed(() => [
+  { id: 'upcoming', label: 'À venir',  count: appointments.value.filter(a => !isPastRdv(a) && a.status === 'active').length },
+  { id: 'past',     label: 'Passés',   count: appointments.value.filter(a => isPastRdv(a)   && a.status === 'active').length },
+  { id: 'canceled', label: 'Annulés',  count: appointments.value.filter(a => a.status === 'canceled').length },
+])
+
+const filteredRdv = computed(() => {
+  if (rdvFilter.value === 'upcoming') return appointments.value.filter(a => !isPastRdv(a) && a.status === 'active')
+  if (rdvFilter.value === 'past')     return appointments.value.filter(a => isPastRdv(a)   && a.status === 'active')
+  return appointments.value.filter(a => a.status === 'canceled')
+})
+
+const linkedQuotes = computed(() =>
+  quotes.value.filter(q => !q.archived && q.client_email === userEmail.value)
+)
+
 const archivedByYear = computed(() => {
   const grouped = {}
   for (const q of archivedQuotes.value) {
@@ -398,6 +521,20 @@ function statusLabel(status) {
 }
 
 // ── Data loading ──
+async function loadAppointments(email) {
+  loadingRdv.value = true
+  const { data } = await supabase
+    .from('appointments')
+    .select('id, event_name, invitee_name, start_at, end_at, status, format, raw')
+    .eq('invitee_email', email)
+    .order('start_at', { ascending: false })
+  appointments.value = (data ?? []).map(a => ({
+    ...a,
+    format: a.format ?? deriveFormat(a),
+  }))
+  loadingRdv.value = false
+}
+
 async function loadQuotes() {
   loading.value = true
   try {
@@ -442,6 +579,7 @@ onUnmounted(() => {
   const user = data.user
   if (user) {
     isAnonymous.value = user.is_anonymous ?? false
+    userEmail.value = user.email || ''
     if (isAnonymous.value) {
       displayName.value = 'Invité'
     } else {
@@ -450,7 +588,10 @@ onUnmounted(() => {
       displayName.value = full.split(' ')[0] || user.email?.split('@')[0] || ''
     }
   }
-  await loadQuotes()
+  const rdvPromise = (!isAnonymous.value && userEmail.value)
+    ? loadAppointments(userEmail.value)
+    : Promise.resolve()
+  await Promise.all([loadQuotes(), rdvPromise])
   if (user) setupRealtime(user.id)  // après loadQuotes — on subscribe depuis un état connu
 })()
 
@@ -1138,6 +1279,105 @@ async function linkAccount() {
 .dq-table-view { display: block; overflow-x: auto; }
 .dq-cards-view { display: none; }
 
+/* ── Section Mes rendez-vous ── */
+.rdv-section-card {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.rdv-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f0f4f8;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.rdv-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.rdv-section-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #2e9cab;
+  flex-shrink: 0;
+}
+
+.rdv-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1b2f39;
+  margin: 0;
+}
+
+.rdv-tabs { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+.rdv-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.65rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 999px;
+  background: #fff;
+  color: #718096;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.rdv-tab:hover { border-color: #2e9cab; color: #2e9cab; }
+.rdv-tab--active { border-color: #2e9cab; background: #e8f7f9; color: #1f7f97; }
+
+.rdv-tab-count {
+  background: #2e9cab;
+  color: #fff;
+  border-radius: 999px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  padding: 0.05rem 0.32rem;
+  line-height: 1.5;
+}
+
+.rdv-time { display: block; font-size: 0.82rem; font-weight: 700; color: #2e9cab; }
+.rdv-dur  { display: block; font-size: 0.68rem; color: #a0aec0; margin-top: 1px; }
+
+.td-rdv-obj {
+  font-size: 0.78rem;
+  color: #4a5568;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.td-rdv-devis { white-space: nowrap; }
+.rdv-none { color: #a0aec0; font-size: 0.72rem; }
+
+.rdv-fmt-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rdv-fmt-badge--online   { background: #ebf8ff; color: #2b6cb0; border: 1px solid #90cdf4; }
+.rdv-fmt-badge--inperson { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+
+.tr--rdv-canceled td { opacity: 0.5; }
+
 /* Tablette : padding bas pour la nav island */
 @media (max-width: 900px) and (min-width: 641px) {
   .dash-page { padding-bottom: 5rem; }
@@ -1251,5 +1491,45 @@ async function linkAccount() {
   .dqcard--dim { opacity: 0.75; }
   .archives-block { margin-top: 0.75rem; }
   .btn-archives-toggle { padding: 0.7rem 1rem; font-size: 0.78rem; }
+
+  /* ── RDV mobile cards ── */
+  .rdv-section-card { margin-top: 0.75rem; }
+  .rdv-section-header { padding: 0.85rem 1rem; }
+  .rdv-mcard {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.9rem 0.25rem;
+    border-bottom: 1px solid #f0f4f8;
+  }
+  .rdv-mcard:last-child { border-bottom: none; }
+  .rdv-mcard--canceled { opacity: 0.55; }
+  .rdv-mcard-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .rdv-mcard-date {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #1b2f39;
+    margin: 0 0 0.1rem;
+  }
+  .rdv-mcard-time {
+    font-size: 0.75rem;
+    color: #2e9cab;
+    font-weight: 600;
+    margin: 0;
+  }
+  .rdv-mcard-obj {
+    font-size: 0.78rem;
+    color: #4a5568;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .rdv-mcard-devis { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 }
 </style>
