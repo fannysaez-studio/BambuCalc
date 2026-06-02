@@ -4917,7 +4917,7 @@
 .bs-overlay {
   position: fixed;
   inset: 0;
-  z-index: 9998;
+  z-index: 10000;
   background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
