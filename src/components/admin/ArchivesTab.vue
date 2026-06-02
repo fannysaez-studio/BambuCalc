@@ -1,7 +1,7 @@
 <template>
   <div class="panel-card">
     <div class="panel-header">
-      <h2 class="panel-title">Archives</h2>
+      <h2 class="panel-title"><Archive class="ptitle-icon" /> Archives</h2>
       <div class="panel-actions">
         <select class="filter-select" v-model.number="archiveYear">
           <option v-for="y in archiveYears" :key="y" :value="y">{{ y }}</option>
@@ -165,7 +165,8 @@ function fmtDate(iso) {
   border-bottom: 1px solid #f0f4f8;
   flex-shrink: 0; flex-wrap: wrap;
 }
-.panel-title { font-size: 1rem; font-weight: 800; color: #1b2f39; margin: 0; }
+.panel-title { font-size: 1rem; font-weight: 800; color: #1b2f39; margin: 0; display: flex; align-items: center; gap: 0.4rem; }
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 .panel-actions { display: flex; align-items: center; gap: 0.65rem; margin-left: auto; flex-wrap: wrap; }
 
 .filter-select {

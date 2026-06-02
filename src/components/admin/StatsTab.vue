@@ -1,7 +1,7 @@
 <template>
   <div class="panel-card">
     <div class="panel-header">
-      <h2 class="panel-title">Statistiques & Business</h2>
+      <h2 class="panel-title"><TrendingUp class="ptitle-icon" /> Statistiques & Business</h2>
     </div>
     <div v-if="loading" class="empty-state"><div class="spinner" /><p>Chargement…</p></div>
     <div v-else class="stats-panel">
@@ -90,6 +90,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { TrendingUp } from 'lucide-vue-next'
 
 const props = defineProps({
   quotes:  { type: Array,   default: () => [] },
@@ -135,7 +136,8 @@ function fmtEur(v) { return new Intl.NumberFormat('fr-FR', { style: 'currency', 
   border-bottom: 1px solid #f0f4f8;
   flex-shrink: 0;
 }
-.panel-title { font-size: 1rem; font-weight: 800; color: #1b2f39; margin: 0; }
+.panel-title { font-size: 1rem; font-weight: 800; color: #1b2f39; margin: 0; display: flex; align-items: center; gap: 0.4rem; }
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 
 .empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;

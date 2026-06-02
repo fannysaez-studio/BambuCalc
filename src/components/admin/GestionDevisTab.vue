@@ -3,6 +3,7 @@
 
     <div class="panel-header">
       <h2 class="panel-title">
+        <component :is="managePage === 1 ? FileText : Send" class="ptitle-icon" />
         {{ managePage === 1 ? 'Devis sauvegardés' : 'Transmettre un devis' }}
       </h2>
       <div class="settings-page-indicator">
@@ -716,6 +717,7 @@ function wasEdited(q) {
   font-size: 0.95rem; font-weight: 800; color: #1b2f39; margin: 0;
   display: flex; align-items: center; gap: 0.5rem;
 }
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 .panel-actions { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
 
 /* ── Indicateur de page (points) ── */

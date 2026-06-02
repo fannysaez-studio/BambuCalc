@@ -1,7 +1,7 @@
 <template>
   <div class="panel-card">
     <div class="panel-header">
-      <h2 class="panel-title">Paramètres de calcul</h2>
+      <h2 class="panel-title"><SlidersHorizontal class="ptitle-icon" /> Paramètres de calcul</h2>
       <span v-if="settingsLoading" class="settings-loading-badge">Chargement…</span>
     </div>
 
@@ -238,7 +238,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
-import { BarChart2, Save, Check, Loader2, BookOpen, ChevronRight } from 'lucide-vue-next'
+import { BarChart2, Save, Check, Loader2, BookOpen, ChevronRight, SlidersHorizontal } from 'lucide-vue-next'
 
 // ── Emits ─────────────────────────────────────────────────────────────────────
 const emit = defineEmits(['go-to'])
@@ -498,6 +498,7 @@ onMounted(() => {
   flex-wrap: wrap;
   flex-shrink: 0;
 }
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 .panel-title {
   font-size: 0.95rem;
   font-weight: 800;

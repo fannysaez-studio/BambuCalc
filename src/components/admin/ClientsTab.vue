@@ -1,7 +1,7 @@
 <template>
   <div class="panel-card">
     <div class="panel-header">
-      <h2 class="panel-title">Clients</h2>
+      <h2 class="panel-title"><Users2 class="ptitle-icon" /> Clients</h2>
       <div class="user-filters">
         <button v-for="f in userFilters" :key="f.id"
           :class="['uf-btn', userFilter === f.id && 'uf-btn--active']"
@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Users, Trash2 } from 'lucide-vue-next'
+import { Users, Users2, Trash2 } from 'lucide-vue-next'
 
 const props = defineProps({
   quotes:        { type: Array,   default: () => [] },
@@ -139,7 +139,8 @@ function fmtDate(iso) {
   border-bottom: 1px solid #f0f4f8;
   flex-shrink: 0; flex-wrap: wrap;
 }
-.panel-title { font-size: 0.95rem; font-weight: 800; color: #1b2f39; margin: 0; }
+.panel-title { font-size: 0.95rem; font-weight: 800; color: #1b2f39; margin: 0; display: flex; align-items: center; gap: 0.4rem; }
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 
 .user-filters { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-left: auto; }
 .uf-btn {

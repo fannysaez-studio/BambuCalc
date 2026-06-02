@@ -1,7 +1,7 @@
 <template>
   <div class="panel-card">
     <div class="panel-header">
-      <h2 class="panel-title">Rendez-vous</h2>
+      <h2 class="panel-title"><CalendarDays class="ptitle-icon" /> Rendez-vous</h2>
       <div class="rdv-filters">
         <button
           v-for="f in filters"
@@ -177,7 +177,7 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick, reactive } from 'vue'
-import { CalendarOff, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
+import { CalendarOff, CalendarDays, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { deriveFormat, ledPresence, getObjectRdv, fmtDate, fmtTime, duration } from '@/utils/rdvUtils'
 
@@ -352,6 +352,7 @@ onMounted(load)
 <style scoped>
 /* styles déplacés vers le bloc global ci-dessous */
 
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 .rdv-filters { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
 
 /* ── Sélection groupée ── */

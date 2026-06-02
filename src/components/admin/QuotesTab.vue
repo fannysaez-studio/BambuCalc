@@ -2,7 +2,7 @@
   <div class="panel-card">
     <div class="panel-header">
       <h2 class="panel-title">
-        Tous les devis
+        <FileText class="ptitle-icon" /> Tous les devis
         <span v-if="filterUserId" class="filter-active-badge">
           {{ clientLabelFor(filterUserId) }}
           <button class="clear-filter" @click="filterUserId = ''" title="Effacer le filtre">×</button>
@@ -337,6 +337,7 @@ function fmtDate(iso) {
   flex-shrink: 0; flex-wrap: wrap;
 }
 .panel-title { font-size: 0.95rem; font-weight: 800; color: #1b2f39; margin: 0; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.ptitle-icon { width: 0.78rem; height: 0.78rem; color: #667eea; flex-shrink: 0; }
 .panel-actions { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; flex-wrap: wrap; }
 
 .filter-active-badge {
