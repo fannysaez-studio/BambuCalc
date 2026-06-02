@@ -80,6 +80,7 @@
             <div class="bs-sheet" @click.stop>
               <div class="bs-handle" />
 
+              <div class="bs-group-label bs-group-label--grey">Clients</div>
               <div class="bs-item"
                 :class="activeTab === 'clients' && 'bs-item--active'"
                 @click="activeTab = 'clients'; burgerOpen = false"
@@ -88,6 +89,7 @@
                 <span class="bs-item-count">{{ clientCount }}</span>
               </div>
 
+              <div class="bs-sep" />
               <div class="bs-group-label">Gestion des devis</div>
               <div class="bs-item"
                 :class="activeTab === 'quotes' && 'bs-item--active'"
