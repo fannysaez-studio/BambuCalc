@@ -117,6 +117,8 @@
       <span>Connexion</span>
     </router-link>
 
+    <CalendarPanel v-if="isAuth" :tab="true" />
+
     <button
       v-if="isAuth"
       class="nav-bar-item nav-bar-item--logout"
