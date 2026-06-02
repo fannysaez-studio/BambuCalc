@@ -73,79 +73,81 @@
           :class="['burger-trigger-chevron', burgerOpen && 'burger-trigger-chevron--open']"
         />
       </button>
-      <Transition name="dropdown">
-        <div v-if="burgerOpen" class="burger-menu">
-          <button
-            class="burger-item"
-            :class="activeTab === 'clients' && 'burger-item--active'"
-            @click="activeTab = 'clients'; burgerOpen = false"
-          >
-            <Users class="burger-item-icon" />Gestion des clients
-            <span class="burger-item-count">{{ clientCount }}</span>
-          </button>
-          <div class="burger-group-label">Gestion des devis</div>
-          <button
-            class="burger-item"
-            :class="activeTab === 'quotes' && 'burger-item--active'"
-            @click="activeTab = 'quotes'; burgerOpen = false"
-          >
-            <FileText class="burger-item-icon" />Tous les devis
-            <span class="burger-item-count">{{ quotes.length }}</span>
-          </button>
-          <button
-            class="burger-item"
-            :class="activeTab === 'manage' && 'burger-item--active'"
-            @click="activeTab = 'manage'; burgerOpen = false"
-          >
-            <Send class="burger-item-icon" />Devis sauvegardés
-            <span class="burger-item-count">{{ manageCount }}</span>
-          </button>
-          <button
-            class="burger-item"
-            :class="activeTab === 'archives' && 'burger-item--active'"
-            @click="activeTab = 'archives'; burgerOpen = false"
-          >
-            <Archive class="burger-item-icon" />Archive Devis
-            <span class="burger-item-count">{{ archiveCount }}</span>
-          </button>
-          <div class="burger-sep" />
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            class="burger-item"
-            :class="activeTab === tab.id && 'burger-item--active'"
-            @click="activeTab = tab.id; burgerOpen = false; devisDropdownOpen = false"
-          >
-            <component :is="tab.icon" class="burger-item-icon" />
-            {{ tab.label }}
-            <span v-if="tab.count !== undefined" class="burger-item-count">{{ tab.count }}</span>
-          </button>
-          <div class="burger-sep" />
-          <div class="burger-group-label">Boîte à outils</div>
-          <button
-            class="burger-item"
-            :class="activeTab === 'catalogue' && 'burger-item--active'"
-            @click="activeTab = 'catalogue'; burgerOpen = false"
-          >
-            <Package class="burger-item-icon" />Catalogue
-            <span class="burger-item-count">{{ catalogueCount }}</span>
-          </button>
-          <button
-            class="burger-item"
-            :class="activeTab === 'stats' && 'burger-item--active'"
-            @click="activeTab = 'stats'; burgerOpen = false"
-          >
-            <BarChart2 class="burger-item-icon" />Statistiques
-          </button>
-          <button
-            class="burger-item"
-            :class="activeTab === 'settings' && 'burger-item--active'"
-            @click="activeTab = 'settings'; burgerOpen = false"
-          >
-            <SlidersHorizontal class="burger-item-icon" />Paramètres
-          </button>
-        </div>
-      </Transition>
+      <!-- Bottom sheet (Teleport → body pour position: fixed sans clip) -->
+      <Teleport to="body">
+        <Transition name="bs">
+          <div v-if="burgerOpen" class="bs-overlay" @click="burgerOpen = false">
+            <div class="bs-sheet" @click.stop>
+              <div class="bs-handle" />
+
+              <div class="bs-item"
+                :class="activeTab === 'clients' && 'bs-item--active'"
+                @click="activeTab = 'clients'; burgerOpen = false"
+              >
+                <Users class="bs-item-icon" />Gestion des clients
+                <span class="bs-item-count">{{ clientCount }}</span>
+              </div>
+
+              <div class="bs-group-label">Gestion des devis</div>
+              <div class="bs-item"
+                :class="activeTab === 'quotes' && 'bs-item--active'"
+                @click="activeTab = 'quotes'; burgerOpen = false"
+              >
+                <FileText class="bs-item-icon" />Tous les devis
+                <span class="bs-item-count">{{ quotes.length }}</span>
+              </div>
+              <div class="bs-item"
+                :class="activeTab === 'manage' && 'bs-item--active'"
+                @click="activeTab = 'manage'; burgerOpen = false"
+              >
+                <Send class="bs-item-icon" />Devis sauvegardés
+                <span class="bs-item-count">{{ manageCount }}</span>
+              </div>
+              <div class="bs-item"
+                :class="activeTab === 'archives' && 'bs-item--active'"
+                @click="activeTab = 'archives'; burgerOpen = false"
+              >
+                <Archive class="bs-item-icon" />Archive Devis
+                <span class="bs-item-count">{{ archiveCount }}</span>
+              </div>
+
+              <div class="bs-sep" />
+              <div class="bs-item"
+                v-for="tab in tabs"
+                :key="tab.id"
+                :class="activeTab === tab.id && 'bs-item--active'"
+                @click="activeTab = tab.id; burgerOpen = false"
+              >
+                <component :is="tab.icon" class="bs-item-icon" />
+                {{ tab.label }}
+                <span v-if="tab.count !== undefined" class="bs-item-count">{{ tab.count }}</span>
+              </div>
+
+              <div class="bs-sep" />
+              <div class="bs-group-label">Boîte à outils</div>
+              <div class="bs-item"
+                :class="activeTab === 'catalogue' && 'bs-item--active'"
+                @click="activeTab = 'catalogue'; burgerOpen = false"
+              >
+                <Package class="bs-item-icon" />Catalogue
+                <span class="bs-item-count">{{ catalogueCount }}</span>
+              </div>
+              <div class="bs-item"
+                :class="activeTab === 'stats' && 'bs-item--active'"
+                @click="activeTab = 'stats'; burgerOpen = false"
+              >
+                <BarChart2 class="bs-item-icon" />Statistiques
+              </div>
+              <div class="bs-item"
+                :class="activeTab === 'settings' && 'bs-item--active'"
+                @click="activeTab = 'settings'; burgerOpen = false"
+              >
+                <SlidersHorizontal class="bs-item-icon" />Paramètres
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
     </div>
 
     <!-- Onglets -->
