@@ -4,9 +4,9 @@
     <nav v-if="showNav" class="nav-island">
 
       <router-link
-        to="/calculator/1"
+        to="/"
         class="nav-item"
-        :class="{ 'nav-item--on': isActive(['/calculator']) }"
+        :class="{ 'nav-item--on': route.path === '/' }"
         data-tip="Accueil"
       >
         <Home :size="18" />
@@ -71,9 +71,9 @@
   <nav v-if="showNav" class="nav-bar">
 
     <router-link
-      to="/calculator/1"
+      to="/"
       class="nav-bar-item"
-      :class="{ 'nav-bar-item--on': isActive(['/calculator']) }"
+      :class="{ 'nav-bar-item--on': route.path === '/' }"
     >
       <Home :size="21" />
       <span>Accueil</span>
@@ -105,7 +105,7 @@
       :class="{ 'nav-bar-item--on': isActive(['/dashboard', '/profile']) }"
     >
       <User :size="21" />
-      <span>Profil</span>
+      <span>Dashboard</span>
     </router-link>
 
     <router-link
@@ -116,8 +116,6 @@
       <LogIn :size="21" />
       <span>Connexion</span>
     </router-link>
-
-    <CalendarPanel v-if="isAuth" :tab="true" />
 
     <button
       v-if="isAuth"

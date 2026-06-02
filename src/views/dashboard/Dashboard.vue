@@ -62,7 +62,8 @@
         @click="activeTab = 'quotes'"
       >
         <FileText class="ctab-icon" />
-        Mes devis
+        <span class="ctab-label-long">Mes devis</span>
+        <span class="ctab-label-short">Devis</span>
         <span v-if="quotes.length > 0" class="ctab-count">{{ quotes.length }}</span>
       </button>
       <button
@@ -70,7 +71,8 @@
         @click="activeTab = 'rdv'"
       >
         <Calendar class="ctab-icon" />
-        Mes rendez-vous
+        <span class="ctab-label-long">Mes rendez-vous</span>
+        <span class="ctab-label-short">RDV</span>
         <span
           v-if="rdvTabs.find(t => t.id === 'upcoming')?.count > 0"
           class="ctab-count"
@@ -81,7 +83,8 @@
         @click="activeTab = 'profile'"
       >
         <User class="ctab-icon" />
-        Mon profil
+        <span class="ctab-label-long">Mon profil</span>
+        <span class="ctab-label-short">Profil</span>
       </button>
     </div>
 
@@ -794,11 +797,14 @@ async function linkAccount() {
 <style scoped>
 .dash-page {
   background: #f0f4f8;
-  padding: 1.5rem 1.5rem 3rem;
+  padding: 1.75rem 1.75rem 3.5rem;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 /* ── Bannière invité ── */
@@ -919,7 +925,6 @@ async function linkAccount() {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-bottom: 1.25rem;
 }
 .ctab-btn {
   display: inline-flex;
@@ -944,6 +949,8 @@ async function linkAccount() {
   box-shadow: 0 3px 10px rgba(46,156,171,0.25);
 }
 .ctab-icon { width: 0.85rem; height: 0.85rem; flex-shrink: 0; }
+.ctab-label-short { display: none; }
+.ctab-label-long  { display: inline; }
 .ctab-count {
   background: rgba(255,255,255,0.25);
   border-radius: 999px;
@@ -963,7 +970,6 @@ async function linkAccount() {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -1044,7 +1050,6 @@ async function linkAccount() {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
 }
 
 .stat-card {
@@ -1470,7 +1475,6 @@ async function linkAccount() {
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
   overflow: hidden;
-  margin-top: 1rem;
 }
 
 .rdv-section-header {
@@ -1649,16 +1653,15 @@ async function linkAccount() {
 /* Mobile (≤ 640px) : cartes à la place du tableau */
 @media (max-width: 640px) {
   .dash-page {
-    padding: 1.5rem 1rem 5rem;
+    padding: 1.25rem 1rem 5rem;
     min-height: 100dvh;
+    gap: 1rem;
   }
   .stats-row {
     grid-template-columns: repeat(2, 1fr);
     gap: 0.65rem;
-    margin-bottom: 1.25rem;
   }
   .stat-card { padding: 0.9rem 0.85rem; gap: 0.6rem; }
-  .dash-hero { margin-bottom: 1.25rem; }
   .dash-greeting { font-size: 1.05rem; }
   /* Hero reste sur une ligne */
   .dash-hero {
@@ -1666,7 +1669,6 @@ async function linkAccount() {
     align-items: center;
     flex-wrap: nowrap;
     gap: 0.5rem;
-    margin-bottom: 1.25rem;
   }
   .dash-hero-left { flex: 1; min-width: 0; }
   .dash-hero-actions { width: auto; flex-shrink: 0; gap: 0.4rem; }
@@ -1686,7 +1688,9 @@ async function linkAccount() {
     margin-bottom: 1rem;
   }
   .client-tabs::-webkit-scrollbar { display: none; }
-  .ctab-btn { white-space: nowrap; flex-shrink: 0; font-size: 0.75rem; padding: 0.38rem 0.85rem; }
+  .ctab-btn { white-space: nowrap; flex-shrink: 0; font-size: 0.72rem; padding: 0.35rem 0.75rem; }
+  .ctab-label-long  { display: none; }
+  .ctab-label-short { display: inline; }
   .anon-banner { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
   .btn-link-toggle { width: 100%; }
 
