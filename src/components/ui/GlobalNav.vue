@@ -334,6 +334,43 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 
 .nav-bar-item--logout:hover { color: #dc2626; }
 
+/* ── CalendarPanel dans la nav bar mobile : alignement flex identique aux autres items ── */
+.nav-bar :deep(.cal-wrap) {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+.nav-bar :deep(.cal-btn--tab) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #94a3b8;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: color 0.18s ease;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-bar :deep(.cal-btn--tab):hover { color: #2e9cab; }
+.nav-bar :deep(.cal-badge--dot) {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 14px);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2e9cab;
+}
+
 /* ── Bell & Calendar dans la pill ── */
 .nav-bell :deep(.notif-btn--compact),
 .nav-cal  :deep(.cal-btn) {
