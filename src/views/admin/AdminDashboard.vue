@@ -320,7 +320,9 @@
     <RdvTab
       v-if="activeTab === 'rdv'"
       :profiles="profiles"
+      :quotes="quotes"
       @go-to-client="quotesFilterUserId = $event; activeTab = 'clients'"
+      @go-to-quotes="onGoToQuotes($event)"
       @count-change="rdvCount = $event"
     />
 

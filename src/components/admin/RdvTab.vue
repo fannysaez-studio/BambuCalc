@@ -55,6 +55,7 @@
             <th>Date &amp; Heure</th>
             <th>Client</th>
             <th>Email</th>
+            <th>Devis</th>
             <th>Objet</th>
             <th>Format</th>
             <th>Présence</th>
@@ -89,6 +90,19 @@
                 {{ a.invitee_email }}
               </a>
               <span v-else class="text-muted-sm">{{ a.invitee_email || '—' }}</span>
+            </td>
+
+            <td class="td-devis">
+              <div v-if="quotesByEmail[a.invitee_email]?.length" class="devis-list">
+                <button
+                  v-for="q in quotesByEmail[a.invitee_email]"
+                  :key="q.id"
+                  :class="['arch-status', `arch-status--${q.status || 'pending'}`]"
+                  :style="clientByEmail[a.invitee_email] ? '' : 'cursor:default;pointer-events:none'"
+                  @click="clientByEmail[a.invitee_email] && $emit('go-to-quotes', clientByEmail[a.invitee_email])"
+                >#{{ q.quote_number }}</button>
+              </div>
+              <span v-else class="devis-none">—</span>
             </td>
 
             <td class="td-object">
@@ -167,8 +181,11 @@ import { CalendarOff, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { deriveFormat, ledPresence, getObjectRdv, fmtDate, fmtTime, duration } from '@/utils/rdvUtils'
 
-const props = defineProps({ profiles: { type: Array, default: () => [] } })
-const emit = defineEmits(['go-to-client', 'count-change'])
+const props = defineProps({
+  profiles: { type: Array, default: () => [] },
+  quotes:   { type: Array, default: () => [] },
+})
+const emit = defineEmits(['go-to-client', 'go-to-quotes', 'count-change'])
 
 const appointments = ref([])
 const loading = ref(false)
@@ -216,6 +233,19 @@ function cancelDialog()  { dialogVisible.value = false; dialogResolve?.(false) }
 const clientByEmail = computed(() => {
   const map = {}
   props.profiles.forEach(p => { if (p.email) map[p.email] = p.id })
+  return map
+})
+
+const quotesByEmail = computed(() => {
+  const map = {}
+  props.quotes
+    .filter(q => !q.archived)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .forEach(q => {
+      if (!q.client_email) return
+      if (!map[q.client_email]) map[q.client_email] = []
+      map[q.client_email].push(q)
+    })
   return map
 })
 
@@ -357,6 +387,9 @@ onMounted(load)
 .td-duration { display: block; font-size: 0.7rem; color: #a0aec0; margin-top: 1px; }
 .td-email    { font-size: 0.72rem; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .td-object   { font-size: 0.75rem; color: #4a5568; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.td-devis   { min-width: 90px; }
+.devis-list { display: flex; flex-direction: column; gap: 3px; }
+.devis-none { color: #a0aec0; font-size: 0.72rem; }
 .td-format, .td-presence { white-space: nowrap; }
 
 .td-client-link { color: #2e9cab; text-decoration: none; }
