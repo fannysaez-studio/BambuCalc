@@ -78,7 +78,7 @@ body {
 
 /* ── Bottom sheet mobile : hauteur minimale + items plus aérés ── */
 .mob-bs-sheet {
-  min-height: 42vh;
+  min-height: 30vh;
 }
 .mob-bs-sheet .cal-item,
 .mob-bs-sheet .notif-item {

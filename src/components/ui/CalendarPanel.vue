@@ -44,7 +44,10 @@
               </div>
             </div>
             <div class="cal-bs-footer">
-              <a href="/rdv" class="cal-bs-cta" @click="open = false">+ Prendre un rendez-vous</a>
+              <a href="/rdv" class="cal-bs-cta-pill" @click="open = false">
+                <CalendarPlus :size="14" />
+                Nouveau RDV
+              </a>
             </div>
           </div>
         </div>
@@ -87,7 +90,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 
 const isMobile = ref(typeof window !== 'undefined' && window.innerWidth <= 640)
 function onResize() { isMobile.value = window.innerWidth <= 640 }
-import { CalendarDays, CalendarOff } from 'lucide-vue-next'
+import { CalendarDays, CalendarOff, CalendarPlus } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 defineProps({
@@ -307,23 +310,26 @@ onUnmounted(() => {
   .cal-panel { left: 8px; right: 8px; width: auto; bottom: 72px; }
 }
 .cal-bs-footer {
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 1rem;
   border-top: 1px solid #f0f4f8;
   flex-shrink: 0;
+  display: flex;
+  justify-content: center;
 }
-.cal-bs-cta {
-  display: block;
-  text-align: center;
-  padding: 0.7rem;
-  border-radius: 12px;
-  background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
-  color: #fff;
-  font-size: 0.88rem;
+.cal-bs-cta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid #2e9cab;
+  color: #2e9cab;
+  background: transparent;
+  font-size: 0.82rem;
   font-weight: 700;
   text-decoration: none;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
-  box-shadow: 0 4px 12px rgba(46,156,171,0.28);
-  transition: filter 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
-.cal-bs-cta:hover { filter: brightness(1.07); }
+.cal-bs-cta-pill:hover { background: #e8f7f9; }
 </style>
