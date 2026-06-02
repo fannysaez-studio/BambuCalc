@@ -80,7 +80,7 @@
             <div class="bs-sheet" @click.stop>
               <div class="bs-handle" />
 
-              <div class="bs-group-label bs-group-label--grey">Clients</div>
+              <div class="bs-group-label bs-group-label">Clients</div>
               <div class="bs-item"
                 :class="activeTab === 'clients' && 'bs-item--active'"
                 @click="activeTab = 'clients'; burgerOpen = false"
@@ -114,7 +114,7 @@
               </div>
 
               <div class="bs-sep" />
-              <div class="bs-group-label bs-group-label--grey">Emails & Communication</div>
+              <div class="bs-group-label bs-group-label">Emails & Communication</div>
               <div class="bs-item"
                 v-for="tab in tabs"
                 :key="tab.id"
