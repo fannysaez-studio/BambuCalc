@@ -52,14 +52,14 @@
             <th class="th-check">
               <input type="checkbox" class="rdv-checkbox" :checked="allSelected" @change="toggleAll" />
             </th>
-            <th>Date &amp; Heure</th>
+            <th class="th-nowrap">Date &amp; Heure</th>
             <th>Client</th>
             <th>Email</th>
             <th>Devis</th>
             <th>Objet</th>
             <th>Format</th>
             <th>Présence</th>
-            <th>Note admin</th>
+            <th>Note</th>
             <th></th>
           </tr>
         </thead>
@@ -379,6 +379,7 @@ onMounted(load)
 @keyframes bulkOut { from { opacity:1; } to { opacity:0; transform:scale(0.85); } }
 
 /* ── Cellules ── */
+.th-nowrap   { white-space: nowrap; }
 .td-datetime { white-space: nowrap; }
 .td-date { display: block; font-size: 0.78rem; font-weight: 600; color: #1b2f39; }
 .td-time { display: block; font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
