@@ -48,9 +48,6 @@
         <div class="hero-bell-mobile">
           <NotificationBell :topPanel="true" />
         </div>
-        <router-link to="/profile" class="btn-profile" title="Mon profil">
-          <User class="btn-profile-icon" />
-        </router-link>
         <router-link to="/calculator/1" class="btn-new" title="Nouveau devis">
           <Plus class="btn-new-icon" />
           <span class="btn-new-text">Nouveau devis</span>
@@ -58,8 +55,38 @@
       </div>
     </div>
 
+    <!-- Tab bar -->
+    <div v-if="!isAnonymous" class="client-tabs">
+      <button
+        :class="['ctab-btn', activeTab === 'quotes' && 'ctab-btn--active']"
+        @click="activeTab = 'quotes'"
+      >
+        <FileText class="ctab-icon" />
+        Mes devis
+        <span v-if="quotes.length > 0" class="ctab-count">{{ quotes.length }}</span>
+      </button>
+      <button
+        :class="['ctab-btn', activeTab === 'rdv' && 'ctab-btn--active']"
+        @click="activeTab = 'rdv'"
+      >
+        <Calendar class="ctab-icon" />
+        Mes rendez-vous
+        <span
+          v-if="rdvTabs.find(t => t.id === 'upcoming')?.count > 0"
+          class="ctab-count"
+        >{{ rdvTabs.find(t => t.id === 'upcoming')?.count }}</span>
+      </button>
+      <button
+        :class="['ctab-btn', activeTab === 'profile' && 'ctab-btn--active']"
+        @click="activeTab = 'profile'"
+      >
+        <User class="ctab-icon" />
+        Mon profil
+      </button>
+    </div>
+
     <!-- Stats -->
-    <div class="stats-row">
+    <div v-show="activeTab === 'quotes'" class="stats-row">
       <div class="stat-card">
         <FileText class="stat-icon" />
         <div>
@@ -91,9 +118,9 @@
     </div>
 
     <!-- Liste des devis -->
-    <div class="quotes-card">
+    <div v-show="activeTab === 'quotes'" class="quotes-card">
       <div class="quotes-header">
-        <h2 class="quotes-title">Mes devis</h2>
+        <h2 class="quotes-title"><FileText class="qh-icon" /> Mes devis</h2>
         <span class="quotes-count">{{ quotes.length }} devis</span>
       </div>
 
@@ -213,7 +240,7 @@
     </div>
 
     <!-- ── Section Mes rendez-vous ── -->
-    <div v-if="!isAnonymous" class="rdv-section-card">
+    <div v-if="!isAnonymous && activeTab === 'rdv'" class="rdv-section-card">
       <div class="rdv-section-header">
         <div class="rdv-section-title-wrap">
           <Calendar class="rdv-section-icon" />
@@ -312,7 +339,7 @@
     </div>
 
     <!-- ── Section Archives ── -->
-    <div v-if="archivedCount > 0" class="archives-block">
+    <div v-if="archivedCount > 0 && activeTab === 'quotes'" class="archives-block">
       <button class="btn-archives-toggle" @click="toggleArchives">
         <Archive :size="14" />
         <span>{{ showArchives ? 'Masquer les archives' : `Archives — ${archivedCount} devis` }}</span>
@@ -431,7 +458,8 @@ import { deriveFormat, getObjectRdv, fmtTime, duration } from '@/utils/rdvUtils'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import NotificationBell from '@/components/ui/NotificationBell.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
-import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar } from 'lucide-vue-next'
+import PasswordField from '@/components/ui/PasswordField.vue'
+import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save } from 'lucide-vue-next'
 
 // ── State ──
 const displayName = ref('')
@@ -441,6 +469,7 @@ const quotes = ref([])
 const appointments = ref([])
 const loadingRdv = ref(false)
 const rdvFilter = ref('upcoming')
+const activeTab = ref('quotes')
 const loading = ref(true)
 const archiveTarget = ref(null)
 const archiving = ref(false)
@@ -777,6 +806,49 @@ async function linkAccount() {
 .btn-link-submit:hover:not(:disabled) { filter: brightness(1.07); }
 .btn-link-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* ── Tab bar client ── */
+.client-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.ctab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 999px;
+  background: #fff;
+  color: #718096;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+.ctab-btn:hover { border-color: #2e9cab; color: #2e9cab; }
+.ctab-btn--active {
+  border-color: #2e9cab;
+  background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(46,156,171,0.25);
+}
+.ctab-icon { width: 0.85rem; height: 0.85rem; flex-shrink: 0; }
+.ctab-count {
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.05rem 0.38rem;
+  line-height: 1.5;
+}
+.ctab-btn:not(.ctab-btn--active) .ctab-count {
+  background: #e8f7f9;
+  color: #2e9cab;
+}
+
 /* ── Hero ── */
 .dash-hero {
   display: flex;
@@ -927,7 +999,11 @@ async function linkAccount() {
   font-weight: 800;
   color: #1b2f39;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
+.qh-icon { width: 0.85rem; height: 0.85rem; color: #2e9cab; flex-shrink: 0; }
 
 .quotes-count {
   font-size: 0.72rem;
@@ -1423,6 +1499,15 @@ async function linkAccount() {
     justify-content: center;
   }
   .btn-new-icon { width: 1.05rem; height: 1.05rem; }
+  .client-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    padding-bottom: 0.2rem;
+    margin-bottom: 1rem;
+  }
+  .client-tabs::-webkit-scrollbar { display: none; }
+  .ctab-btn { white-space: nowrap; flex-shrink: 0; font-size: 0.75rem; padding: 0.38rem 0.85rem; }
   .anon-banner { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
   .btn-link-toggle { width: 100%; }
 
