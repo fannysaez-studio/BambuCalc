@@ -48,7 +48,7 @@
         <div class="hero-bell-mobile">
           <NotificationBell :topPanel="true" />
         </div>
-        <CalendarPanel v-if="!isAnonymous" class="hero-rdv-btn" />
+        <CalendarPanel v-if="!isAnonymous && !isAdminUser" class="hero-rdv-btn" />
         <router-link to="/calculator/1" class="btn-new" title="Nouveau devis">
           <Plus class="btn-new-icon" />
           <span class="btn-new-text">Nouveau devis</span>
@@ -568,6 +568,7 @@ const appointments = ref([])
 const loadingRdv = ref(false)
 const rdvFilter = ref('upcoming')
 const activeTab = ref('quotes')
+const isAdminUser = ref(false)
 
 // ── Profil inline ──
 const firstName   = ref('')
@@ -719,6 +720,8 @@ onUnmounted(() => {
   if (user) {
     isAnonymous.value = user.is_anonymous ?? false
     userEmail.value = user.email || ''
+    const { data: adminRow } = await supabase.from('admins').select('user_id').eq('user_id', user.id).maybeSingle()
+    isAdminUser.value = !!adminRow
     if (isAnonymous.value) {
       displayName.value = 'Invité'
     } else {
