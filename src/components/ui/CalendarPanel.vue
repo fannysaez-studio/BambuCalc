@@ -12,52 +12,76 @@
       <span v-if="tab" class="cal-tab-label">RDV</span>
     </button>
 
-    <!-- Panel -->
     <Teleport to="body">
-    <Transition name="cal-drop">
-      <div v-if="open" class="cal-panel">
-        <div class="cal-panel-header">
-          <span class="cal-panel-title">Prochains rendez-vous</span>
-          <button v-if="newCount > 0" class="cal-action" @click="markSeen">✓ Tout vu</button>
-        </div>
-
-        <div v-if="loading" class="cal-empty">
-          <div class="cal-spinner" />
-        </div>
-
-        <div v-else-if="appointments.length === 0" class="cal-empty">
-          <CalendarOff :size="22" class="cal-empty-icon" />
-          <p>Aucun RDV à venir</p>
-        </div>
-
-        <div v-else class="cal-list">
-          <div
-            v-for="a in appointments"
-            :key="a.id"
-            class="cal-item"
-            :class="{ 'cal-item--new': isNew(a) }"
-          >
-            <div class="cal-item-icon">
-              <CalendarDays :size="14" />
-              <span v-if="isNew(a)" class="cal-item-dot" />
+      <!-- Mobile : bottom sheet -->
+      <Transition name="mob-bs">
+        <div v-if="open && isMobile" class="mob-bs-overlay" @click.self="open = false">
+          <div class="mob-bs-sheet">
+            <div class="mob-bs-handle" />
+            <div class="mob-bs-header">
+              <span class="mob-bs-title">Prochains rendez-vous</span>
+              <button v-if="newCount > 0" class="mob-bs-action" @click="markSeen">✓ Tout vu</button>
             </div>
-            <div class="cal-item-body">
-              <p class="cal-item-title">{{ a.event_name || 'Rendez-vous' }}</p>
-              <p v-if="a.start_at" class="cal-item-date">{{ fmtDate(a.start_at) }}</p>
-              <p v-if="a.invitee_name" class="cal-item-who">{{ a.invitee_name }}</p>
-              <p v-if="a.invitee_email" class="cal-item-email">{{ a.invitee_email }}</p>
+            <div v-if="loading" class="cal-empty"><div class="cal-spinner" /></div>
+            <div v-else-if="appointments.length === 0" class="cal-empty">
+              <CalendarOff :size="22" class="cal-empty-icon" /><p>Aucun RDV à venir</p>
             </div>
-            <span v-if="a.status === 'canceled'" class="cal-item-canceled">Annulé</span>
+            <div v-else class="cal-list">
+              <div v-for="a in appointments" :key="a.id" class="cal-item" :class="{ 'cal-item--new': isNew(a) }">
+                <div class="cal-item-icon">
+                  <CalendarDays :size="14" />
+                  <span v-if="isNew(a)" class="cal-item-dot" />
+                </div>
+                <div class="cal-item-body">
+                  <p class="cal-item-title">{{ a.event_name || 'Rendez-vous' }}</p>
+                  <p v-if="a.start_at" class="cal-item-date">{{ fmtDate(a.start_at) }}</p>
+                  <p v-if="a.invitee_name" class="cal-item-who">{{ a.invitee_name }}</p>
+                  <p v-if="a.invitee_email" class="cal-item-email">{{ a.invitee_email }}</p>
+                </div>
+                <span v-if="a.status === 'canceled'" class="cal-item-canceled">Annulé</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+
+      <!-- Desktop : panel flottant -->
+      <Transition name="cal-drop">
+        <div v-if="open && !isMobile" class="cal-panel">
+          <div class="cal-panel-header">
+            <span class="cal-panel-title">Prochains rendez-vous</span>
+            <button v-if="newCount > 0" class="cal-action" @click="markSeen">✓ Tout vu</button>
+          </div>
+          <div v-if="loading" class="cal-empty"><div class="cal-spinner" /></div>
+          <div v-else-if="appointments.length === 0" class="cal-empty">
+            <CalendarOff :size="22" class="cal-empty-icon" /><p>Aucun RDV à venir</p>
+          </div>
+          <div v-else class="cal-list">
+            <div v-for="a in appointments" :key="a.id" class="cal-item" :class="{ 'cal-item--new': isNew(a) }">
+              <div class="cal-item-icon">
+                <CalendarDays :size="14" />
+                <span v-if="isNew(a)" class="cal-item-dot" />
+              </div>
+              <div class="cal-item-body">
+                <p class="cal-item-title">{{ a.event_name || 'Rendez-vous' }}</p>
+                <p v-if="a.start_at" class="cal-item-date">{{ fmtDate(a.start_at) }}</p>
+                <p v-if="a.invitee_name" class="cal-item-who">{{ a.invitee_name }}</p>
+                <p v-if="a.invitee_email" class="cal-item-email">{{ a.invitee_email }}</p>
+              </div>
+              <span v-if="a.status === 'canceled'" class="cal-item-canceled">Annulé</span>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+
+const isMobile = ref(typeof window !== 'undefined' && window.innerWidth <= 640)
+function onResize() { isMobile.value = window.innerWidth <= 640 }
 import { CalendarDays, CalendarOff } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
@@ -118,6 +142,7 @@ let realtimeChannel = null
 onMounted(async () => {
   await load()
   document.addEventListener('click', handleOutside)
+  window.addEventListener('resize', onResize)
   realtimeChannel = supabase
     .channel('admin-appointments-bus')
     .on('broadcast', { event: 'appointments-changed' }, () => load())
@@ -125,6 +150,7 @@ onMounted(async () => {
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleOutside)
+  window.removeEventListener('resize', onResize)
   if (realtimeChannel) supabase.removeChannel(realtimeChannel)
 })
 </script>

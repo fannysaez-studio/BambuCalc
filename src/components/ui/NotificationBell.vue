@@ -12,64 +12,82 @@
       <span v-if="tab" class="notif-tab-label">Alertes</span>
     </button>
 
-    <!-- Panel dropdown -->
     <Teleport to="body">
-    <Transition name="notif-drop">
-      <div v-if="open" class="notif-panel" :class="{ 'notif-panel--top': topPanel }">
-        <div class="notif-panel-header">
-          <span class="notif-panel-title">Notifications</span>
-          <div class="notif-panel-actions">
-            <button
-              v-if="notifications.some(n => !n.read)"
-              class="notif-action"
-              @click="markAllRead"
-            >✓ Tout lire</button>
-            <button
-              v-if="notifications.length > 0"
-              class="notif-action notif-action--danger"
-              @click="removeAll"
-            >Tout supprimer</button>
+      <!-- Mobile : bottom sheet -->
+      <Transition name="mob-bs">
+        <div v-if="open && isMobile" class="mob-bs-overlay" @click.self="open = false">
+          <div class="mob-bs-sheet">
+            <div class="mob-bs-handle" />
+            <div class="mob-bs-header">
+              <span class="mob-bs-title">Notifications</span>
+              <div class="mob-bs-actions">
+                <button v-if="notifications.some(n => !n.read)" class="mob-bs-action" @click="markAllRead">✓ Tout lire</button>
+                <button v-if="notifications.length > 0" class="mob-bs-action mob-bs-action--danger" @click="removeAll">Tout supprimer</button>
+              </div>
+            </div>
+            <div v-if="loading" class="notif-empty"><div class="notif-spinner" /></div>
+            <div v-else-if="notifications.length === 0" class="notif-empty">
+              <BellOff :size="22" class="notif-empty-icon" /><p>Aucune notification</p>
+            </div>
+            <div v-else class="notif-list">
+              <div v-for="n in notifications" :key="n.id" class="notif-item" :class="{ 'notif-item--unread': !n.read }" @click="markRead(n)">
+                <div class="notif-icon-wrap">
+                  <FileText v-if="n.type === 'new_quote'" :size="14" />
+                  <CheckCircle v-else-if="n.type === 'status_changed'" :size="14" />
+                  <Pencil v-else :size="14" />
+                </div>
+                <div class="notif-content">
+                  <p class="notif-title">{{ n.title }}</p>
+                  <p v-if="n.message" class="notif-message">{{ n.message }}</p>
+                  <p class="notif-time">{{ timeAgo(n.created_at) }}</p>
+                </div>
+                <button class="notif-close" @click.stop="remove(n.id)" title="Supprimer">✕</button>
+              </div>
+            </div>
           </div>
         </div>
+      </Transition>
 
-        <div v-if="loading" class="notif-empty">
-          <div class="notif-spinner" />
-        </div>
-
-        <div v-else-if="notifications.length === 0" class="notif-empty">
-          <BellOff :size="22" class="notif-empty-icon" />
-          <p>Aucune notification</p>
-        </div>
-
-        <div v-else class="notif-list">
-          <div
-            v-for="n in notifications"
-            :key="n.id"
-            class="notif-item"
-            :class="{ 'notif-item--unread': !n.read }"
-            @click="markRead(n)"
-          >
-            <div class="notif-icon-wrap">
-              <FileText v-if="n.type === 'new_quote'" :size="14" />
-              <CheckCircle v-else-if="n.type === 'status_changed'" :size="14" />
-              <Pencil v-else :size="14" />
+      <!-- Desktop : panel flottant -->
+      <Transition name="notif-drop">
+        <div v-if="open && !isMobile" class="notif-panel" :class="{ 'notif-panel--top': topPanel }">
+          <div class="notif-panel-header">
+            <span class="notif-panel-title">Notifications</span>
+            <div class="notif-panel-actions">
+              <button v-if="notifications.some(n => !n.read)" class="notif-action" @click="markAllRead">✓ Tout lire</button>
+              <button v-if="notifications.length > 0" class="notif-action notif-action--danger" @click="removeAll">Tout supprimer</button>
             </div>
-            <div class="notif-content">
-              <p class="notif-title">{{ n.title }}</p>
-              <p v-if="n.message" class="notif-message">{{ n.message }}</p>
-              <p class="notif-time">{{ timeAgo(n.created_at) }}</p>
+          </div>
+          <div v-if="loading" class="notif-empty"><div class="notif-spinner" /></div>
+          <div v-else-if="notifications.length === 0" class="notif-empty">
+            <BellOff :size="22" class="notif-empty-icon" /><p>Aucune notification</p>
+          </div>
+          <div v-else class="notif-list">
+            <div v-for="n in notifications" :key="n.id" class="notif-item" :class="{ 'notif-item--unread': !n.read }" @click="markRead(n)">
+              <div class="notif-icon-wrap">
+                <FileText v-if="n.type === 'new_quote'" :size="14" />
+                <CheckCircle v-else-if="n.type === 'status_changed'" :size="14" />
+                <Pencil v-else :size="14" />
+              </div>
+              <div class="notif-content">
+                <p class="notif-title">{{ n.title }}</p>
+                <p v-if="n.message" class="notif-message">{{ n.message }}</p>
+                <p class="notif-time">{{ timeAgo(n.created_at) }}</p>
+              </div>
+              <button class="notif-close" @click.stop="remove(n.id)" title="Supprimer">✕</button>
             </div>
-            <button class="notif-close" @click.stop="remove(n.id)" title="Supprimer">✕</button>
           </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
     </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const isMobile = ref(typeof window !== 'undefined' && window.innerWidth <= 640)
+function onResize() { isMobile.value = window.innerWidth <= 640 }
 import { Bell, BellOff, FileText, CheckCircle, Pencil } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
@@ -171,12 +189,14 @@ onMounted(() => {
   })
   authSubscription = subscription
   document.addEventListener('click', handleClickOutside)
+  window.addEventListener('resize', onResize)
 })
 
 onUnmounted(() => {
   if (realtimeChannel) supabase.removeChannel(realtimeChannel)
   if (authSubscription) authSubscription.unsubscribe()
   document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('resize', onResize)
 })
 </script>
 
