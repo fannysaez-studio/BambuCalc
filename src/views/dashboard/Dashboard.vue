@@ -407,6 +407,61 @@
       </div>
     </div>
 
+    <!-- ── Onglet Mon profil ── -->
+    <div v-if="!isAnonymous && activeTab === 'profile'" class="profile-inline">
+      <div class="pi-infobar">
+        <div class="pi-meta-row">
+          <span class="pi-meta-label">Email</span>
+          <span class="pi-meta-val">{{ userEmail || '—' }}</span>
+        </div>
+        <div class="pi-meta-row">
+          <span class="pi-meta-label">Membre depuis</span>
+          <span class="pi-meta-val">{{ memberSince }}</span>
+        </div>
+      </div>
+
+      <div class="pi-cols">
+        <!-- Identité -->
+        <div class="pi-col">
+          <p class="pi-col-title">Identité</p>
+          <div class="pi-field">
+            <label class="pi-label">Prénom</label>
+            <input class="pi-input" v-model="firstName" placeholder="Jean" />
+          </div>
+          <div class="pi-field">
+            <label class="pi-label">Nom</label>
+            <input class="pi-input" v-model="lastName" placeholder="Dupont" />
+          </div>
+          <div class="pi-field">
+            <label class="pi-label">Téléphone</label>
+            <input class="pi-input" type="tel" v-model="phone" placeholder="+33 6 00 00 00 00" />
+          </div>
+          <div class="pi-field">
+            <label class="pi-label">Entreprise</label>
+            <input class="pi-input" v-model="company" placeholder="Mon Entreprise SAS" />
+          </div>
+          <button class="pi-btn-save" @click="saveProfile" :disabled="saving">
+            <Save class="pi-btn-icon" />
+            {{ saving ? 'Sauvegarde…' : 'Sauvegarder' }}
+          </button>
+        </div>
+
+        <!-- Sécurité -->
+        <div class="pi-col">
+          <p class="pi-col-title"><Shield class="pi-col-icon" /> Sécurité</p>
+          <PasswordField id="dash-new-pwd"     label="Nouveau mot de passe" :show-strength="true" v-model="newPassword" />
+          <PasswordField id="dash-confirm-pwd" label="Confirmer le mot de passe" v-model="confirmPwd" />
+          <p v-if="pwdError" class="pi-error">{{ pwdError }}</p>
+          <button class="pi-btn-outline" @click="savePassword" :disabled="savingPwd">
+            {{ savingPwd ? 'Enregistrement…' : 'Changer le mot de passe' }}
+          </button>
+          <button class="pi-btn-logout" @click="logout">
+            <LogOut class="pi-btn-icon" /> Se déconnecter
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal confirmation archivage -->
     <Teleport to="body">
       <Transition name="modal">
@@ -470,6 +525,18 @@ const appointments = ref([])
 const loadingRdv = ref(false)
 const rdvFilter = ref('upcoming')
 const activeTab = ref('quotes')
+
+// ── Profil inline ──
+const firstName   = ref('')
+const lastName    = ref('')
+const phone       = ref('')
+const company     = ref('')
+const memberSince = ref('')
+const saving      = ref(false)
+const savingPwd   = ref(false)
+const newPassword = ref('')
+const confirmPwd  = ref('')
+const pwdError    = ref(null)
 const loading = ref(true)
 const archiveTarget = ref(null)
 const archiving = ref(false)
@@ -614,7 +681,16 @@ onUnmounted(() => {
     } else {
       const meta = user.user_metadata || {}
       const full = meta.full_name || meta.name || ''
-      displayName.value = full.split(' ')[0] || user.email?.split('@')[0] || ''
+      const parts = full.split(' ')
+      displayName.value = meta.first_name || parts[0] || user.email?.split('@')[0] || ''
+      firstName.value   = meta.first_name || parts[0] || ''
+      lastName.value    = meta.last_name  || parts.slice(1).join(' ') || ''
+      phone.value       = meta.phone   || ''
+      company.value     = meta.company || ''
+      memberSince.value = user.created_at
+        ? new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })
+            .format(new Date(user.created_at))
+        : '—'
     }
   }
   const rdvPromise = (!isAnonymous.value && userEmail.value)
@@ -661,6 +737,38 @@ async function toggleArchives() {
       loadingArchives.value = false
     }
   }
+}
+
+async function saveProfile() {
+  saving.value = true
+  const fn   = firstName.value.trim()
+  const ln   = lastName.value.trim()
+  const full = [fn, ln].filter(Boolean).join(' ')
+  const { error } = await supabase.auth.updateUser({
+    data: { full_name: full, first_name: fn, last_name: ln, phone: phone.value.trim(), company: company.value.trim() },
+  })
+  if (!error) {
+    const { data } = await supabase.auth.getUser()
+    if (data.user) await supabase.from('profiles').update({ full_name: full }).eq('id', data.user.id)
+  }
+  saving.value = false
+  toast.value?.show(error ? 'Erreur lors de la sauvegarde.' : 'Profil mis à jour !', error ? 'error' : 'success')
+}
+
+async function savePassword() {
+  pwdError.value = null
+  if (newPassword.value.length < 8) { pwdError.value = 'Le mot de passe doit contenir au moins 8 caractères.'; return }
+  if (newPassword.value !== confirmPwd.value) { pwdError.value = 'Les mots de passe ne correspondent pas.'; return }
+  savingPwd.value = true
+  const { error } = await supabase.auth.updateUser({ password: newPassword.value })
+  savingPwd.value = false
+  if (error) { pwdError.value = error.message || 'Erreur lors du changement.' }
+  else { newPassword.value = ''; confirmPwd.value = ''; toast.value?.show('Mot de passe modifié !', 'success') }
+}
+
+async function logout() {
+  await supabase.auth.signOut()
+  window.location.href = '/login'
 }
 
 async function linkAccount() {
@@ -1454,6 +1562,77 @@ async function linkAccount() {
 
 .tr--rdv-canceled td { opacity: 0.5; }
 
+/* ── Profil inline ── */
+.profile-inline {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+.pi-infobar { display: flex; background: #f7f9fc; border-bottom: 1px solid #f0f4f8; }
+.pi-meta-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 0.55rem 1.25rem; flex: 1;
+  border-right: 1px solid #f0f4f8;
+}
+.pi-meta-row:last-child { border-right: none; }
+.pi-meta-label { font-size: 0.7rem; font-weight: 700; color: #a0aec0; white-space: nowrap; }
+.pi-meta-val   { font-size: 0.78rem; font-weight: 600; color: #2d3748; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pi-cols { display: grid; grid-template-columns: 1fr 1fr; }
+.pi-col {
+  display: flex; flex-direction: column; gap: 0.85rem;
+  padding: 1.25rem; border-right: 1px solid #f0f4f8;
+}
+.pi-col:last-child { border-right: none; }
+.pi-col-title {
+  font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.07em; color: #a0aec0; margin: 0;
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.pi-col-icon { width: 0.75rem; height: 0.75rem; }
+.pi-field { display: flex; flex-direction: column; gap: 0.25rem; }
+.pi-label { font-size: 0.72rem; font-weight: 700; color: #4a5568; }
+.pi-input {
+  border: 1.5px solid #e2e8f0; border-radius: 8px;
+  padding: 0.5rem 0.75rem; font-size: 0.85rem;
+  color: #1b2f39; font-family: inherit; background: #fff;
+  outline: none; transition: border-color 0.2s;
+}
+.pi-input:focus { border-color: #2e9cab; box-shadow: 0 0 0 3px rgba(46,154,171,0.12); }
+.pi-error {
+  font-size: 0.8rem; color: #c0392b;
+  background: rgba(220,53,69,0.07); border: 1px solid rgba(220,53,69,0.2);
+  border-radius: 8px; padding: 0.5rem 0.75rem; margin: 0;
+}
+.pi-btn-save {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1.1rem; border: none; border-radius: 999px;
+  background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
+  color: #fff; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 12px rgba(46,156,171,0.28);
+  transition: filter 0.2s; align-self: flex-start;
+}
+.pi-btn-save:disabled { opacity: 0.65; cursor: not-allowed; }
+.pi-btn-save:hover:not(:disabled) { filter: brightness(1.07); }
+.pi-btn-outline {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.55rem 1.1rem; border: 1.5px solid #2e9cab; border-radius: 999px;
+  background: transparent; color: #2e9cab; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background 0.2s;
+}
+.pi-btn-outline:hover:not(:disabled) { background: #e8f7f9; }
+.pi-btn-outline:disabled { opacity: 0.65; cursor: not-allowed; }
+.pi-btn-logout {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 1.1rem; border: 1.5px solid #e2e8f0; border-radius: 999px;
+  background: transparent; color: #718096; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.pi-btn-logout:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
+.pi-btn-icon { width: 0.85rem; height: 0.85rem; }
+
 /* Tablette : padding bas pour la nav island */
 @media (max-width: 900px) and (min-width: 641px) {
   .dash-page { padding-bottom: 5rem; }
@@ -1576,6 +1755,16 @@ async function linkAccount() {
   .dqcard--dim { opacity: 0.75; }
   .archives-block { margin-top: 0.75rem; }
   .btn-archives-toggle { padding: 0.7rem 1rem; font-size: 0.78rem; }
+
+  /* ── Profil mobile ── */
+  .profile-inline { margin-top: 0; }
+  .pi-infobar { flex-direction: column; }
+  .pi-meta-row { border-right: none; border-bottom: 1px solid #f0f4f8; }
+  .pi-meta-row:last-child { border-bottom: none; }
+  .pi-cols { grid-template-columns: 1fr; }
+  .pi-col { border-right: none; border-bottom: 1px solid #f0f4f8; }
+  .pi-col:last-child { border-bottom: none; }
+  .pi-btn-save, .pi-btn-outline, .pi-btn-logout { width: 100%; justify-content: center; align-self: stretch; }
 
   /* ── RDV mobile cards ── */
   .rdv-section-card { margin-top: 0.75rem; }
