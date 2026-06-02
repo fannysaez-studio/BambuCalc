@@ -93,3 +93,23 @@ body {
 .mob-bs-sheet .notif-list {
   flex: 1;
 }
+
+/* ── Handle sur fond sombre (style iOS natif) ── */
+.mob-bs-header--rounded {
+  border-radius: 20px 20px 0 0;
+  padding-top: 0.5rem;
+}
+.mob-bs-handle-dark {
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  margin: 0 auto 0.65rem;
+}
+.mob-bs-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0 1rem 0.75rem;
+}

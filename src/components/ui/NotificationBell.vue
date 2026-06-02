@@ -17,12 +17,14 @@
       <Transition name="mob-bs">
         <div v-if="open && isMobile" class="mob-bs-overlay" @click.self="open = false">
           <div class="mob-bs-sheet">
-            <div class="mob-bs-handle" />
-            <div class="mob-bs-header">
-              <span class="mob-bs-title">Notifications</span>
-              <div class="mob-bs-actions">
-                <button v-if="notifications.some(n => !n.read)" class="mob-bs-action" @click="markAllRead">✓ Tout lire</button>
-                <button v-if="notifications.length > 0" class="mob-bs-action mob-bs-action--danger" @click="removeAll">Tout supprimer</button>
+            <div class="mob-bs-header mob-bs-header--rounded">
+              <div class="mob-bs-handle-dark" />
+              <div class="mob-bs-header-row">
+                <span class="mob-bs-title">Notifications</span>
+                <div class="mob-bs-actions">
+                  <button v-if="notifications.some(n => !n.read)" class="mob-bs-action" @click="markAllRead">✓ Tout lire</button>
+                  <button v-if="notifications.length > 0" class="mob-bs-action mob-bs-action--danger" @click="removeAll">Tout supprimer</button>
+                </div>
               </div>
             </div>
             <div v-if="loading" class="notif-empty"><div class="notif-spinner" /></div>

@@ -17,10 +17,12 @@
       <Transition name="mob-bs">
         <div v-if="open && isMobile" class="mob-bs-overlay" @click.self="open = false">
           <div class="mob-bs-sheet">
-            <div class="mob-bs-handle" />
-            <div class="mob-bs-header">
-              <span class="mob-bs-title">Prochains rendez-vous</span>
-              <button v-if="newCount > 0" class="mob-bs-action" @click="markSeen">✓ Tout vu</button>
+            <div class="mob-bs-header mob-bs-header--rounded">
+              <div class="mob-bs-handle-dark" />
+              <div class="mob-bs-header-row">
+                <span class="mob-bs-title">Prochains rendez-vous</span>
+                <button v-if="newCount > 0" class="mob-bs-action" @click="markSeen">✓ Tout vu</button>
+              </div>
             </div>
             <div v-if="loading" class="cal-empty"><div class="cal-spinner" /></div>
             <div v-else-if="appointments.length === 0" class="cal-empty">
