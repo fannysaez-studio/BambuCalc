@@ -118,8 +118,8 @@
       <span>Connexion</span>
     </router-link>
 
-    <!-- RDV : admin uniquement dans la nav mobile (sans bouton booking — admin reçoit les RDV) -->
-    <CalendarPanel v-if="isAdminUser" :tab="true" :show-booking="false" />
+    <!-- RDV : admin uniquement dans la nav mobile -->
+    <CalendarPanel v-if="isAdminUser" :tab="true" />
 
     <button
       v-if="isAuth"

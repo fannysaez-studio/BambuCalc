@@ -43,10 +43,10 @@
                 <span v-if="a.status === 'canceled'" class="cal-item-canceled">Annulé</span>
               </div>
             </div>
-            <div v-if="props.showBooking" class="cal-bs-footer">
+            <div class="cal-bs-footer">
               <a href="/rdv" class="cal-bs-cta-pill" @click="open = false">
                 <CalendarPlus :size="14" />
-                Nouveau RDV
+                Planifier un RDV
               </a>
             </div>
           </div>
@@ -94,8 +94,7 @@ import { CalendarDays, CalendarOff, CalendarPlus } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
 const props = defineProps({
-  tab:         { type: Boolean, default: false },
-  showBooking: { type: Boolean, default: true },
+  tab: { type: Boolean, default: false },
 })
 
 const appointments = ref([])
