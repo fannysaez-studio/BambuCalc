@@ -98,8 +98,9 @@
       <span>Admin</span>
     </router-link>
 
+    <!-- Dashboard : clients uniquement (admin a le ⊞ dans le hero) -->
     <router-link
-      v-if="isAuth"
+      v-if="isAuth && !isAdminUser"
       to="/dashboard"
       class="nav-bar-item"
       :class="{ 'nav-bar-item--on': isActive(['/dashboard', '/profile']) }"
@@ -117,7 +118,8 @@
       <span>Connexion</span>
     </router-link>
 
-    <CalendarPanel v-if="isAuth" :tab="true" />
+    <!-- RDV : admin uniquement dans la nav (clients l'ont dans le hero dashboard) -->
+    <CalendarPanel v-if="isAdminUser" :tab="true" />
 
     <button
       v-if="isAuth"

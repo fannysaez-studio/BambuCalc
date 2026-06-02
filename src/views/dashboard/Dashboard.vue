@@ -48,6 +48,7 @@
         <div class="hero-bell-mobile">
           <NotificationBell :topPanel="true" />
         </div>
+        <CalendarPanel v-if="!isAnonymous" class="hero-rdv-btn" />
         <router-link to="/calculator/1" class="btn-new" title="Nouveau devis">
           <Plus class="btn-new-icon" />
           <span class="btn-new-text">Nouveau devis</span>
@@ -517,6 +518,7 @@ import ToastMessage from '@/components/ui/ToastMessage.vue'
 import NotificationBell from '@/components/ui/NotificationBell.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import PasswordField from '@/components/ui/PasswordField.vue'
+import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save } from 'lucide-vue-next'
 
 // ── State ──
@@ -1034,6 +1036,18 @@ async function linkAccount() {
 .btn-new-icon { width: 0.95rem; height: 0.95rem; }
 
 .dash-hero-actions { display: flex; align-items: center; gap: 0.65rem; }
+
+/* CalendarPanel dans le hero — même hauteur que les autres boutons */
+.hero-rdv-btn :deep(.cal-btn) {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  border: 1.5px solid #e2e8f0;
+  background: rgba(255,255,255,0.9);
+  color: #718096;
+  transition: all 0.2s;
+}
+.hero-rdv-btn :deep(.cal-btn):hover { border-color: #2e9cab; color: #2e9cab; }
 .hero-bell-mobile { display: none; }
 @media (max-width: 640px) { .hero-bell-mobile { display: flex; } }
 .btn-profile {
