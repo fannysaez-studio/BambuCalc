@@ -4945,12 +4945,17 @@
 }
 
 .bs-group-label {
-  font-size: 0.6rem;
+  display: inline-block;
+  font-size: 0.58rem;
   font-weight: 800;
-  color: #a0aec0;
+  color: #6d28d9;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 0.35rem 0.65rem 0.15rem;
+  letter-spacing: 0.07em;
+  background: rgba(109, 40, 217, 0.08);
+  border: 1px solid rgba(109, 40, 217, 0.2);
+  border-radius: 6px;
+  padding: 0.18rem 0.5rem;
+  margin: 0.5rem 0.5rem 0.2rem;
 }
 
 .bs-sep {
