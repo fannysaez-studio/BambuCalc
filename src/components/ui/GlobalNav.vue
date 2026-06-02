@@ -105,7 +105,7 @@
       class="nav-bar-item"
       :class="{ 'nav-bar-item--on': isActive(['/dashboard', '/profile']) }"
     >
-      <User :size="21" />
+      <LayoutGrid :size="21" />
       <span>Dashboard</span>
     </router-link>
 
@@ -136,7 +136,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { Home, ShieldCheck, User, LogIn, LogOut, Mail } from 'lucide-vue-next'
+import { Home, ShieldCheck, User, LogIn, LogOut, Mail, LayoutGrid } from 'lucide-vue-next'
 import NotificationBell from '@/components/ui/NotificationBell.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 
