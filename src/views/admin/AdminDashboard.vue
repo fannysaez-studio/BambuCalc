@@ -513,7 +513,7 @@ const rdvCount = ref(0)
 
 const tabs = computed(() => [
   { id: 'emails', label: 'Gestion des Emails', icon: Mail },
-  { id: 'rdv',    label: 'Rendez-vous',        icon: CalendarDays, count: rdvCount.value || undefined },
+  { id: 'rdv',    label: 'Gestion des rdv',    icon: CalendarDays, count: rdvCount.value || undefined },
 ])
 const currentTabIcon = computed(() => {
   if (activeTab.value === 'clients')   return Users
