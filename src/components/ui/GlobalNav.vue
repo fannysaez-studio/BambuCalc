@@ -118,16 +118,8 @@
       <span>Connexion</span>
     </router-link>
 
-    <!-- Dashboard ⊞ : admin (accès rapide au dashboard client) -->
-    <router-link
-      v-if="isAdminUser"
-      to="/dashboard"
-      class="nav-bar-item"
-      :class="{ 'nav-bar-item--on': isActive(['/dashboard', '/profile']) }"
-    >
-      <LayoutGrid :size="21" />
-      <span>Dashboard</span>
-    </router-link>
+    <!-- RDV : admin uniquement dans la nav mobile -->
+    <CalendarPanel v-if="isAdminUser" :tab="true" />
 
     <button
       v-if="isAuth"
