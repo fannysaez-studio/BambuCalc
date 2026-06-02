@@ -1,5 +1,5 @@
 <template>
-  <div class="dash-page">
+  <div class="dash-page" @click="dashBsOpen = false">
 
     <!-- Bannière mode invité -->
     <div v-if="isAnonymous" class="anon-banner">
@@ -56,38 +56,66 @@
       </div>
     </div>
 
-    <!-- Tab bar -->
+    <!-- Tab bar desktop (≥641px) -->
     <div v-if="!isAnonymous" class="client-tabs">
-      <button
-        :class="['ctab-btn', activeTab === 'quotes' && 'ctab-btn--active']"
-        @click="activeTab = 'quotes'"
-      >
+      <button :class="['ctab-btn', activeTab === 'quotes' && 'ctab-btn--active']" @click="activeTab = 'quotes'">
         <FileText class="ctab-icon" />
         <span class="ctab-label-long">Mes devis</span>
         <span class="ctab-label-short">Devis</span>
         <span v-if="quotes.length > 0" class="ctab-count">{{ quotes.length }}</span>
       </button>
-      <button
-        :class="['ctab-btn', activeTab === 'rdv' && 'ctab-btn--active']"
-        @click="activeTab = 'rdv'"
-      >
+      <button :class="['ctab-btn', activeTab === 'rdv' && 'ctab-btn--active']" @click="activeTab = 'rdv'">
         <Calendar class="ctab-icon" />
         <span class="ctab-label-long">Mes rendez-vous</span>
         <span class="ctab-label-short">RDV</span>
-        <span
-          v-if="rdvTabs.find(t => t.id === 'upcoming')?.count > 0"
-          class="ctab-count"
-        >{{ rdvTabs.find(t => t.id === 'upcoming')?.count }}</span>
+        <span v-if="rdvTabs.find(t => t.id === 'upcoming')?.count > 0" class="ctab-count">{{ rdvTabs.find(t => t.id === 'upcoming')?.count }}</span>
       </button>
-      <button
-        :class="['ctab-btn', activeTab === 'profile' && 'ctab-btn--active']"
-        @click="activeTab = 'profile'"
-      >
+      <button :class="['ctab-btn', activeTab === 'profile' && 'ctab-btn--active']" @click="activeTab = 'profile'">
         <User class="ctab-icon" />
         <span class="ctab-label-long">Mon profil</span>
         <span class="ctab-label-short">Profil</span>
       </button>
     </div>
+
+    <!-- Trigger mobile (≤640px) — ouvre le bottom sheet -->
+    <div v-if="!isAnonymous" class="dash-trigger-wrap" @click.stop>
+      <button class="dash-trigger" @click="dashBsOpen = !dashBsOpen">
+        <component :is="currentTabIcon" class="dash-trigger-icon" />
+        <span class="dash-trigger-label">{{ currentTabLabel }}</span>
+        <ChevronDown :class="['dash-trigger-chevron', dashBsOpen && 'dash-trigger-chevron--open']" />
+      </button>
+    </div>
+
+    <!-- Bottom sheet client (Teleport → body) -->
+    <Teleport to="body">
+      <Transition name="bs">
+        <div v-if="dashBsOpen" class="bs-overlay" @click="dashBsOpen = false">
+          <div class="dash-bs-sheet" @click.stop>
+            <div class="dash-bs-handle" />
+            <div
+              :class="['dash-bs-item', activeTab === 'quotes' && 'dash-bs-item--active']"
+              @click="activeTab = 'quotes'; dashBsOpen = false"
+            >
+              <FileText class="dash-bs-icon" />Mes devis
+              <span v-if="quotes.length > 0" class="dash-bs-count">{{ quotes.length }}</span>
+            </div>
+            <div
+              :class="['dash-bs-item', activeTab === 'rdv' && 'dash-bs-item--active']"
+              @click="activeTab = 'rdv'; dashBsOpen = false"
+            >
+              <Calendar class="dash-bs-icon" />Mes rendez-vous
+              <span v-if="rdvTabs.find(t => t.id === 'upcoming')?.count > 0" class="dash-bs-count">{{ rdvTabs.find(t => t.id === 'upcoming')?.count }}</span>
+            </div>
+            <div
+              :class="['dash-bs-item', activeTab === 'profile' && 'dash-bs-item--active']"
+              @click="activeTab = 'profile'; dashBsOpen = false"
+            >
+              <User class="dash-bs-icon" />Mon profil
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Stats -->
     <div v-show="activeTab === 'quotes'" class="stats-row">
@@ -521,6 +549,16 @@ import PasswordField from '@/components/ui/PasswordField.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save } from 'lucide-vue-next'
 
+// Tab labels pour le trigger mobile
+const tabMeta = {
+  quotes:  { icon: FileText,  label: 'Mes devis' },
+  rdv:     { icon: Calendar,  label: 'Mes rendez-vous' },
+  profile: { icon: User,      label: 'Mon profil' },
+}
+const currentTabIcon  = computed(() => tabMeta[activeTab.value]?.icon  ?? FileText)
+const currentTabLabel = computed(() => tabMeta[activeTab.value]?.label ?? 'Mes devis')
+const dashBsOpen = ref(false)
+
 // ── State ──
 const displayName = ref('')
 const isAnonymous = ref(false)
@@ -921,6 +959,61 @@ async function linkAccount() {
 }
 .btn-link-submit:hover:not(:disabled) { filter: brightness(1.07); }
 .btn-link-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Trigger mobile dashboard ── */
+.dash-trigger-wrap { display: none; }
+
+.dash-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.58rem 0.85rem;
+  border-radius: 12px;
+  border: 1.5px solid rgba(46,156,171,0.25);
+  background: rgba(255,255,255,0.97);
+  color: #2e9cab;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 2px 8px rgba(46,156,171,0.1);
+}
+.dash-trigger-icon { width: 1rem; height: 1rem; flex-shrink: 0; }
+.dash-trigger-label { flex: 1; }
+.dash-trigger-chevron { width: 0.85rem; height: 0.85rem; flex-shrink: 0; transition: transform 0.2s ease; }
+.dash-trigger-chevron--open { transform: rotate(180deg); }
+
+/* Bottom sheet client */
+.dash-bs-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 0.5rem 0.75rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+}
+.dash-bs-handle {
+  width: 40px; height: 4px;
+  background: #e2e8f0; border-radius: 999px;
+  margin: 0.35rem auto 0.85rem;
+}
+.dash-bs-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.65rem 0.75rem; border-radius: 12px;
+  color: #4a5568; font-size: 0.88rem; font-weight: 600;
+  font-family: inherit; cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.dash-bs-item:hover    { background: #e8f7f9; color: #2e9cab; }
+.dash-bs-item--active  { background: #e8f7f9; color: #2e9cab; font-weight: 700; }
+.dash-bs-icon  { width: 1rem; height: 1rem; flex-shrink: 0; }
+.dash-bs-count {
+  margin-left: auto; font-size: 0.65rem; font-weight: 700;
+  background: rgba(46,156,171,0.12); color: #2e9cab;
+  padding: 0.05rem 0.38rem; border-radius: 999px; flex-shrink: 0;
+}
 
 /* ── Tab bar client ── */
 .client-tabs {
@@ -1694,17 +1787,9 @@ async function linkAccount() {
     justify-content: center;
   }
   .btn-new-icon { width: 1.05rem; height: 1.05rem; }
-  .client-tabs {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    scrollbar-width: none;
-    padding-bottom: 0.2rem;
-    margin-bottom: 1rem;
-  }
-  .client-tabs::-webkit-scrollbar { display: none; }
-  .ctab-btn { white-space: nowrap; flex-shrink: 0; font-size: 0.72rem; padding: 0.35rem 0.75rem; }
-  .ctab-label-long  { display: none; }
-  .ctab-label-short { display: inline; }
+  /* Mobile : cacher les pills, afficher le trigger */
+  .client-tabs { display: none; }
+  .dash-trigger-wrap { display: block; }
   .anon-banner { flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.75rem; }
   .btn-link-toggle { width: 100%; }
 
@@ -1824,4 +1909,21 @@ async function linkAccount() {
   }
   .rdv-mcard-devis { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 }
+</style>
+
+<style>
+/* ── Bottom sheet overlay client (global — Teleport to body) ── */
+.bs-overlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(15,23,42,0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex; align-items: flex-end;
+}
+.bs-enter-active { transition: opacity 0.22s ease; }
+.bs-leave-active { transition: opacity 0.18s ease; }
+.bs-enter-from, .bs-leave-to { opacity: 0; }
+.bs-enter-active .dash-bs-sheet { transition: transform 0.32s cubic-bezier(0.34,1.1,0.64,1); }
+.bs-leave-active  .dash-bs-sheet { transition: transform 0.2s ease; }
+.bs-enter-from .dash-bs-sheet, .bs-leave-to .dash-bs-sheet { transform: translateY(100%); }
 </style>
