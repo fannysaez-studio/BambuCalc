@@ -287,6 +287,7 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   border-top: 1px solid rgba(0, 0, 0, 0.07);
   box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.07);
   align-items: stretch;
+  justify-content: space-between;
 }
 
 .nav-bar-item {
