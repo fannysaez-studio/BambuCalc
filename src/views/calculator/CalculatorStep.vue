@@ -331,12 +331,11 @@ export default {
     } catch {
       this.isAdmin = false
     }
-    if (!this.store.editingQuoteId && !this.$route.query.editId && this.store.quoteNumberIsStale) {
-      const d  = new Date()
-      const yy = d.getFullYear()
-      const mm = String(d.getMonth() + 1).padStart(2, '0')
-      const dd = String(d.getDate()).padStart(2, '0')
-      this.store.quoteNumber = `DEV n° ${yy}${mm}${dd}-01`
+    // Numéro séquentiel dès l'ouverture (pas de random — ni de stale)
+    if (!this.store.editingQuoteId && !this.$route.query.editId) {
+      if (this.store.quoteNumberIsStale || this.store.quoteNumber.endsWith('-000')) {
+        this.store.quoteNumber = await this.generateSequentialQuoteNumber()
+      }
     }
   },
   data() {
@@ -556,7 +555,7 @@ export default {
       const mm = String(d.getMonth() + 1).padStart(2, '0')
       const dd = String(d.getDate()).padStart(2, '0')
       const dateStr = `${yy}${mm}${dd}`
-      const prefix  = `DEV n° ${dateStr}-`
+      const prefix  = `DEV-${dateStr}-`
       try {
         const { data } = await supabase
           .from('quotes').select('quote_number')
@@ -567,9 +566,9 @@ export default {
           const numPart = parseInt(data[0].quote_number.split('-').pop()) || 0
           counter = numPart + 1
         }
-        return `${prefix}${String(counter).padStart(2, '0')}`
+        return `${prefix}${String(counter).padStart(3, '0')}`
       } catch {
-        return `${prefix}01`
+        return `${prefix}001`
       }
     },
 

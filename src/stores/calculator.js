@@ -5,8 +5,7 @@ function genQuoteNumber() {
   const yy = d.getFullYear()
   const mm = String(d.getMonth() + 1).padStart(2, '0')
   const dd = String(d.getDate()).padStart(2, '0')
-  const rand = String(Math.floor(Math.random() * 9999)).padStart(4, '0')
-  return `DEV-${yy}${mm}${dd}-${rand}`
+  return `DEV-${yy}${mm}${dd}-000`  // remplacé par le séquentiel réel dans created()
 }
 
 export const useCalculatorStore = defineStore('calculator', {
@@ -124,7 +123,7 @@ export const useCalculatorStore = defineStore('calculator', {
       return state.clientName || ''
     },
 
-    // Indique si le numéro de devis date d'un autre jour
+    // Indique si le numéro de devis date d'un autre jour (SPA gardée ouverte la nuit)
     quoteNumberIsStale(state) {
       const today = new Date()
       const yy = today.getFullYear()
