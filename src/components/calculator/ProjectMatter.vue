@@ -1,30 +1,19 @@
 <template>
   <div :class="formStyles.section">
 
-    <!-- Type de projet + Quantité -->
-    <div class="grid-2">
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Type de projet</label>
-        <select :class="formStyles.select" :value="projectSeriesType"
-          @change="$emit('update:projectSeriesType', $event.target.value)">
-          <option value="unique">Pièce unique</option>
-          <option value="deco">Décoration</option>
-          <option value="portesCles">Porte-clés / Goodies (série)</option>
-          <option value="figurine">Figurine</option>
-          <option value="carteVisite">Carte de visite 3D</option>
-          <option value="standQR">Stand / QR Code</option>
-          <option value="autre">Autre</option>
-        </select>
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Quantité</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="quantity"
-            @input="$emit('update:quantity', parseInt($event.target.value) || 1)"
-            min="1" step="1" />
-          <span class="unit">pcs</span>
-        </div>
-      </div>
+    <!-- Type de projet -->
+    <div :class="formStyles.formGroup">
+      <label :class="formStyles.label">Type de projet</label>
+      <select :class="formStyles.select" :value="projectSeriesType"
+        @change="$emit('update:projectSeriesType', $event.target.value)">
+        <option value="unique">Pièce unique</option>
+        <option value="deco">Décoration</option>
+        <option value="portesCles">Porte-clés / Goodies (série)</option>
+        <option value="figurine">Figurine</option>
+        <option value="carteVisite">Carte de visite 3D</option>
+        <option value="standQR">Stand / QR Code</option>
+        <option value="autre">Autre</option>
+      </select>
     </div>
 
     <!-- Description libre -->
@@ -119,7 +108,6 @@ export default {
   props: {
     projectSeriesType:  { type: String, default: 'unique' },
     projectDescription: { type: String, default: '' },
-    quantity:           { type: Number, default: 1 },
     material:           { type: String, default: '' },
     costPerKg:          { type: Number, default: 0 },
     lossPercent:        { type: Number, default: 10 },
@@ -128,7 +116,7 @@ export default {
     materialId:         { type: String, default: null },
   },
   emits: [
-    'update:projectSeriesType', 'update:projectDescription', 'update:quantity',
+    'update:projectSeriesType', 'update:projectDescription',
     'update:material', 'update:costPerKg', 'update:lossPercent',
     'update:colorCount', 'update:purgeWaste', 'update:materialId',
   ],
@@ -246,12 +234,6 @@ export default {
 .sep { height: 1px; background: #f0f4f8; margin: 0.75rem 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 0.5rem; }
 
-@media (max-width: 480px) {
-  .grid-2 { grid-template-columns: 1fr; }
-}
-.input-unit-wrap { display: flex; align-items: center; gap: 0.5rem; }
-.input-unit-wrap input { flex: 1; }
-.unit { font-size: 0.82rem; font-weight: 700; color: #4a5568; white-space: nowrap; }
 
 /* Nombre de couleurs */
 .count-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
