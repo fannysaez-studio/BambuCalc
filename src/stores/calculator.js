@@ -40,6 +40,10 @@ export const useCalculatorStore = defineStore('calculator', {
     projectType: 'standard',
     projectSeriesType: 'unique',
     projectDescription: '',
+    projectWidth: null,   // mm
+    projectLength: null,  // mm
+    projectHeight: null,  // mm
+    projectFinish: 'brut', // brut | ponce | peint | autre
 
     // Conditions devis
     paymentMethod: 'virement',
@@ -242,6 +246,10 @@ export const useCalculatorStore = defineStore('calculator', {
         projectType:         'standard',
         projectSeriesType:   'unique',
         projectDescription:  '',
+        projectWidth:        null,
+        projectLength:       null,
+        projectHeight:       null,
+        projectFinish:       'brut',
         paymentMethod:       'virement',
         depositPercent:      0,
         quoteNotes:          '',

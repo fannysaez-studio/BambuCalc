@@ -1,35 +1,6 @@
 <template>
   <div :class="formStyles.section">
 
-    <!-- Type de projet -->
-    <div :class="formStyles.formGroup">
-      <label :class="formStyles.label">Type de projet</label>
-      <select :class="formStyles.select" :value="projectSeriesType"
-        @change="$emit('update:projectSeriesType', $event.target.value)">
-        <option value="unique">Pièce unique</option>
-        <option value="deco">Décoration</option>
-        <option value="portesCles">Porte-clés / Goodies (série)</option>
-        <option value="figurine">Figurine</option>
-        <option value="carteVisite">Carte de visite 3D</option>
-        <option value="standQR">Stand / QR Code</option>
-        <option value="autre">Autre</option>
-      </select>
-    </div>
-
-    <!-- Description libre -->
-    <div :class="formStyles.formGroup">
-      <label :class="formStyles.label">Décrivez votre projet</label>
-      <textarea :class="formStyles.input"
-        rows="3"
-        :value="projectDescription"
-        @input="$emit('update:projectDescription', $event.target.value)"
-        placeholder="Décrivez votre projet : dimensions souhaitées, usage, contraintes, finitions attendues, délai souhaité…"
-        style="resize:vertical;min-height:72px;" />
-      <p :class="formStyles.helpText">Plus vous êtes précis, plus le devis sera rapide et exact.</p>
-    </div>
-
-    <div class="sep" />
-
     <!-- Nombre de couleurs -->
     <div :class="formStyles.formGroup">
       <label :class="formStyles.label">Nombre de couleurs</label>
@@ -106,17 +77,14 @@ import formStyles from '@/styles/Form.module.css'
 export default {
   name: 'ProjectMatter',
   props: {
-    projectSeriesType:  { type: String, default: 'unique' },
-    projectDescription: { type: String, default: '' },
-    material:           { type: String, default: '' },
-    costPerKg:          { type: Number, default: 0 },
-    lossPercent:        { type: Number, default: 10 },
-    colorCount:         { type: Number, default: 1 },
-    purgeWaste:         { type: Number, default: 0 },
-    materialId:         { type: String, default: null },
+    material:    { type: String, default: '' },
+    costPerKg:   { type: Number, default: 0 },
+    lossPercent: { type: Number, default: 10 },
+    colorCount:  { type: Number, default: 1 },
+    purgeWaste:  { type: Number, default: 0 },
+    materialId:  { type: String, default: null },
   },
   emits: [
-    'update:projectSeriesType', 'update:projectDescription',
     'update:material', 'update:costPerKg', 'update:lossPercent',
     'update:colorCount', 'update:purgeWaste', 'update:materialId',
   ],

@@ -1,8 +1,8 @@
 <template>
   <div class="step-page">
 
-    <!-- ── Stepper horizontal ── -->
-    <div class="stepper">
+    <!-- ── Stepper horizontal (desktop) ── -->
+    <div class="stepper stepper--desktop">
       <div class="stepper-track">
         <div v-for="(s, i) in steps" :key="s.step" class="step-item">
           <div v-if="i > 0" :class="['step-line', currentStep > s.step - 1 && 'step-line-done']"></div>
@@ -19,6 +19,17 @@
             {{ s.label }}
           </span>
         </div>
+      </div>
+    </div>
+
+    <!-- ── Stepper mobile : barre de progression ── -->
+    <div class="stepper stepper--mobile">
+      <div class="mobile-step-info">
+        <span class="mobile-step-num">Étape {{ currentStep }} / {{ steps.length }}</span>
+        <span class="mobile-step-label">{{ currentStepDef.label }}</span>
+      </div>
+      <div class="mobile-progress-track">
+        <div class="mobile-progress-bar" :style="{ width: (currentStep / steps.length * 100) + '%' }"></div>
       </div>
     </div>
 
@@ -41,11 +52,20 @@
 
         <div class="step-card-body">
 
-          <!-- ── ÉTAPE 1 : IDENTIQUE POUR TOUS ── -->
-          <ProjectMatter
+          <!-- ── ÉTAPE 1 : Projet (identique pour tous) ── -->
+          <ProjectProjet
             v-if="currentStep === 1"
             v-model:projectSeriesType="store.projectSeriesType"
             v-model:projectDescription="store.projectDescription"
+            v-model:projectLength="store.projectLength"
+            v-model:projectWidth="store.projectWidth"
+            v-model:projectHeight="store.projectHeight"
+            v-model:projectFinish="store.projectFinish"
+          />
+
+          <!-- ── ÉTAPE 2 : Matière (identique pour tous) ── -->
+          <ProjectMatter
+            v-if="currentStep === 2"
             v-model:material="store.defaultMaterial"
             v-model:costPerKg="store.defaultCostPerKg"
             v-model:lossPercent="store.defaultLossPercent"
@@ -54,12 +74,12 @@
             v-model:materialId="store.defaultMaterialId"
           />
 
-          <!-- ── ÉTAPES 2-6 ADMIN ── -->
-          <template v-if="isAdmin && currentStep > 1">
+          <!-- ── ÉTAPES 3-8 ADMIN ── -->
+          <template v-if="isAdmin && currentStep > 2">
 
-            <!-- Étape 2 : Client -->
+            <!-- Étape 3 : Client -->
             <ProjectDetails
-              v-if="currentStep === 2"
+              v-if="currentStep === 3"
               :quoteNumber="store.quoteNumber"
               :quoteDate="store.quoteDate"
               v-model:quoteValidityDays="store.quoteValidityDays"
@@ -79,15 +99,20 @@
               v-model:clientVatNumber="store.clientVatNumber"
             />
 
-            <!-- Étape 3 : Pièces + Conditions -->
+            <!-- Étape 4 : Pièces -->
             <ProjectPieces
-              v-if="currentStep === 3"
+              v-if="currentStep === 4"
               v-model:pieces="store.pieces"
               :defaultMaterialId="store.defaultMaterialId"
               :defaultMaterial="store.defaultMaterial"
               :defaultCostPerKg="store.defaultCostPerKg"
               :defaultLossPercent="store.defaultLossPercent"
               :defaultColorCount="store.defaultColorCount"
+            />
+
+            <!-- Étape 5 : Conditions du devis -->
+            <ProjectConditions
+              v-if="currentStep === 5"
               v-model:paymentMethod="store.paymentMethod"
               v-model:depositPercent="store.depositPercent"
               v-model:quoteValidityDays="store.quoteValidityDays"
@@ -96,9 +121,9 @@
               v-model:quoteNotes="store.quoteNotes"
             />
 
-            <!-- Étape 4 : Temps -->
+            <!-- Étape 6 : Temps -->
             <PrintingTime
-              v-if="currentStep === 4"
+              v-if="currentStep === 6"
               v-model:printHours="store.printHours"
               v-model:printMinutes="store.printMinutes"
               v-model:prepTime="store.prepTime"
@@ -107,9 +132,9 @@
               :isAdmin="true"
             />
 
-            <!-- Étape 5 : Tarifs -->
+            <!-- Étape 7 : Tarifs -->
             <PricingSuggestions
-              v-if="currentStep === 5"
+              v-if="currentStep === 7"
               :baseCost="store.calculatedCosts.subtotal"
               :baseCostPerUnit="store.calculatedCosts.subtotal / Math.max(1, store.calculatedCosts.quantity)"
               :seriesQuantity="store.calculatedCosts.quantity"
@@ -119,9 +144,9 @@
               v-model:customMargin="store.customMargin"
             />
 
-            <!-- Étape 6 : Coûts -->
+            <!-- Étape 8 : Coûts -->
             <CostBreakdown
-              v-if="currentStep === 6"
+              v-if="currentStep === 8"
               :costs="store.calculatedCosts"
               :sellingPrices="store.sellingPrices"
               :isAdmin="true"
@@ -129,11 +154,11 @@
 
           </template>
 
-          <!-- ── ÉTAPES 2-4 CLIENT ── -->
-          <template v-if="!isAdmin && currentStep > 1">
+          <!-- ── ÉTAPES 3-5 CLIENT ── -->
+          <template v-if="!isAdmin && currentStep > 2">
 
-            <!-- Étape 2 : Poids + Quantité -->
-            <div v-if="currentStep === 2" class="client-step2">
+            <!-- Étape 3 : Poids + Quantité -->
+            <div v-if="currentStep === 3" class="client-step2">
               <div class="qty-block">
                 <p class="qty-title">Quantité souhaitée</p>
                 <div class="qty-buttons">
@@ -155,9 +180,9 @@
               />
             </div>
 
-            <!-- Étape 3 : Coordonnées -->
+            <!-- Étape 4 : Coordonnées -->
             <ClientInfo
-              v-if="currentStep === 3"
+              v-if="currentStep === 4"
               v-model:clientFirstName="store.clientFirstName"
               v-model:clientLastName="store.clientLastName"
               v-model:clientEmail="store.clientEmail"
@@ -169,8 +194,8 @@
               v-model:paymentMethod="store.paymentMethod"
             />
 
-            <!-- Étape 4 : Confirmation -->
-            <div v-if="currentStep === 4" class="client-confirm">
+            <!-- Étape 5 : Confirmation -->
+            <div v-if="currentStep === 5" class="client-confirm">
               <div class="confirm-hero">
                 <span class="confirm-emoji">✅</span>
                 <p class="confirm-title">Prêt à envoyer votre demande !</p>
@@ -273,25 +298,28 @@ import { useCalculatorStore } from '@/stores/calculator'
 import { saveQuote as saveQuoteToDb, updateQuote } from '@/utils/quotes'
 import { checkIsAdmin } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
+import ProjectProjet     from '@/components/calculator/ProjectProjet.vue'
 import ProjectDetails    from '@/components/calculator/ProjectDetails.vue'
 import ProjectMatter     from '@/components/calculator/ProjectMatter.vue'
 import ProjectPieces     from '@/components/calculator/ProjectPieces.vue'
+import ProjectConditions from '@/components/calculator/ProjectConditions.vue'
 import ClientInfo        from '@/components/calculator/ClientInfo.vue'
 import FilamentSection   from '@/components/calculator/FilamentSection.vue'
 import PrintingTime      from '@/components/calculator/PrintingTime.vue'
 import PricingSuggestions from '@/components/calculator/PricingSuggestions.vue'
 import CostBreakdown     from '@/components/calculator/CostBreakdown.vue'
 import ToastMessage      from '@/components/ui/ToastMessage.vue'
-import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard } from 'lucide-vue-next'
+import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard, FileText, Palette } from 'lucide-vue-next'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 
 export default {
   name: 'CalculatorStep',
   components: {
-    ProjectDetails, ProjectMatter, ProjectPieces, ClientInfo, FilamentSection,
-    PrintingTime, PricingSuggestions, CostBreakdown, ToastMessage,
-    QuotePreviewModal,
+    ProjectProjet, ProjectDetails, ProjectMatter, ProjectPieces, ProjectConditions,
+    ClientInfo, FilamentSection, PrintingTime, PricingSuggestions, CostBreakdown,
+    ToastMessage, QuotePreviewModal,
     Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard,
+    FileText, Palette,
   },
   setup() {
     return { store: useCalculatorStore() }
@@ -427,19 +455,22 @@ export default {
     steps() {
       if (this.isAdmin) {
         return [
-          { step: 1, label: 'Projet & Matière', icon: 'Package',    description: 'Type de projet, filament et couleurs.' },
-          { step: 2, label: 'Client',           icon: 'User',       description: 'Informations client et adresse.' },
-          { step: 3, label: 'Pièces',           icon: 'Layers',     description: 'Pièces à imprimer, filaments, images et conditions.' },
-          { step: 4, label: 'Temps',            icon: 'Clock',      description: "Durée d'impression et temps de travail." },
-          { step: 5, label: 'Tarifs',           icon: 'Tag',        description: 'Choisissez votre marge et la tarification.' },
-          { step: 6, label: 'Coûts',            icon: 'BarChart3',  description: 'Résumé complet des coûts et total TTC.' },
+          { step: 1, label: 'Projet',     icon: 'Package',    description: 'Type de projet, description, dimensions et finition.' },
+          { step: 2, label: 'Matière',    icon: 'Palette',    description: 'Filament et nombre de couleurs.' },
+          { step: 3, label: 'Client',     icon: 'User',       description: 'Informations client et adresse.' },
+          { step: 4, label: 'Pièces',     icon: 'Layers',     description: 'Pièces à imprimer, filaments et images.' },
+          { step: 5, label: 'Conditions', icon: 'FileText',   description: 'Paiement, délais et conditions du devis.' },
+          { step: 6, label: 'Temps',      icon: 'Clock',      description: "Durée d'impression et temps de travail." },
+          { step: 7, label: 'Tarifs',     icon: 'Tag',        description: 'Choisissez votre marge et la tarification.' },
+          { step: 8, label: 'Coûts',      icon: 'BarChart3',  description: 'Résumé complet des coûts et total TTC.' },
         ]
       }
       return [
-        { step: 1, label: 'Projet & Matière', icon: 'Package',      description: 'Type de projet, filament et couleurs.' },
-        { step: 2, label: 'Poids & Quantité', icon: 'Clock',        description: 'Poids estimé et nombre de pièces souhaitées.' },
-        { step: 3, label: 'Vos coordonnées',  icon: 'User',         description: 'Vos informations pour recevoir le devis.' },
-        { step: 4, label: 'Confirmation',     icon: 'CheckCircle',  description: 'Récapitulatif et envoi de votre demande.' },
+        { step: 1, label: 'Projet',          icon: 'Package',      description: 'Type de projet et description.' },
+        { step: 2, label: 'Matière',         icon: 'Palette',      description: 'Filament et couleurs.' },
+        { step: 3, label: 'Poids & Quantité',icon: 'Clock',        description: 'Poids estimé et nombre de pièces souhaitées.' },
+        { step: 4, label: 'Vos coordonnées', icon: 'User',         description: 'Vos informations pour recevoir le devis.' },
+        { step: 5, label: 'Confirmation',    icon: 'CheckCircle',  description: 'Récapitulatif et envoi de votre demande.' },
       ]
     },
 
@@ -453,20 +484,20 @@ export default {
 
     validate() {
       const s = this.store
-      if (this.currentStep === 1) {
+      if (this.currentStep === 2) {
         if (!s.defaultCostPerKg || s.defaultCostPerKg <= 0) return 'Veuillez sélectionner un filament.'
         return null
       }
       if (this.isAdmin) {
         switch (this.currentStep) {
-          case 2: {
+          case 3: {
             const hasName = s.clientType === 'particulier'
               ? (s.clientFirstName?.trim() || s.clientLastName?.trim())
               : s.clientName?.trim()
             if (!hasName) return 'Le nom du client est obligatoire.'
             return null
           }
-          case 3: {
+          case 4: {
             const hasNamedPiece = s.pieces.some(p => p.name?.trim())
             if (!hasNamedPiece) return 'Au moins une pièce doit avoir un nom.'
             return null
@@ -475,11 +506,11 @@ export default {
         }
       }
       switch (this.currentStep) {
-        case 2: return null
-        case 3:
+        case 3: return null
+        case 4:
           if (!s.clientEmail?.trim()) return 'Votre adresse email est obligatoire pour recevoir le devis.'
           return null
-        case 4: return null
+        case 5: return null
         default: return null
       }
     },
@@ -488,8 +519,8 @@ export default {
       const err = this.validate()
       if (err) { this.$refs.toast.show(err, 'error'); return }
 
-      // Synchro step 1 → pièces sans filament affecté
-      if (this.currentStep === 1) {
+      // Synchro étape 2 (Matière) → pièces sans filament affecté
+      if (this.currentStep === 2) {
         this.store.pieces = this.store.pieces.map(p =>
           !p.materialId ? {
             ...p,
@@ -503,8 +534,10 @@ export default {
 
       const messages = [
         'Projet enregistré ✓',
+        'Matière sélectionnée ✓',
         'Client enregistré ✓',
         'Pièces enregistrées ✓',
+        'Conditions enregistrées ✓',
         'Temps enregistré ✓',
         'Tarif sélectionné ✓',
       ]
@@ -660,7 +693,7 @@ export default {
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
 }
 
-/* ── Stepper horizontal ── */
+/* ── Stepper ── */
 .stepper {
   width: 100%;
   max-width: 640px;
@@ -671,6 +704,9 @@ export default {
   border: 1px solid #e2e8f0;
   flex-shrink: 0;
 }
+/* Desktop : dots visibles, barre cachée */
+.stepper--mobile { display: none; }
+.stepper--desktop { display: block; }
 
 .stepper-track {
   display: flex;
@@ -976,23 +1012,26 @@ export default {
     justify-content: flex-start;
   }
 
-  .stepper {
-    padding: 0.6rem 0.85rem;
+  /* ── Stepper mobile : barre de progression ── */
+  .stepper--desktop { display: none; }
+  .stepper--mobile  { display: block; padding: 0.6rem 1rem; }
+  .mobile-step-info {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 0.4rem;
   }
-
-  .step-label { display: none; }
-  .label-active {
-    display: block;
-    font-size: 0.65rem;
-    white-space: normal;
-    line-height: 1.2;
-    max-width: 74px;
-    text-align: center;
+  .mobile-step-num {
+    font-size: 0.65rem; font-weight: 700; color: #a0aec0;
+    text-transform: uppercase; letter-spacing: 0.06em;
   }
-
-  .step-dot {
-    width: 1.75rem;
-    height: 1.75rem;
+  .mobile-step-label { font-size: 0.82rem; font-weight: 800; color: #2e9cab; }
+  .mobile-progress-track {
+    height: 4px; background: #e2e8f0; border-radius: 999px; overflow: hidden;
+  }
+  .mobile-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3fb2bf, #2e9cab);
+    border-radius: 999px;
+    transition: width 0.35s ease;
   }
 
   .content-area {
