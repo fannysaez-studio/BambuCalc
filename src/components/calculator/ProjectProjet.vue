@@ -69,7 +69,7 @@
         <button v-for="f in finishes" :key="f.value" type="button"
           :class="['finish-btn', projectFinish === f.value && 'finish-btn--active']"
           @click="$emit('update:projectFinish', f.value)">
-          <span class="finish-icon">{{ f.icon }}</span>
+          <component :is="f.icon" class="finish-icon" />
           <span class="finish-label">{{ f.label }}</span>
         </button>
       </div>
@@ -80,9 +80,11 @@
 
 <script>
 import formStyles from '@/styles/Form.module.css'
+import { Printer, Gem, Paintbrush, Sparkles } from 'lucide-vue-next'
 
 export default {
   name: 'ProjectProjet',
+  components: { Printer, Gem, Paintbrush, Sparkles },
   props: {
     projectSeriesType:  { type: String, default: 'unique' },
     projectDescription: { type: String, default: '' },
@@ -100,10 +102,10 @@ export default {
     return {
       formStyles,
       finishes: [
-        { value: 'brut',   icon: '🖨️', label: 'Brut' },
-        { value: 'ponce',  icon: '🪚', label: 'Poncé' },
-        { value: 'peint',  icon: '🎨', label: 'Peint' },
-        { value: 'autre',  icon: '✨', label: 'Autre' },
+        { value: 'brut',  icon: 'Printer',    label: 'Brut' },
+        { value: 'ponce', icon: 'Gem',         label: 'Poncé' },
+        { value: 'peint', icon: 'Paintbrush',  label: 'Peint' },
+        { value: 'autre', icon: 'Sparkles',    label: 'Autre' },
       ],
     }
   },
@@ -139,7 +141,8 @@ export default {
   background: linear-gradient(135deg, #e8f7f9, #d0f0f5);
   box-shadow: 0 0 0 3px rgba(46,156,171,0.15);
 }
-.finish-icon { font-size: 1.1rem; }
+.finish-icon { width: 1.15rem; height: 1.15rem; color: #718096; }
+.finish-btn--active .finish-icon { color: #1f7f97; }
 .finish-label { font-size: 0.7rem; font-weight: 700; color: #4a5568; }
 .finish-btn--active .finish-label { color: #1f7f97; }
 
