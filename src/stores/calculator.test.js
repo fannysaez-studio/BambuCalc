@@ -63,27 +63,6 @@ describe('projectCoeff', () => {
   })
 })
 
-// ── purgeWeightAuto ───────────────────────────────────────────────────────────
-
-describe('purgeWeightAuto', () => {
-  it('retourne 0 avec une seule couleur', () => {
-    const store = useCalculatorStore()
-    store.colorCount = 1
-    store.weight = 200
-    store.amsCoefficient = 1.25
-    expect(store.purgeWeightAuto).toBe(0)
-  })
-
-  it('calcule la purge AMS avec plusieurs couleurs', () => {
-    const store = useCalculatorStore()
-    store.colorCount = 2
-    store.weight = 200
-    store.amsCoefficient = 1.25
-    // purge = round(200 * (1.25 - 1)) = round(50) = 50
-    expect(store.purgeWeightAuto).toBe(50)
-  })
-})
-
 // ── displayClientName ─────────────────────────────────────────────────────────
 
 describe('displayClientName', () => {
@@ -107,16 +86,21 @@ describe('displayClientName', () => {
 // ── calculatedCosts ───────────────────────────────────────────────────────────
 
 describe('calculatedCosts', () => {
-  it('retourne tout à zéro si aucune valeur saisie', () => {
+  function storeWithOnePiece(weight, costPerKg, lossPercent = 0, colorCount = 1, purgeWaste = 0) {
     const store = useCalculatorStore()
-    store.weight = 0
-    store.costPerKg = 0
-    store.printHours = 0
-    store.printMinutes = 0
-    store.prepTime = 0
-    store.postTime = 0
+    store.pieces = [{
+      id: 'p1', name: 'Test', quantity: 1,
+      weight, costPerKg, lossPercent, colorCount, purgeWaste,
+      materialId: null, material: '', referenceImage: null, referenceImageUrl: '',
+    }]
+    store.printHours = 0; store.printMinutes = 0
+    store.prepTime = 0;   store.postTime = 0
     store.packagingCost = 0
+    return store
+  }
 
+  it('retourne tout à zéro si aucune valeur saisie', () => {
+    const store = storeWithOnePiece(0, 0)
     const costs = store.calculatedCosts
     expect(costs.materialCost).toBe(0)
     expect(costs.equipmentCost).toBe(0)
@@ -124,46 +108,58 @@ describe('calculatedCosts', () => {
     expect(costs.totalCost).toBe(0)
   })
 
-  it('calcule correctement le coût matière avec perte', () => {
-    const store = useCalculatorStore()
-    // 100g PLA+ à 16.99€/kg, 5% perte, 1 couleur
-    store.weight = 100
-    store.costPerKg = 16.99
-    store.lossPercent = 5
-    store.colorCount = 1
-    store.purgeWaste = 0
-    store.printHours = 0
-    store.printMinutes = 0
-    store.prepTime = 0
-    store.postTime = 0
-    store.packagingCost = 0
-
-    // lossWeight = 5g, totalWeight = 105g
-    // materialCost = (105/1000) * 16.99 = 1.78395 → 1.78
+  it('calcule le coût matière avec perte sur une pièce', () => {
+    const store = storeWithOnePiece(100, 16.99, 5)
+    // lossWeight = 5g, totalWeight = 105g, matCost = (105/1000)*16.99 = 1.78395 → 1.78
     const costs = store.calculatedCosts
     expect(costs.totalWeight).toBe(105)
     expect(costs.materialCost).toBe(1.78)
   })
 
-  it('calcule correctement le coût équipement', () => {
+  it('somme le coût matière de deux pièces différentes', () => {
     const store = useCalculatorStore()
-    store.weight = 0
-    store.costPerKg = 0
-    store.lossPercent = 0
-    store.printHours = 2
-    store.printMinutes = 0
-    store.electricityRate = 0.23
-    store.printerCost = 1800
-    store.printerLifeHours = 4000
-    store.maintenanceRate = 0.10
-    store.prepTime = 0
-    store.postTime = 0
+    store.pieces = [
+      { id: 'p1', name: 'A', quantity: 1, weight: 100, costPerKg: 10,
+        lossPercent: 0, colorCount: 1, purgeWaste: 0,
+        materialId: null, material: '', referenceImage: null, referenceImageUrl: '' },
+      { id: 'p2', name: 'B', quantity: 2, weight: 50,  costPerKg: 20,
+        lossPercent: 0, colorCount: 1, purgeWaste: 0,
+        materialId: null, material: '', referenceImage: null, referenceImageUrl: '' },
+    ]
+    store.printHours = 0; store.printMinutes = 0
+    store.prepTime = 0;   store.postTime = 0
     store.packagingCost = 0
+    // pA = (100/1000)*10 = 1.00, pB = (2*50/1000)*20 = 2.00, total = 3.00
+    expect(store.calculatedCosts.materialCost).toBe(3)
+  })
 
-    // electricity = 2 * 0.35 * 0.23 = 0.161 → 0.16
-    // amortization = (1800/4000) * 2 = 0.9
-    // maintenance = 0.10 * 2 = 0.2
-    // equipmentCost = 1.261 → 1.26
+  it('totalQty = somme des quantités de toutes les pièces', () => {
+    const store = useCalculatorStore()
+    store.pieces = [
+      { id: 'p1', quantity: 3, weight: 0, costPerKg: 0, lossPercent: 0,
+        colorCount: 1, purgeWaste: 0, name: '', materialId: null, material: '',
+        referenceImage: null, referenceImageUrl: '' },
+      { id: 'p2', quantity: 2, weight: 0, costPerKg: 0, lossPercent: 0,
+        colorCount: 1, purgeWaste: 0, name: '', materialId: null, material: '',
+        referenceImage: null, referenceImageUrl: '' },
+    ]
+    store.printHours = 0; store.printMinutes = 0
+    store.prepTime = 60;  store.postTime = 0
+    store.hourlyRate = 60; store.packagingCost = 0; store.taxRate = 0
+    // workCost = 60€, quantity = 5, costPerUnit = 12€
+    expect(store.calculatedCosts.quantity).toBe(5)
+    expect(store.calculatedCosts.costPerUnit).toBe(12)
+  })
+
+  it('calcule correctement le coût équipement (global)', () => {
+    const store = storeWithOnePiece(0, 0)
+    store.printHours = 2; store.printMinutes = 0
+    store.electricityRate = 0.23
+    store.printerCost = 1800; store.printerLifeHours = 4000
+    store.maintenanceRate = 0.10
+    // electricity = 2*0.35*0.23 = 0.161 → 0.16
+    // amortization = (1800/4000)*2 = 0.9
+    // maintenance = 0.10*2 = 0.2, total = 1.261 → 1.26
     const costs = store.calculatedCosts
     expect(costs.electricity).toBe(0.16)
     expect(costs.amortization).toBe(0.9)
@@ -171,79 +167,60 @@ describe('calculatedCosts', () => {
   })
 
   it('calcule correctement le coût de main-d\'œuvre', () => {
-    const store = useCalculatorStore()
-    store.weight = 0
-    store.costPerKg = 0
-    store.printHours = 0
-    store.printMinutes = 0
-    store.prepTime = 30
-    store.postTime = 30
-    store.hourlyRate = 20
-    store.packagingCost = 0
-
-    // workCost = (60 min / 60) * 20 = 20
-    const costs = store.calculatedCosts
-    expect(costs.workCost).toBe(20)
+    const store = storeWithOnePiece(0, 0)
+    store.prepTime = 30; store.postTime = 30; store.hourlyRate = 20
+    // workCost = (60min/60) * 20 = 20
+    expect(store.calculatedCosts.workCost).toBe(20)
   })
 
   it('applique le coeff projet figurine (1.30)', () => {
-    const store = useCalculatorStore()
+    const store = storeWithOnePiece(0, 0)
     store.packagingCost = 100
     store.projectType = 'figurine'
     store.taxRate = 0
-    store.weight = 0
-    store.costPerKg = 0
-    store.printHours = 0
-    store.printMinutes = 0
-    store.prepTime = 0
-    store.postTime = 0
-
     // subtotal = 100 * 1.30 = 130
-    const costs = store.calculatedCosts
-    expect(costs.subtotal).toBe(130)
+    expect(store.calculatedCosts.subtotal).toBe(130)
   })
 
-  it('gère une quantité > 1 pour costPerUnit', () => {
+  it('expose le détail matière par pièce dans .pieces', () => {
     const store = useCalculatorStore()
-    store.packagingCost = 0
-    store.taxRate = 0
-    store.weight = 0
-    store.costPerKg = 0
-    store.printHours = 0
-    store.printMinutes = 0
-    store.prepTime = 60
-    store.postTime = 0
-    store.hourlyRate = 60
-    store.quantity = 3
-    // workCost = 60€, totalCost = 60€, costPerUnit = 20€
-    const costs = store.calculatedCosts
-    expect(costs.costPerUnit).toBe(20)
+    store.pieces = [
+      { id: 'p1', name: 'Boîtier', quantity: 2, weight: 50, costPerKg: 20,
+        lossPercent: 0, colorCount: 1, purgeWaste: 0,
+        materialId: null, material: '', referenceImage: null, referenceImageUrl: '' },
+    ]
+    store.printHours = 0; store.printMinutes = 0; store.prepTime = 0
+    store.postTime = 0; store.packagingCost = 0
+    // pieceWeight = 50*2 = 100g, materialCost = (100/1000)*20 = 2.00
+    const detail = store.calculatedCosts.pieces[0]
+    expect(detail.name).toBe('Boîtier')
+    expect(detail.weight).toBe(100)
+    expect(detail.materialCost).toBe(2)
   })
 })
 
 // ── sellingPrices ─────────────────────────────────────────────────────────────
 
 describe('sellingPrices', () => {
-  // Setup : packagingCost = 100 pour avoir subtotal = 100 (tout le reste à 0)
   function storeWithSubtotal100() {
     const store = useCalculatorStore()
     store.packagingCost = 100
     store.taxRate = 20
     store.projectType = 'standard'
-    store.weight = 0
-    store.costPerKg = 0
-    store.printHours = 0
-    store.printMinutes = 0
-    store.prepTime = 0
-    store.postTime = 0
-    store.quantity = 1
+    store.pieces = [{
+      id: 'p1', name: '', quantity: 1, weight: 0, costPerKg: 0,
+      lossPercent: 0, colorCount: 1, purgeWaste: 0,
+      materialId: null, material: '', referenceImage: null, referenceImageUrl: '',
+    }]
+    store.printHours = 0; store.printMinutes = 0
+    store.prepTime = 0;   store.postTime = 0
     return store
   }
 
   it('marge ami (15%) → TTC = 138', () => {
     const store = storeWithSubtotal100()
     store.selectedPricing = 'ami'
-    // sellingHT = 100 * 1.15 = 115, tax = 23, TTC = 138
+    // sellingHT = 100*1.15 = 115, tax = 23, TTC = 138
     expect(store.sellingPrices.subtotalHT).toBe(115)
     expect(store.sellingPrices.totalTTC).toBe(138)
   })
@@ -251,14 +228,12 @@ describe('sellingPrices', () => {
   it('marge standard (40%) → TTC = 168', () => {
     const store = storeWithSubtotal100()
     store.selectedPricing = 'standard'
-    // sellingHT = 140, tax = 28, TTC = 168
     expect(store.sellingPrices.totalTTC).toBe(168)
   })
 
   it('marge pro (65%) → TTC = 198', () => {
     const store = storeWithSubtotal100()
     store.selectedPricing = 'pro'
-    // sellingHT = 165, tax = 33, TTC = 198
     expect(store.sellingPrices.totalTTC).toBe(198)
   })
 })
@@ -266,19 +241,20 @@ describe('sellingPrices', () => {
 // ── resetForNewQuote ──────────────────────────────────────────────────────────
 
 describe('resetForNewQuote', () => {
-  it('vide les champs client et projet', () => {
+  it('vide les champs client et remet pieces à une pièce vide', () => {
     const store = useCalculatorStore()
     store.clientFirstName = 'Alice'
     store.clientEmail = 'alice@test.com'
-    store.projectName = 'Mon projet'
-    store.quantity = 5
+    store.pieces[0].name = 'Mon projet'
+    store.pieces[0].quantity = 5
 
     store.resetForNewQuote()
 
     expect(store.clientFirstName).toBe('')
     expect(store.clientEmail).toBe('')
-    expect(store.projectName).toBe('')
-    expect(store.quantity).toBe(1)
+    expect(store.pieces.length).toBe(1)
+    expect(store.pieces[0].name).toBe('')
+    expect(store.pieces[0].quantity).toBe(1)
   })
 
   it('conserve les paramètres équipement', () => {
@@ -289,7 +265,6 @@ describe('resetForNewQuote', () => {
 
     store.resetForNewQuote()
 
-    // Ces champs ne font pas partie du reset
     expect(store.electricityRate).toBe(0.30)
     expect(store.printerCost).toBe(2500)
     expect(store.hourlyRate).toBe(35)
@@ -299,9 +274,7 @@ describe('resetForNewQuote', () => {
     const store = useCalculatorStore()
     const before = store.quoteNumber
     store.resetForNewQuote()
-    // Le numéro doit changer (nouveau random à 4 chiffres)
     expect(store.quoteNumber).toMatch(/^DEV-\d{8}-\d{4}$/)
-    // Statistiquement très peu probable qu'ils soient identiques
     expect(store.quoteNumber).not.toBe(before)
   })
 })
