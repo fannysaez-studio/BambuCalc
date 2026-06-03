@@ -388,7 +388,11 @@ export default {
   padding: 0 0.65rem;
 }
 .img-upload-area:hover { border-color: #2e9cab; background: #f0fbfc; }
-.img-upload-area--has { border-style: solid; border-color: #2e9cab; }
+/* Quand image chargée : zone compacte autour de la miniature */
+.img-upload-area--has {
+  border-style: solid; border-color: #2e9cab;
+  width: fit-content; max-width: 160px; padding: 0.2rem 2rem 0.2rem 0.4rem;
+}
 .img-placeholder {
   display: flex; flex-direction: row; align-items: center;
   gap: 0.5rem; padding: 0; width: 100%;
