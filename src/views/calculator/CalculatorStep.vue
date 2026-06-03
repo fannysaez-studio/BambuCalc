@@ -239,11 +239,13 @@
 
       <!-- ── Navigation bas ── -->
       <div class="step-nav">
-        <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
-        <div class="step-nav-right">
+        <div class="step-nav-left">
           <router-link to="/dashboard" class="btn-dash-icon" title="Tableau de bord">
             <LayoutDashboard :size="18" />
           </router-link>
+          <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
+        </div>
+        <div class="step-nav-right">
           <button
             v-if="currentStep === steps.length && isAdmin"
             class="btn-preview-devis"
@@ -874,6 +876,13 @@ export default {
   flex-shrink: 0;
 }
 
+
+.step-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
 
 .step-nav-right {
   display: flex;
