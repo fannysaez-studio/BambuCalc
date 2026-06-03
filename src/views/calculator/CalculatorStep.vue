@@ -241,13 +241,9 @@
       <div class="step-nav">
         <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
         <div class="step-nav-right">
-          <button
-            v-if="currentStep < steps.length"
-            class="btn-next"
-            @click="goNext"
-          >
-            Suivant →
-          </button>
+          <router-link to="/dashboard" class="btn-dash-icon" title="Tableau de bord">
+            <LayoutDashboard :size="18" />
+          </router-link>
           <button
             v-if="currentStep === steps.length && isAdmin"
             class="btn-preview-devis"
@@ -271,9 +267,13 @@
               {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
             </span>
           </button>
-          <router-link to="/dashboard" class="btn-dash-icon" title="Tableau de bord">
-            <LayoutDashboard :size="18" />
-          </router-link>
+          <button
+            v-if="currentStep < steps.length"
+            class="btn-next"
+            @click="goNext"
+          >
+            Suivant →
+          </button>
         </div>
       </div>
 
