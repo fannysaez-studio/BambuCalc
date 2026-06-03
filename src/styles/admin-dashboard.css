@@ -1,3 +1,9 @@
+/* ── Desktop/tablette : la sidebar gère la navigation, cache la tabs-bar horizontale ── */
+@media (min-width: 769px) {
+  .tabs-bar,
+  .tabs-burger { display: none !important; }
+}
+
 .admin-page {
   height: calc(100dvh - 4.5rem);
   overflow: hidden;
@@ -15,7 +21,7 @@
 .admin-banner {
   /* escapes the 1.5rem padding on top + sides to go edge-to-edge */
   height: 5rem;
-  margin: -1.5rem -1.5rem 0;
+  margin: -1.5rem -1.5rem 0; /* n'échappe que le padding interne, pas le padding-top du page-wrap */
   flex-shrink: 0;
   background:
     url('/hero-adminDashboard.svg') center / cover no-repeat,

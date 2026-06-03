@@ -536,8 +536,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, watch, markRaw, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
+import { useNavigationStore } from '@/stores/navigation'
 import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import { fmtEur } from '@/utils/formatters'
@@ -548,6 +549,8 @@ import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import PasswordField from '@/components/ui/PasswordField.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save } from 'lucide-vue-next'
+
+const navStore = useNavigationStore()
 
 // Tab labels pour le trigger mobile
 const tabMeta = {
@@ -615,6 +618,27 @@ const topMaterial = computed(() => {
   quotes.value.forEach(q => { if (q.material) counts[q.material] = (counts[q.material] || 0) + 1 })
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
 })
+
+// ── Onglets contextuels sidebar ──
+const clientContextTabs = computed(() => [
+  { id: 'quotes',  label: 'Mes devis',        icon: markRaw(FileText),  count: quotes.value.length },
+  { id: 'rdv',     label: 'Mes rendez-vous',  icon: markRaw(Calendar),  count: rdvTabs.value.find(t => t.id === 'upcoming')?.count },
+  { id: 'profile', label: 'Mon profil',       icon: markRaw(User) },
+])
+
+watch(clientContextTabs, (tabs) => {
+  navStore.setContext(tabs, activeTab.value)
+}, { deep: true, immediate: true })
+
+watch(() => navStore.activeContextTab, (val) => {
+  if (val && val !== activeTab.value) activeTab.value = val
+})
+
+watch(activeTab, (val) => {
+  if (navStore.activeContextTab !== val) navStore.setActiveTab(val)
+})
+
+onUnmounted(() => navStore.clearContext())
 
 // ── RDV computed ──
 function isPastRdv(a) { return a.start_at && new Date(a.start_at) < new Date() }
@@ -1746,6 +1770,12 @@ async function linkAccount() {
 }
 .pi-btn-logout:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
 .pi-btn-icon { width: 0.85rem; height: 0.85rem; }
+
+/* Desktop/tablette : la sidebar gère les onglets */
+@media (min-width: 769px) {
+  .client-tabs,
+  .dash-trigger-wrap { display: none !important; }
+}
 
 /* Tablette : padding bas pour la nav island */
 @media (max-width: 900px) and (min-width: 641px) {

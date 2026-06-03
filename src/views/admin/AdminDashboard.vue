@@ -442,8 +442,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, markRaw, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useNavigationStore } from '@/stores/navigation'
 import {
   adminDeleteQuote,
   adminDeleteUser,
@@ -479,9 +480,11 @@ import {
   SlidersHorizontal,
   Package,
   CalendarDays,
+  CalendarCheck,
   Wrench,
   ChevronDown,
   Mail,
+  Inbox,
   Bell,
   BellOff,
   Plus,
@@ -490,6 +493,7 @@ import {
 
 const router = useRouter()
 const calculatorStore = useCalculatorStore()
+const navStore = useNavigationStore()
 const toast = ref(null)
 const { isSupported: pushSupported, isSubscribed, permission: pushPermission, loading: pushLoading, init: initPush, subscribe: subscribePush, unsubscribe: unsubscribePush } = usePushNotifications()
 
@@ -559,6 +563,46 @@ const clientCount = computed(
       return isAnon ? quotes.value.some((q) => q.user_id === p.id) : true
     }).length,
 )
+
+// ── Onglets contextuels sidebar ──
+const adminContextTabs = computed(() => [
+  { id: 'clients', label: 'Clients', icon: markRaw(Users), count: clientCount.value },
+  { group: true, id: 'devis', label: 'Devis', icon: markRaw(FileText), count: quotes.value.length,
+    children: [
+      { id: 'quotes',   label: 'Tous les devis', icon: markRaw(FileText), count: quotes.value.length },
+      { id: 'manage',   label: 'Sauvegardés',    icon: markRaw(Send),     count: manageCount.value },
+      { id: 'archives', label: 'Archives',       icon: markRaw(Archive),  count: archiveCount.value },
+    ],
+  },
+  { separator: true },
+  { id: 'emails', label: 'Emails',       icon: markRaw(Inbox) },
+  { id: 'rdv',    label: 'Rendez-vous',  icon: markRaw(CalendarCheck), count: rdvCount.value || undefined },
+  { separator: true },
+  { group: true, id: 'outils', label: 'Outils', icon: markRaw(Wrench),
+    children: [
+      { id: 'catalogue', label: 'Catalogue',    icon: markRaw(Package),          count: catalogueCount.value || undefined },
+      { id: 'stats',     label: 'Statistiques', icon: markRaw(BarChart2) },
+      { id: 'settings',  label: 'Paramètres',   icon: markRaw(SlidersHorizontal) },
+    ],
+  },
+])
+
+// Sync computed → store (immediate = on mount aussi)
+watch(adminContextTabs, (tabs) => {
+  navStore.setContext(tabs, activeTab.value)
+}, { deep: true, immediate: true })
+
+// Store → local (clic depuis la sidebar)
+watch(() => navStore.activeContextTab, (val) => {
+  if (val && val !== activeTab.value) activeTab.value = val
+})
+
+// Local → store (changements depuis le code interne ex: go-to-quotes)
+watch(activeTab, (val) => {
+  if (navStore.activeContextTab !== val) navStore.setActiveTab(val)
+})
+
+onUnmounted(() => navStore.clearContext())
 
 ;(async () => {
   const { data, error } = await supabase.auth.getUser()
