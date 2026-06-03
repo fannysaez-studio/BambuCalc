@@ -61,6 +61,7 @@
             v-model:projectWidth="store.projectWidth"
             v-model:projectHeight="store.projectHeight"
             v-model:projectFinish="store.projectFinish"
+            v-model:projectFinishNote="store.projectFinishNote"
           />
 
           <!-- ── ÉTAPE 2 : Matière (identique pour tous) ── -->

@@ -43,7 +43,8 @@ export const useCalculatorStore = defineStore('calculator', {
     projectWidth: null,   // mm
     projectLength: null,  // mm
     projectHeight: null,  // mm
-    projectFinish: 'brut', // brut | ponce | peint | autre
+    projectFinish: 'brut',     // brut | ponce | peint | vernis | assemble | autre
+    projectFinishNote: '',     // texte libre si "autre"
 
     // Conditions devis
     paymentMethod: 'virement',
@@ -250,6 +251,7 @@ export const useCalculatorStore = defineStore('calculator', {
         projectLength:       null,
         projectHeight:       null,
         projectFinish:       'brut',
+        projectFinishNote:   '',
         paymentMethod:       'virement',
         depositPercent:      0,
         quoteNotes:          '',
