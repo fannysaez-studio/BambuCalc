@@ -46,17 +46,18 @@
             v-if="currentStep === 1"
             v-model:projectSeriesType="store.projectSeriesType"
             v-model:projectDescription="store.projectDescription"
-            v-model:quantity="store.quantity"
-            v-model:material="store.material"
-            v-model:costPerKg="store.costPerKg"
-            v-model:lossPercent="store.lossPercent"
-            v-model:colorCount="store.colorCount"
-            v-model:purgeWaste="store.purgeWaste"
-            v-model:materialId="store.materialId"
+            v-model:material="store.defaultMaterial"
+            v-model:costPerKg="store.defaultCostPerKg"
+            v-model:lossPercent="store.defaultLossPercent"
+            v-model:colorCount="store.defaultColorCount"
+            v-model:purgeWaste="ignoredPurge"
+            v-model:materialId="store.defaultMaterialId"
           />
 
-          <!-- ── ÉTAPES 2-5 ADMIN ── -->
+          <!-- ── ÉTAPES 2-6 ADMIN ── -->
           <template v-if="isAdmin && currentStep > 1">
+
+            <!-- Étape 2 : Client -->
             <ProjectDetails
               v-if="currentStep === 2"
               :quoteNumber="store.quoteNumber"
@@ -76,48 +77,56 @@
               v-model:clientCountry="store.clientCountry"
               v-model:clientSiret="store.clientSiret"
               v-model:clientVatNumber="store.clientVatNumber"
-              v-model:quantity="store.quantity"
-              v-model:projectName="store.projectName"
-              v-model:printProfile="store.printProfile"
-              v-model:printerModel="store.printerModel"
-              v-model:nozzleSize="store.nozzleSize"
-              :showTechnicalFields="true"
-              v-model:referenceImage="store.referenceImage"
-              v-model:referenceImageUrl="store.referenceImageUrl"
+            />
+
+            <!-- Étape 3 : Pièces + Conditions -->
+            <ProjectPieces
+              v-if="currentStep === 3"
+              v-model:pieces="store.pieces"
+              :defaultMaterialId="store.defaultMaterialId"
+              :defaultMaterial="store.defaultMaterial"
+              :defaultCostPerKg="store.defaultCostPerKg"
+              :defaultLossPercent="store.defaultLossPercent"
+              :defaultColorCount="store.defaultColorCount"
               v-model:paymentMethod="store.paymentMethod"
               v-model:depositPercent="store.depositPercent"
+              v-model:quoteValidityDays="store.quoteValidityDays"
               v-model:processingDelay="store.processingDelay"
               v-model:deliveryDelay="store.deliveryDelay"
               v-model:quoteNotes="store.quoteNotes"
             />
+
+            <!-- Étape 4 : Temps -->
             <PrintingTime
-              v-if="currentStep === 3"
+              v-if="currentStep === 4"
               v-model:printHours="store.printHours"
               v-model:printMinutes="store.printMinutes"
               v-model:prepTime="store.prepTime"
               v-model:postTime="store.postTime"
               v-model:hourlyRate="store.hourlyRate"
-              v-model:weight="store.weight"
-              v-model:purgeWaste="store.purgeWaste"
-              :colorCount="store.colorCount"
               :isAdmin="true"
             />
+
+            <!-- Étape 5 : Tarifs -->
             <PricingSuggestions
-              v-if="currentStep === 4"
+              v-if="currentStep === 5"
               :baseCost="store.calculatedCosts.subtotal"
-              :baseCostPerUnit="store.calculatedCosts.subtotal / Math.max(1, store.quantity)"
-              :seriesQuantity="store.quantity"
+              :baseCostPerUnit="store.calculatedCosts.subtotal / Math.max(1, store.calculatedCosts.quantity)"
+              :seriesQuantity="store.calculatedCosts.quantity"
               :volumeDiscount="0"
               :taxRate="store.taxRate"
               v-model:selectedPricing="store.selectedPricing"
               v-model:customMargin="store.customMargin"
             />
+
+            <!-- Étape 6 : Coûts -->
             <CostBreakdown
-              v-if="currentStep === 5"
+              v-if="currentStep === 6"
               :costs="store.calculatedCosts"
               :sellingPrices="store.sellingPrices"
               :isAdmin="true"
             />
+
           </template>
 
           <!-- ── ÉTAPES 2-4 CLIENT ── -->
@@ -129,17 +138,19 @@
                 <p class="qty-title">Quantité souhaitée</p>
                 <div class="qty-buttons">
                   <button v-for="q in quantityPresets" :key="q.value" type="button"
-                    :class="['qty-btn', store.quantity === q.value && 'qty-btn--active']"
-                    @click="store.quantity = q.value">
+                    :class="['qty-btn', store.pieces[0].quantity === q.value && 'qty-btn--active']"
+                    @click="store.pieces[0].quantity = q.value">
                     {{ q.label }}
                   </button>
                 </div>
                 <p class="qty-hint">Le tarif sera ajusté en fonction du nombre de pièces.</p>
               </div>
               <PrintingTime
-                v-model:weight="store.weight"
-                v-model:purgeWaste="store.purgeWaste"
-                :colorCount="store.colorCount"
+                v-model:printHours="store.printHours"
+                v-model:printMinutes="store.printMinutes"
+                v-model:prepTime="store.prepTime"
+                v-model:postTime="store.postTime"
+                v-model:hourlyRate="store.hourlyRate"
                 :isAdmin="false"
               />
             </div>
@@ -158,7 +169,7 @@
               v-model:paymentMethod="store.paymentMethod"
             />
 
-            <!-- Étape 4 : Confirmation (sans aucun détail de coût) -->
+            <!-- Étape 4 : Confirmation -->
             <div v-if="currentStep === 4" class="client-confirm">
               <div class="confirm-hero">
                 <span class="confirm-emoji">✅</span>
@@ -177,17 +188,17 @@
                   <span class="confirm-key">Description</span>
                   <span class="confirm-val confirm-val--desc">{{ store.projectDescription }}</span>
                 </div>
-                <div v-if="store.material" class="confirm-row">
+                <div v-if="store.defaultMaterial" class="confirm-row">
                   <span class="confirm-key">Matière</span>
-                  <span class="confirm-val">{{ store.material }}</span>
+                  <span class="confirm-val">{{ store.defaultMaterial }}</span>
                 </div>
                 <div class="confirm-row">
                   <span class="confirm-key">Quantité</span>
-                  <span class="confirm-val">{{ store.quantity }} pièce(s)</span>
+                  <span class="confirm-val">{{ store.pieces[0].quantity }} pièce(s)</span>
                 </div>
-                <div v-if="store.colorCount > 1" class="confirm-row">
+                <div v-if="store.defaultColorCount > 1" class="confirm-row">
                   <span class="confirm-key">Couleurs</span>
-                  <span class="confirm-val">{{ store.colorCount }} couleurs</span>
+                  <span class="confirm-val">{{ store.defaultColorCount }} couleurs</span>
                 </div>
               </div>
               <p class="confirm-rgpd">
@@ -264,6 +275,7 @@ import { checkIsAdmin } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
 import ProjectDetails    from '@/components/calculator/ProjectDetails.vue'
 import ProjectMatter     from '@/components/calculator/ProjectMatter.vue'
+import ProjectPieces     from '@/components/calculator/ProjectPieces.vue'
 import ClientInfo        from '@/components/calculator/ClientInfo.vue'
 import FilamentSection   from '@/components/calculator/FilamentSection.vue'
 import PrintingTime      from '@/components/calculator/PrintingTime.vue'
@@ -276,7 +288,7 @@ import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 export default {
   name: 'CalculatorStep',
   components: {
-    ProjectDetails, ProjectMatter, ClientInfo, FilamentSection,
+    ProjectDetails, ProjectMatter, ProjectPieces, ClientInfo, FilamentSection,
     PrintingTime, PricingSuggestions, CostBreakdown, ToastMessage,
     QuotePreviewModal,
     Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard,
@@ -304,6 +316,7 @@ export default {
       saving: false,
       saveStatus: null,
       showPreview: false,
+      ignoredPurge: 0,
       quantityPresets: [
         { value: 1,   label: '1 — Unique' },
         { value: 5,   label: '5' },
@@ -329,53 +342,85 @@ export default {
     },
 
     previewQuote() {
-      const s  = this.store
-      const c  = s.calculatedCosts
-      const sp = s.sellingPrices
+      const s   = this.store
+      const c   = s.calculatedCosts
+      const sp  = s.sellingPrices
+      const margin   = sp.margin / 100
+      const taxRate  = (Number(s.taxRate) || 20) / 100
+      const coeff    = s.projectCoeff
+      const overhead = c.equipmentCost + c.workCost + c.packagingCost
+      const totalMat = c.materialCost || 0.001
+
       const displayName = s.clientType === 'particulier'
         ? [s.clientCivility, s.clientFirstName, s.clientLastName].filter(Boolean).join(' ')
         : s.clientName
+
+      const items = s.pieces.map(p => {
+        const qty   = Math.max(1, p.quantity || 1)
+        const w     = p.weight || 0
+        const loss  = (p.lossPercent || 0) / 100
+        const purge = p.colorCount > 1 ? (p.purgeWaste || 0) : 0
+        const pieceWeight  = w * qty * (1 + loss) + purge * qty
+        const pieceMat     = (pieceWeight / 1000) * (p.costPerKg || 0)
+        const pieceOverhead = (pieceMat / totalMat) * overhead
+        const pieceCost    = (pieceMat + pieceOverhead) * coeff
+        const pieceHT      = pieceCost * (1 + margin)
+        const pieceTTC     = pieceHT * (1 + taxRate)
+        const r = v => Math.round(v * 100) / 100
+        return {
+          id:               p.id,
+          name:             p.name || '—',
+          quantity:         qty,
+          weight:           Math.round(pieceWeight * 10) / 10,
+          material:         p.material || '—',
+          colorCount:       p.colorCount || 1,
+          referenceImageUrl: p.referenceImageUrl || '',
+          unitPriceHT:      r(pieceHT / qty),
+          totalTTC:         r(pieceTTC),
+          tvaPart:          r(pieceTTC - pieceHT),
+        }
+      })
+
       return {
-        quote_number:       s.quoteNumber,
-        quote_date:         s.quoteDate,
+        quote_number:        s.quoteNumber,
+        quote_date:          s.quoteDate,
         quote_validity_days: s.quoteValidityDays,
-        status:             'pending',
-        client_name:        displayName,
+        status:              'pending',
+        client_name:         displayName,
         client_contact_name: s.clientContactName,
-        client_first_name:  s.clientFirstName,
-        client_last_name:   s.clientLastName,
-        client_civility:    s.clientCivility,
-        client_email:       s.clientEmail,
-        client_phone:       s.clientPhone,
-        client_address:     s.clientAddress,
-        client_postal_code: s.clientPostalCode,
-        client_city:        s.clientCity,
-        client_country:     s.clientCountry,
-        client_siret:       s.clientSiret,
-        client_vat_number:  s.clientVatNumber,
-        project_name:       s.projectName,
-        quantity:           s.quantity,
-        project_type:       s.projectType,
-        printer_model:      s.printerModel,
-        nozzle_size:        s.nozzleSize,
-        material:           s.material,
-        weight:             s.weight,
-        print_hours:        s.printHours,
-        print_minutes:      s.printMinutes,
-        tax_rate:           s.taxRate,
-        payment_method:     s.paymentMethod,
-        deposit_percent:    s.depositPercent,
-        processing_delay:   s.processingDelay,
-        delivery_delay:     s.deliveryDelay,
-        quote_notes:        s.quoteNotes,
-        material_cost:      c.materialCost,
-        equipment_cost:     c.equipmentCost,
-        work_cost:          c.workCost,
-        subtotal_ht:        c.subtotal,
-        margin_percent:     sp.margin,
-        total_cost:         sp.totalTTC,
-        cost_per_unit:      sp.pricePerUnit,
-        reference_image_url: s.referenceImageUrl || null,
+        client_first_name:   s.clientFirstName,
+        client_last_name:    s.clientLastName,
+        client_civility:     s.clientCivility,
+        client_email:        s.clientEmail,
+        client_phone:        s.clientPhone,
+        client_address:      s.clientAddress,
+        client_postal_code:  s.clientPostalCode,
+        client_city:         s.clientCity,
+        client_country:      s.clientCountry,
+        client_siret:        s.clientSiret,
+        client_vat_number:   s.clientVatNumber,
+        project_name:        s.pieces.length === 1
+          ? (s.pieces[0].name || '')
+          : `Multi-pièces (${s.pieces.length})`,
+        quantity:            c.quantity,
+        printer_model:       s.printerModel,
+        nozzle_size:         s.nozzleSize,
+        print_hours:         s.printHours,
+        print_minutes:       s.printMinutes,
+        tax_rate:            s.taxRate,
+        payment_method:      s.paymentMethod,
+        deposit_percent:     s.depositPercent,
+        processing_delay:    s.processingDelay,
+        delivery_delay:      s.deliveryDelay,
+        quote_notes:         s.quoteNotes,
+        material_cost:       c.materialCost,
+        equipment_cost:      c.equipmentCost,
+        work_cost:           c.workCost,
+        subtotal_ht:         c.subtotal,
+        margin_percent:      sp.margin,
+        total_cost:          sp.totalTTC,
+        cost_per_unit:       sp.pricePerUnit,
+        items,
       }
     },
 
@@ -383,10 +428,11 @@ export default {
       if (this.isAdmin) {
         return [
           { step: 1, label: 'Projet & Matière', icon: 'Package',    description: 'Type de projet, filament et couleurs.' },
-          { step: 2, label: 'Client & Pièce',   icon: 'Layers',     description: 'Informations client, nom de pièce et imprimante.' },
-          { step: 3, label: 'Temps',            icon: 'Clock',      description: "Durée d'impression et temps de travail." },
-          { step: 4, label: 'Tarifs',           icon: 'Tag',        description: 'Choisissez votre marge et la tarification.' },
-          { step: 5, label: 'Coûts',            icon: 'BarChart3',  description: 'Résumé complet des coûts et total TTC.' },
+          { step: 2, label: 'Client',           icon: 'User',       description: 'Informations client et adresse.' },
+          { step: 3, label: 'Pièces',           icon: 'Layers',     description: 'Pièces à imprimer, filaments, images et conditions.' },
+          { step: 4, label: 'Temps',            icon: 'Clock',      description: "Durée d'impression et temps de travail." },
+          { step: 5, label: 'Tarifs',           icon: 'Tag',        description: 'Choisissez votre marge et la tarification.' },
+          { step: 6, label: 'Coûts',            icon: 'BarChart3',  description: 'Résumé complet des coûts et total TTC.' },
         ]
       }
       return [
@@ -399,11 +445,6 @@ export default {
 
   },
 
-  watch: {
-    'store.weight'()     { this.store.purgeWaste = this.store.purgeWeightAuto },
-    'store.colorCount'() { this.store.purgeWaste = this.store.purgeWeightAuto },
-  },
-
   methods: {
     navigateToStep(step) {
       if (step >= this.currentStep) return
@@ -413,17 +454,21 @@ export default {
     validate() {
       const s = this.store
       if (this.currentStep === 1) {
-        if (!s.costPerKg || s.costPerKg <= 0) return 'Veuillez sélectionner un filament.'
+        if (!s.defaultCostPerKg || s.defaultCostPerKg <= 0) return 'Veuillez sélectionner un filament.'
         return null
       }
       if (this.isAdmin) {
         switch (this.currentStep) {
           case 2: {
-            if (!s.projectName?.trim()) return 'Le nom de la pièce est obligatoire.'
             const hasName = s.clientType === 'particulier'
               ? (s.clientFirstName?.trim() || s.clientLastName?.trim())
               : s.clientName?.trim()
             if (!hasName) return 'Le nom du client est obligatoire.'
+            return null
+          }
+          case 3: {
+            const hasNamedPiece = s.pieces.some(p => p.name?.trim())
+            if (!hasNamedPiece) return 'Au moins une pièce doit avoir un nom.'
             return null
           }
           default: return null
@@ -442,7 +487,27 @@ export default {
     goNext() {
       const err = this.validate()
       if (err) { this.$refs.toast.show(err, 'error'); return }
-      const messages = ['Projet enregistré ✓', 'Matière enregistrée ✓', 'Temps enregistré ✓', 'Tarif sélectionné ✓']
+
+      // Synchro step 1 → pièces sans filament affecté
+      if (this.currentStep === 1) {
+        this.store.pieces = this.store.pieces.map(p =>
+          !p.materialId ? {
+            ...p,
+            materialId:  this.store.defaultMaterialId,
+            material:    this.store.defaultMaterial,
+            costPerKg:   this.store.defaultCostPerKg,
+            lossPercent: this.store.defaultLossPercent,
+          } : p
+        )
+      }
+
+      const messages = [
+        'Projet enregistré ✓',
+        'Client enregistré ✓',
+        'Pièces enregistrées ✓',
+        'Temps enregistré ✓',
+        'Tarif sélectionné ✓',
+      ]
       this.$refs.toast.show(messages[this.currentStep - 1] || 'Étape validée ✓', 'success', 2000)
       this.$router.push(`/calculator/${this.currentStep + 1}`)
     },
@@ -488,20 +553,22 @@ export default {
         const quoteNumber = editId ? s.quoteNumber : await this.generateSequentialQuoteNumber()
         if (!editId) s.quoteNumber = quoteNumber
 
-        // En édition : conserve l'URL existante si aucun nouveau fichier n'est uploadé
-        // Les blob: URLs ne sont valides que dans la session courante → jamais sauvegarder en DB
-        let referenceImageUrl = (s.referenceImageUrl || '').startsWith('blob:') ? '' : (s.referenceImageUrl || '')
-        if (s.referenceImage) {
-          const ext  = s.referenceImage.name.split('.').pop()
-          const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-          const { error: uploadError } = await supabase.storage
-            .from('quote-images').upload(path, s.referenceImage, { upsert: true })
-          if (!uploadError) {
-            const { data: urlData } = supabase.storage.from('quote-images').getPublicUrl(path)
-            referenceImageUrl = urlData.publicUrl
-            // Mettre à jour le store avec l'URL Supabase (remplace le blob URL temporaire)
-            s.referenceImageUrl = referenceImageUrl
-            s.referenceImage = null
+        // Upload images pour toutes les pièces
+        for (let i = 0; i < s.pieces.length; i++) {
+          const piece = s.pieces[i]
+          // Nettoyer les blob URLs périmées
+          if ((piece.referenceImageUrl || '').startsWith('blob:')) {
+            s.pieces[i] = { ...piece, referenceImageUrl: '' }
+          }
+          if (piece.referenceImage) {
+            const ext  = piece.referenceImage.name.split('.').pop()
+            const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+            const { error: upErr } = await supabase.storage
+              .from('quote-images').upload(path, piece.referenceImage, { upsert: true })
+            if (!upErr) {
+              const { data: urlData } = supabase.storage.from('quote-images').getPublicUrl(path)
+              s.pieces[i] = { ...s.pieces[i], referenceImageUrl: urlData.publicUrl, referenceImage: null }
+            }
           }
         }
 
@@ -518,13 +585,17 @@ export default {
           client_address: s.clientAddress, client_postal_code: s.clientPostalCode,
           client_city: s.clientCity, client_country: s.clientCountry,
           client_siret: s.clientSiret, client_vat_number: s.clientVatNumber,
-          project_name: s.projectName, quantity: s.quantity,
+          // Champs pièce (rétrocompat + first piece pour l'affichage dashboard)
+          project_name: s.pieces.length === 1
+            ? (s.pieces[0].name || '')
+            : `Multi-pièces (${s.pieces.length})`,
+          quantity:     c.quantity,
           project_type: s.projectType,
           project_series_type: s.projectSeriesType || null,
           project_description: s.projectDescription || null,
           print_profile: s.printProfile, printer_model: s.printerModel, nozzle_size: s.nozzleSize,
-          material: s.material, cost_per_kg: s.costPerKg,
-          weight: s.weight, loss_percent: s.lossPercent, color_count: s.colorCount, purge_waste: s.purgeWaste,
+          material:      s.pieces[0]?.material || s.defaultMaterial || '',
+          weight:        c.totalWeight,
           print_hours: s.printHours, print_minutes: s.printMinutes,
           prep_time: s.prepTime, post_time: s.postTime, hourly_rate: s.hourlyRate,
           packaging_cost: s.packagingCost, tax_rate: s.taxRate,
@@ -533,7 +604,17 @@ export default {
           work_cost: c.workCost, subtotal_ht: c.subtotal,
           margin_percent: sp.margin,
           total_cost: sp.totalTTC, cost_per_unit: sp.pricePerUnit,
-          reference_image_url: referenceImageUrl || null,
+          // Image rétrocompat (première pièce avec image)
+          reference_image_url: s.pieces.find(p => p.referenceImageUrl)?.referenceImageUrl || null,
+          // Tableau complet des pièces
+          items: s.pieces.map(p => ({
+            id: p.id, name: p.name, quantity: p.quantity || 1,
+            weight: p.weight || 0, lossPercent: p.lossPercent || 5,
+            colorCount: p.colorCount || 1, purgeWaste: p.purgeWaste || 0,
+            materialId: p.materialId || null, material: p.material || '',
+            costPerKg: p.costPerKg || 0,
+            referenceImageUrl: p.referenceImageUrl || null,
+          })),
         }
 
         let savedQuote
@@ -667,7 +748,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  flex-shrink: 0; /* ne grossit PAS — laisse justify-content: center agir */
+  flex-shrink: 0;
 }
 
 /* ── Carte de l'étape ── */
@@ -680,7 +761,6 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* Hauteur max = viewport - stepper(~76px) - nav(~44px) - padding(28px) - gaps(24px) */
   max-height: calc(100dvh - 172px);
   flex-shrink: 1;
 }
@@ -890,19 +970,16 @@ export default {
    RESPONSIVE MOBILE (< 640px)
 ══════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-  /* ── Page ── */
   .step-page {
     padding: 0.75rem 0.85rem 5rem;
     gap: 0.45rem;
     justify-content: flex-start;
   }
 
-  /* ── Stepper ── */
   .stepper {
     padding: 0.6rem 0.85rem;
   }
 
-  /* Masque toutes les labels sauf l'étape active */
   .step-label { display: none; }
   .label-active {
     display: block;
@@ -918,14 +995,12 @@ export default {
     height: 1.75rem;
   }
 
-  /* ── Zone contenu ── */
   .content-area {
     flex: 1;
     min-height: 0;
     gap: 0.5rem;
   }
 
-  /* ── Carte ── */
   .step-card {
     max-height: calc(100dvh - 214px);
     border-radius: 16px;
@@ -950,7 +1025,6 @@ export default {
   .step-card-title { font-size: 0.9rem; }
   .step-card-desc  { font-size: 0.7rem; }
 
-  /* ── Navigation bas ── */
   .step-nav {
     padding: 0;
     gap: 0.5rem;
