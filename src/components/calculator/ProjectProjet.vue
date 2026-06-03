@@ -65,12 +65,22 @@
     <!-- Finition -->
     <div :class="formStyles.formGroup">
       <label :class="formStyles.label">Finition souhaitée <span class="optional">optionnel</span></label>
+      <div class="finish-buttons">
+        <button v-for="f in finishes" :key="f.value" type="button"
+          :class="['finish-btn', projectFinish === f.value && 'finish-btn--active']"
+          @click="$emit('update:projectFinish', f.value)">
+          <component :is="f.icon" class="finish-icon" />
+          <span class="finish-label">{{ f.label }}</span>
+        </button>
+      </div>
       <input
+        v-if="projectFinish === 'autre'"
         :class="formStyles.input"
         type="text"
         :value="projectFinishNote"
         @input="$emit('update:projectFinishNote', $event.target.value)"
-        placeholder="Ex: poncé, peint, vernis, brut…"
+        placeholder="Précisez la finition souhaitée…"
+        style="margin-top: 0.45rem;"
       />
     </div>
 
@@ -79,22 +89,35 @@
 
 <script>
 import formStyles from '@/styles/Form.module.css'
+import { Printer, Wrench, Sparkles } from 'lucide-vue-next'
+
 export default {
   name: 'ProjectProjet',
+  components: { Printer, Wrench, Sparkles },
   props: {
     projectSeriesType:  { type: String, default: 'unique' },
     projectDescription: { type: String, default: '' },
     projectLength:      { type: Number, default: null },
     projectWidth:       { type: Number, default: null },
     projectHeight:      { type: Number, default: null },
+    projectFinish:      { type: String, default: 'brut' },
     projectFinishNote:  { type: String, default: '' },
   },
   emits: [
     'update:projectSeriesType', 'update:projectDescription',
     'update:projectLength', 'update:projectWidth', 'update:projectHeight',
-    'update:projectFinishNote',
+    'update:projectFinish', 'update:projectFinishNote',
   ],
-  data() { return { formStyles } },
+  data() {
+    return {
+      formStyles,
+      finishes: [
+        { value: 'brut',     icon: 'Printer', label: 'Brut' },
+        { value: 'assemble', icon: 'Wrench',  label: 'Assemblé' },
+        { value: 'autre',    icon: 'Sparkles',label: 'Autre' },
+      ],
+    }
+  },
 }
 </script>
 
@@ -114,6 +137,24 @@ export default {
 .input-unit-wrap input { flex: 1; }
 .unit { font-size: 0.75rem; font-weight: 700; color: #4a5568; white-space: nowrap; }
 
+
+.finish-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.finish-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  padding: 0.6rem 0.4rem; border: 1.5px solid #e2e8f0; border-radius: 12px;
+  background: #fff; cursor: pointer; font-family: inherit;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.finish-btn:hover { border-color: #2e9cab; background: #f0fbfc; }
+.finish-btn--active {
+  border-color: #2e9cab;
+  background: linear-gradient(135deg, #e8f7f9, #d0f0f5);
+  box-shadow: 0 0 0 3px rgba(46,156,171,0.15);
+}
+.finish-icon { width: 1.15rem; height: 1.15rem; color: #718096; }
+.finish-btn--active .finish-icon { color: #1f7f97; }
+.finish-label { font-size: 0.72rem; font-weight: 700; color: #4a5568; }
+.finish-btn--active .finish-label { color: #1f7f97; }
 
 @media (max-width: 480px) {
   .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
