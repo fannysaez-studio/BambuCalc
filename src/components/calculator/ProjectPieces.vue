@@ -105,7 +105,9 @@
           @dragover.prevent @drop.prevent="handleDrop($event, idx)">
           <template v-if="piece.referenceImageUrl">
             <img :src="piece.referenceImageUrl" class="img-preview" alt=""
-              @error="imgErrors[idx] = true" @load="imgErrors[idx] = false" />
+              @error="imgErrors[idx] = true" @load="imgErrors[idx] = false"
+              @click.stop="zoomImg = piece.referenceImageUrl"
+              title="Cliquez pour agrandir" style="cursor:zoom-in" />
             <div v-if="imgErrors[idx]" class="img-placeholder img-placeholder--saved">
               <span class="img-ph-icon">🖼️</span>
               <span class="img-ph-text">Image enregistrée</span>
@@ -124,6 +126,14 @@
       </div>
 
     </div><!-- /piece-card -->
+
+    <!-- Modal zoom image -->
+    <teleport to="body">
+      <div v-if="zoomImg" class="zoom-overlay" @click="zoomImg = ''">
+        <img :src="zoomImg" class="zoom-img" alt="" />
+        <button class="zoom-close" type="button" @click.stop="zoomImg = ''">✕</button>
+      </div>
+    </teleport>
 
     <!-- Bouton ajouter une pièce -->
     <button class="btn-add-piece" type="button" @click="addPiece">
@@ -157,6 +167,7 @@ export default {
       rawMaterials: [],
       imgRefs:      {},
       imgErrors:    {},
+      zoomImg:      '',
     }
   },
   computed: {
@@ -419,6 +430,25 @@ export default {
   font-family: inherit; cursor: pointer; transition: all 0.2s ease;
 }
 .btn-add-piece:hover { background: #e8f7f9; border-color: #2e9cab; }
+
+/* ── Zoom image modal ── */
+.zoom-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  z-index: 99999; display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out; padding: 1rem;
+}
+.zoom-img {
+  max-width: 90vw; max-height: 90vh; object-fit: contain;
+  border-radius: 10px; box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.zoom-close {
+  position: fixed; top: 1rem; right: 1rem;
+  width: 2.4rem; height: 2.4rem; border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.15); color: #fff; font-size: 1.1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.zoom-close:hover { background: rgba(255,255,255,0.28); }
 
 @media (max-width: 480px) {
   .grid-2 { grid-template-columns: 1fr; }
