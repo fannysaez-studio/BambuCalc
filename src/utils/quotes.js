@@ -1,5 +1,39 @@
 import { supabase } from '../lib/supabase'
 
+// Reconstruit le tableau pieces[] depuis un devis DB (new items[] ou legacy flat fields)
+export function buildPiecesFromQuote(q) {
+  if (q.items?.length) {
+    return q.items.map((item, i) => ({
+      id:               item.id || `piece-${i + 1}`,
+      name:             item.name || '',
+      quantity:         item.quantity ?? 1,
+      weight:           item.weight ?? 0,
+      lossPercent:      item.lossPercent ?? 5,
+      colorCount:       item.colorCount ?? 1,
+      purgeWaste:       item.purgeWaste ?? 0,
+      materialId:       item.materialId || null,
+      material:         item.material || '',
+      costPerKg:        item.costPerKg ?? 0,
+      referenceImage:   null,
+      referenceImageUrl: item.referenceImageUrl || '',
+    }))
+  }
+  return [{
+    id:               'piece-1',
+    name:             q.project_name || '',
+    quantity:         q.quantity ?? 1,
+    weight:           q.weight ?? 0,
+    lossPercent:      q.loss_percent ?? 5,
+    colorCount:       q.color_count ?? 1,
+    purgeWaste:       q.purge_waste ?? 0,
+    materialId:       null,
+    material:         q.material || '',
+    costPerKg:        q.cost_per_kg ?? 0,
+    referenceImage:   null,
+    referenceImageUrl: (q.reference_image_url || '').startsWith('blob:') ? '' : (q.reference_image_url || ''),
+  }]
+}
+
 // ── Opérations utilisateur ────────────────────────────────────────────────────
 
 export async function saveQuote(quote) {

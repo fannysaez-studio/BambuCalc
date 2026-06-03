@@ -90,14 +90,52 @@ async function loadImageDataUrl(url) {
 }
 
 async function _buildDoc(quote, mode = 'client') {
-  let refImageData = null
-  if (quote.reference_image_url) {
-    try {
-      refImageData = await loadImageDataUrl(quote.reference_image_url)
-    } catch {
-      /* CORS */
-    }
+  const taxRate = quote.tax_rate ?? 20
+
+  // ── Construction des lignes (multi-pièces ou legacy) ─────────────
+  let items
+  if (quote.items?.length) {
+    items = quote.items.map(item => ({
+      name:             item.name || '—',
+      quantity:         item.quantity ?? 1,
+      weight:           item.weight || 0,
+      material:         item.material || '—',
+      colorCount:       item.colorCount || 1,
+      referenceImageUrl:item.referenceImageUrl || '',
+      unitPriceHT:      item.unitPriceHT ?? 0,
+      totalTTC:         item.totalTTC ?? 0,
+      tvaPart:          item.tvaPart ?? 0,
+    }))
+  } else {
+    const uph = (quote.cost_per_unit || 0) / (1 + taxRate / 100)
+    const ttc = quote.total_cost || 0
+    items = [{
+      name:             `Impression 3D — ${quote.project_name || '—'}`,
+      quantity:         quote.quantity ?? 1,
+      weight:           quote.weight || 0,
+      material:         quote.material || '—',
+      colorCount:       1,
+      referenceImageUrl:quote.reference_image_url || '',
+      unitPriceHT:      uph,
+      totalTTC:         ttc,
+      tvaPart:          ttc - uph * (quote.quantity ?? 1),
+    }]
   }
+
+  // Charger toutes les images en parallèle
+  const itemImages = await Promise.all(
+    items.map(async item => {
+      if (!item.referenceImageUrl) return null
+      try { return await loadImageDataUrl(item.referenceImageUrl) }
+      catch { return null }
+    })
+  )
+  const hasAnyImage = itemImages.some(Boolean)
+
+  // Totaux globaux
+  const allTotalTTC = items.reduce((s, i) => s + i.totalTTC, 0)
+  const allTotalHT  = allTotalTTC / (1 + taxRate / 100)
+  const allTotalTVA = allTotalTTC - allTotalHT
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210
@@ -228,140 +266,100 @@ async function _buildDoc(quote, mode = 'client') {
   doc.text('OBJET :', margin, y + 4)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...DARK)
-  doc.text(quote.project_name || '—', margin + 20, y + 4)
+  const objetLabel = items.length > 1
+    ? `Impression 3D multi-pièces — ${items.length} article(s)`
+    : (quote.project_name || '—')
+  doc.text(objetLabel, margin + 20, y + 4)
   y += 9
 
   // ── TABLEAU ───────────────────────────────────────────────────
-  const taxRate = quote.tax_rate ?? 20
-  const unitPriceHT = (quote.cost_per_unit || 0) / (1 + taxRate / 100)
-  const totalHT = unitPriceHT * (quote.quantity || 1)
-  const totalTVA = (quote.total_cost || 0) - totalHT
-
-  const printerLabel =
-    {
-      'p2s-combo': 'Bambu P2S Combo',
-      'p2s-mono': 'Bambu P2S Monocouleur',
-      x1c: 'Bambu X1C',
-      'a1-mini': 'Bambu A1 Mini',
-      a1: 'Bambu A1',
-    }[quote.printer_model] ||
-    quote.printer_model ||
-    '—'
-
-  const printTime =
-    quote.print_hours || quote.print_minutes
-      ? `${quote.print_hours || 0}h${String(quote.print_minutes || 0).padStart(2, '0')}`
-      : null
-
-  const specParts = [
-    `Matière : ${quote.material || '—'}`,
-    printTime ? `Durée impression : ${printTime}` : null,
-    quote.weight ? `Poids : ${quote.weight} g` : null,
-    quote.nozzle_size ? `Buse : ${quote.nozzle_size} mm` : null,
-    `Imprimante : ${printerLabel}`,
-  ].filter(Boolean)
-
-  // Titre + lignes specs séparées pour rendu manuel avec puces
-  const descTitle = `Impression 3D — ${quote.project_name || '—'}`
-  const descSpecs = specParts  // tableau de strings, sans indentation
-
-  // Pour autoTable : texte vide dans col 0 (rendu manuel dans didDrawCell)
-  const PHOTO_COL_W = 38
+  const PHOTO_COL_W = 32
   const IMG_W = PHOTO_COL_W - 6
-  const IMG_H = 28
-  // Hauteur cellule description = titre + specs avec espacement
-  const DESC_CELL_H = Math.max(4 + 6 + descSpecs.length * 5 + 4, refImageData ? IMG_H + 10 : 28)
+  const IMG_H = 22
+  const ROW_H = IMG_H + 10  // hauteur minimale par ligne
 
-  const tableHead = refImageData
+  const tableHead = hasAnyImage
     ? [['Désignation / Spécifications', 'Photo réf.', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']]
     : [['Désignation / Spécifications', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']]
 
-  const tableBody = refImageData
-    ? [['', '', quote.quantity ?? 1, fmtEur(unitPriceHT), fmtEur(totalTVA), fmtEur(quote.total_cost || 0)]]
-    : [['', quote.quantity ?? 1, fmtEur(unitPriceHT), fmtEur(totalTVA), fmtEur(quote.total_cost || 0)]]
+  const tableBody = items.map(item => hasAnyImage
+    ? ['', '', item.quantity, fmtEur(item.unitPriceHT), fmtEur(item.tvaPart), fmtEur(item.totalTTC)]
+    : ['', item.quantity, fmtEur(item.unitPriceHT), fmtEur(item.tvaPart), fmtEur(item.totalTTC)]
+  )
 
-  const colStyles = refImageData
-    ? {
-        0: { cellWidth: 'auto' },
-        1: { cellWidth: PHOTO_COL_W, halign: 'center' },
-        2: { cellWidth: 14, halign: 'center' },
-        3: { cellWidth: 27, halign: 'right' },
-        4: { cellWidth: 22, halign: 'right' },
-        5: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
-      }
-    : {
-        0: { cellWidth: 'auto' },
-        1: { cellWidth: 14, halign: 'center' },
-        2: { cellWidth: 27, halign: 'right' },
-        3: { cellWidth: 22, halign: 'right' },
-        4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
-      }
+  const colStyles = hasAnyImage
+    ? { 0: { cellWidth: 'auto' }, 1: { cellWidth: PHOTO_COL_W, halign: 'center' },
+        2: { cellWidth: 14, halign: 'center' }, 3: { cellWidth: 27, halign: 'right' },
+        4: { cellWidth: 22, halign: 'right' }, 5: { cellWidth: 30, halign: 'right', fontStyle: 'bold' } }
+    : { 0: { cellWidth: 'auto' }, 1: { cellWidth: 14, halign: 'center' },
+        2: { cellWidth: 27, halign: 'right' }, 3: { cellWidth: 22, halign: 'right' },
+        4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' } }
 
   autoTable(doc, {
     startY: y,
     margin: { left: margin, right: margin },
     head: tableHead,
     body: tableBody,
-    styles: {
-      fontSize: 8,
-      cellPadding: 3.5,
-      textColor: DARK,
-      lineColor: [226, 232, 240],
-      lineWidth: 0.25,
-    },
+    styles: { fontSize: 8, cellPadding: 3.5, textColor: DARK, lineColor: [226, 232, 240], lineWidth: 0.25 },
     headStyles: { fillColor: TEAL, textColor: WHITE, fontStyle: 'bold', fontSize: 7.5 },
     alternateRowStyles: { fillColor: [249, 250, 252] },
     columnStyles: colStyles,
     didParseCell(data) {
-      if (data.section !== 'body' || data.row.index !== 0) return
-      // Cellule description : réserver la hauteur + vider le texte (rendu manuel)
+      if (data.section !== 'body') return
+      const rowIdx = data.row.index
+      const imgData = itemImages[rowIdx]
       if (data.column.index === 0) {
-        data.cell.styles.minCellHeight = DESC_CELL_H
+        const item = items[rowIdx]
+        const specs = [
+          `Matière : ${item.material}`,
+          item.weight ? `Poids total : ${item.weight} g` : null,
+          item.colorCount > 1 ? `${item.colorCount} couleurs` : null,
+        ].filter(Boolean)
+        data.cell.styles.minCellHeight = Math.max(ROW_H, 10 + specs.length * 5)
         data.cell.text = []
       }
-      // Cellule photo : réserver la hauteur
-      if (refImageData && data.column.index === 1) {
-        data.cell.styles.minCellHeight = DESC_CELL_H
+      if (hasAnyImage && data.column.index === 1) {
+        data.cell.styles.minCellHeight = ROW_H
         data.cell.text = []
       }
     },
     didDrawCell(data) {
-      if (data.section !== 'body' || data.row.index !== 0) return
+      if (data.section !== 'body') return
+      const rowIdx = data.row.index
+      const item   = items[rowIdx]
+      const imgData = itemImages[rowIdx]
 
-      // ── Colonne photo ──────────────────────────────────────
-      if (refImageData && data.column.index === 1) {
-        const px = data.cell.x + (data.cell.width - IMG_W) / 2
-        const py = data.cell.y + (data.cell.height - IMG_H) / 2
-        doc.addImage(refImageData, 'JPEG', px, py, IMG_W, IMG_H, undefined, 'MEDIUM')
-        doc.setFontSize(6)
-        doc.setFont('helvetica', 'italic')
-        doc.setTextColor(160, 174, 192)
-        doc.text('Réf. client', px + IMG_W / 2, py + IMG_H + 3, { align: 'center' })
+      // ── Photo ──
+      if (hasAnyImage && data.column.index === 1) {
+        if (imgData) {
+          const px = data.cell.x + (data.cell.width - IMG_W) / 2
+          const py = data.cell.y + (data.cell.height - IMG_H) / 2
+          doc.addImage(imgData, 'JPEG', px, py, IMG_W, IMG_H, undefined, 'MEDIUM')
+          doc.setFontSize(6); doc.setFont('helvetica', 'italic'); doc.setTextColor(160, 174, 192)
+          doc.text('Réf. client', px + IMG_W / 2, py + IMG_H + 3, { align: 'center' })
+        }
         return
       }
 
-      // ── Colonne description avec puces teal ────────────────
+      // ── Description ──
       if (data.column.index !== 0) return
       const pad = 3.5
       const x0  = data.cell.x + pad
       let   ly  = data.cell.y + pad + 4
 
-      // Titre gras
-      doc.setFont('helvetica', 'bold')
-      doc.setFontSize(8.5)
-      doc.setTextColor(...DARK)
-      doc.text(descTitle, x0, ly)
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(...DARK)
+      doc.text(item.name, x0, ly)
       ly += 6
 
-      // Specs avec puces teal
-      descSpecs.forEach((spec) => {
-        // Puce : petit cercle teal plein
+      const specs = [
+        `Matière : ${item.material}`,
+        item.weight ? `Poids total : ${item.weight} g` : null,
+        item.colorCount > 1 ? `${item.colorCount} couleurs` : null,
+      ].filter(Boolean)
+      specs.forEach(spec => {
         doc.setFillColor(...TEAL)
         doc.circle(x0 + 1, ly - 1.2, 0.75, 'F')
-        // Texte spec
-        doc.setFont('helvetica', 'normal')
-        doc.setFontSize(7.5)
-        doc.setTextColor(...DARK)
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(...DARK)
         doc.text(spec, x0 + 4, ly)
         ly += 4.8
       })
@@ -447,11 +445,11 @@ async function _buildDoc(quote, mode = 'client') {
   const condWidth = totalsX - margin - 6
 
   const totals = [
-    ['Sous-total HT', fmtEur(totalHT)],
-    [`TVA (${taxRate}%)`, fmtEur(totalTVA)],
+    ['Sous-total HT', fmtEur(allTotalHT)],
+    [`TVA (${taxRate}%)`, fmtEur(allTotalTVA)],
   ]
   if (quote.deposit_percent > 0) {
-    const acompte = (quote.total_cost || 0) * (quote.deposit_percent / 100)
+    const acompte = allTotalTTC * (quote.deposit_percent / 100)
     totals.push([`Acompte (${quote.deposit_percent}%)`, fmtEur(acompte)])
   }
   const totalsH = totals.length * 6 + 13
@@ -501,7 +499,7 @@ async function _buildDoc(quote, mode = 'client') {
   doc.setTextColor(...WHITE)
   doc.setFontSize(10)
   doc.text('Total TTC', totalsX, ty + 2)
-  doc.text(fmtEur(quote.total_cost || 0), W - margin, ty + 2, { align: 'right' })
+  doc.text(fmtEur(allTotalTTC), W - margin, ty + 2, { align: 'right' })
 
   // ── NOTES ─────────────────────────────────────────────────────
   let curY = afterTable + condBandH + 8
