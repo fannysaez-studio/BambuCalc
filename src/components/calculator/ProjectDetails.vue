@@ -138,136 +138,6 @@
       </div>
     </div>
 
-    <div class="sep" />
-
-    <!-- ── Section pièce & impression ── -->
-    <div class="section-label">Pièce & impression</div>
-
-    <div class="grid-2">
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Nom de la pièce</label>
-        <input :class="formStyles.input" type="text" :value="projectName"
-          @input="$emit('update:projectName', $event.target.value)"
-          placeholder="Ex: Boîtier de commande" />
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Quantité</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="quantity"
-            @input="$emit('update:quantity', parseInt($event.target.value))"
-            min="1" step="1" />
-          <span class="unit">unité(s)</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Image de référence -->
-    <div :class="formStyles.formGroup">
-      <label :class="formStyles.label">
-        Image de référence
-        <span class="optional">optionnel</span>
-      </label>
-      <div
-        class="img-upload-area"
-        :class="{ 'img-upload-area--has': referenceImageUrl }"
-        @click="$refs.imgInput.click()"
-        @dragover.prevent
-        @drop.prevent="handleDrop"
-      >
-        <template v-if="referenceImageUrl">
-          <img
-            :src="referenceImageUrl"
-            class="img-preview"
-            alt=""
-            v-show="!imgLoadError"
-            @error="imgLoadError = true"
-            @load="imgLoadError = false"
-          />
-          <div v-if="imgLoadError" class="img-placeholder img-placeholder--saved">
-            <span class="img-ph-icon">🖼️</span>
-            <span class="img-ph-text">Image enregistrée — cliquez pour en choisir une autre</span>
-          </div>
-        </template>
-        <div v-else class="img-placeholder">
-          <span class="img-ph-icon">📎</span>
-          <span class="img-ph-text">Cliquez ou glissez une image (JPG, PNG, WEBP)</span>
-        </div>
-        <button v-if="referenceImageUrl" class="img-remove" type="button" @click.stop="removeImage">×</button>
-      </div>
-      <input ref="imgInput" type="file" accept="image/*" style="display:none" @change="handleImageUpload" />
-    </div>
-
-    <div class="sep" />
-
-    <!-- ── Section conditions ── -->
-    <div class="section-label">Conditions du devis</div>
-
-    <div class="grid-3">
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Mode de paiement</label>
-        <select :class="formStyles.select" :value="paymentMethod"
-          @change="$emit('update:paymentMethod', $event.target.value)">
-          <option value="virement">Virement bancaire</option>
-          <option value="cheque">Chèque</option>
-          <option value="cb">Carte bancaire</option>
-          <option value="especes">Espèces</option>
-          <option value="paypal">PayPal</option>
-        </select>
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Acompte demandé</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="depositPercent"
-            @input="$emit('update:depositPercent', parseInt($event.target.value) || 0)"
-            min="0" max="100" step="5" />
-          <span class="unit">%</span>
-        </div>
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Validité du devis</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="quoteValidityDays"
-            @input="$emit('update:quoteValidityDays', parseInt($event.target.value) || 30)"
-            min="1" max="365" step="1" />
-          <span class="unit">jours</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Délais -->
-    <div class="grid-2">
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Délai de fabrication</label>
-        <select :class="formStyles.select" :value="processingDelay"
-          @change="$emit('update:processingDelay', $event.target.value)">
-          <option value="24h">24 heures</option>
-          <option value="2-3j">2 à 3 jours ouvrés</option>
-          <option value="5-7j">5 à 7 jours ouvrés</option>
-          <option value="1-2s">1 à 2 semaines</option>
-          <option value="2-4s">2 à 4 semaines</option>
-          <option value="custom">À convenir</option>
-        </select>
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Livraison / Retrait</label>
-        <select :class="formStyles.select" :value="deliveryDelay"
-          @change="$emit('update:deliveryDelay', $event.target.value)">
-          <option value="pickup">Retrait en main propre</option>
-          <option value="colissimo">Colissimo (2-3 j)</option>
-          <option value="chronopost">Chronopost (J+1)</option>
-          <option value="mondial">Mondial Relay (3-5 j)</option>
-          <option value="custom">À convenir</option>
-        </select>
-      </div>
-    </div>
-
-    <div :class="formStyles.formGroup">
-      <label :class="formStyles.label">Notes / Conditions particulières <span class="optional">optionnel</span></label>
-      <textarea :class="formStyles.input" rows="2" :value="quoteNotes"
-        @input="$emit('update:quoteNotes', $event.target.value)"
-        placeholder="Ex: Pièce imprimée en PLA+ blanc, sans post-traitement inclus."
-        style="resize: vertical; min-height: 52px;" />
-    </div>
 
   </div>
 </template>
@@ -298,21 +168,6 @@ export default {
     clientSiret:       { type: String,  default: '' },
     clientVatNumber:   { type: String,  default: '' },
 
-    projectName:          { type: String,  default: '' },
-    quantity:             { type: Number,  default: 1 },
-    printProfile:         { type: String,  default: 'normal' },
-    printerModel:         { type: String,  default: 'p2s-combo' },
-    nozzleSize:           { type: String,  default: '0.4' },
-    showTechnicalFields:  { type: Boolean, default: false },
-
-    referenceImage:    { type: Object,  default: null },
-    referenceImageUrl: { type: String,  default: '' },
-
-    paymentMethod:     { type: String,  default: 'virement' },
-    depositPercent:    { type: Number,  default: 0 },
-    processingDelay:   { type: String,  default: '5-7j' },
-    deliveryDelay:     { type: String,  default: 'pickup' },
-    quoteNotes:        { type: String,  default: '' },
   },
   emits: [
     'update:quoteValidityDays',
@@ -323,39 +178,8 @@ export default {
     'update:clientAddress', 'update:clientPostalCode',
     'update:clientCity', 'update:clientCountry',
     'update:clientSiret', 'update:clientVatNumber',
-    'update:projectName', 'update:quantity',
-    'update:printProfile', 'update:printerModel', 'update:nozzleSize',
-    'update:referenceImage', 'update:referenceImageUrl',
-    'update:paymentMethod', 'update:depositPercent',
-    'update:processingDelay', 'update:deliveryDelay',
-    'update:quoteNotes',
   ],
-  data() { return { formStyles, imgLoadError: false } },
-  watch: {
-    referenceImageUrl(newVal) {
-      // Réinitialise l'état d'erreur dès que l'URL change (ex : passage en mode édition)
-      if (newVal) this.imgLoadError = false
-    },
-  },
-  methods: {
-    handleImageUpload(e) {
-      const file = e.target.files[0]
-      if (!file) return
-      this.$emit('update:referenceImage', file)
-      this.$emit('update:referenceImageUrl', URL.createObjectURL(file))
-    },
-    handleDrop(e) {
-      const file = e.dataTransfer.files[0]
-      if (!file || !file.type.startsWith('image/')) return
-      this.$emit('update:referenceImage', file)
-      this.$emit('update:referenceImageUrl', URL.createObjectURL(file))
-    },
-    removeImage() {
-      this.$emit('update:referenceImage', null)
-      this.$emit('update:referenceImageUrl', '')
-      this.$refs.imgInput.value = ''
-    },
-  },
+  data() { return { formStyles } },
 }
 </script>
 
@@ -426,60 +250,4 @@ export default {
   vertical-align: middle;
 }
 
-/* ── Image upload ── */
-.img-upload-area {
-  position: relative;
-  border: 1.5px dashed #cbd5e0;
-  border-radius: 12px;
-  background: #f7f9fc;
-  cursor: pointer;
-  overflow: hidden;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.2s ease, background 0.2s ease;
-}
-.img-upload-area:hover { border-color: #2e9cab; background: #f0fbfc; }
-.img-upload-area--has { border-style: solid; }
-
-.img-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 1rem;
-}
-.img-ph-icon { font-size: 1.4rem; }
-.img-ph-text { font-size: 0.75rem; color: #a0aec0; font-weight: 500; text-align: center; }
-
-.img-placeholder--saved { background: #f0fbfc; }
-.img-placeholder--saved .img-ph-text { color: #2e9cab; }
-
-.img-preview {
-  width: 100%;
-  max-height: 140px;
-  object-fit: contain;
-  display: block;
-}
-
-.img-remove {
-  position: absolute;
-  top: 0.4rem;
-  right: 0.4rem;
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 50%;
-  border: none;
-  background: rgba(0,0,0,0.5);
-  color: #fff;
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-.img-remove:hover { background: rgba(231,76,60,0.85); }
 </style>
