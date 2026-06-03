@@ -85,14 +85,23 @@
 
 <script>
 import { BarChart3, DollarSign, Zap, Download } from 'lucide-vue-next'
+import { useHead } from '@vueuse/head'
 
 export default {
   name: 'LandingView',
-  components: {
-    BarChart3,
-    DollarSign,
-    Zap,
-    Download,
+  components: { BarChart3, DollarSign, Zap, Download },
+  setup() {
+    useHead({
+      title: 'BambuCalc — Calculateur de coûts d\'impression 3D',
+      meta: [
+        { name: 'description', content: 'Calculez vos coûts d\'impression 3D, estimez vos marges et générez vos devis en quelques secondes. Outil professionnel pour prestataires d\'impression 3D.' },
+        { property: 'og:title', content: 'BambuCalc — Calculateur d\'impression 3D' },
+        { property: 'og:description', content: 'Estimez vos coûts, gérez vos devis et pilotez vos marges d\'impression 3D.' },
+        { property: 'og:url', content: 'https://bambucalc.netlify.app/' },
+        { name: 'twitter:title', content: 'BambuCalc — Calculateur d\'impression 3D' },
+        { name: 'twitter:description', content: 'Estimez vos coûts, gérez vos devis et pilotez vos marges d\'impression 3D.' },
+      ],
+    })
   },
 }
 </script>

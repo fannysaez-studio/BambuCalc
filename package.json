@@ -17,6 +17,7 @@
   "dependencies": {
     "@stripe/stripe-js": "^9.7.0",
     "@supabase/supabase-js": "^2.106.2",
+    "@vueuse/head": "^2.0.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "lucide-vue-next": "^1.0.0",

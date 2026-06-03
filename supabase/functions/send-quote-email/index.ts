@@ -10,6 +10,12 @@ const BRAND_COLOR   = '#2e9cab'
 
 // ── Utilitaires ───────────────────────────────────────────────────────────────
 
+function htmlEscape(str: string): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
 // Génère une ligne label / valeur 100% inline, sans flexbox (compatibilité Gmail)
 function row(label: string, value: string): string {
   return `
@@ -157,10 +163,11 @@ serve(async (req) => {
     console.log('[SETTINGS] replyTo    :', replyTo)
 
     // ── Construction données client ───────────────────────────────
-    const clientDisplay =
+    const clientDisplay = htmlEscape(
       quote.client_name ||
       [quote.client_first_name, quote.client_last_name].filter(Boolean).join(' ') ||
       '—'
+    )
 
     const adresse = [
       quote.client_address,
@@ -169,9 +176,9 @@ serve(async (req) => {
       quote.client_country,
     ].filter(Boolean).join(', ')
 
-    const civility        = quote.client_civility ? quote.client_civility + ' ' : ''
-    const lastName        = quote.client_last_name || ''
-    const clientFirstName = quote.client_first_name || clientDisplay.split(' ')[0] || clientDisplay
+    const civility        = quote.client_civility ? htmlEscape(quote.client_civility) + ' ' : ''
+    const lastName        = htmlEscape(quote.client_last_name || '')
+    const clientFirstName = htmlEscape(quote.client_first_name || clientDisplay.split(' ')[0] || clientDisplay)
     const clientPolite    = civility + (lastName || clientFirstName)
 
     const introText = customIntro
@@ -179,8 +186,8 @@ serve(async (req) => {
           .replace(/\[client\]/gi,     clientFirstName)
           .replace(/\[client_nom\]/gi, clientPolite)
           .replace(/\[civilité\]/gi,   civility.trim())
-          .replace(/\[numéro\]/gi,     quote.quote_number ?? '')
-          .replace(/\[projet\]/gi,     quote.project_name ?? '')
+          .replace(/\[numéro\]/gi,     htmlEscape(quote.quote_number ?? ''))
+          .replace(/\[projet\]/gi,     htmlEscape(quote.project_name ?? ''))
           .replace(/\[total\]/gi,      fmtEur(quote.total_cost ?? 0))
       : `Bonjour ${clientDisplay},<br/>Voici le récapitulatif de votre devis. N'hésitez pas à nous contacter pour toute question.`
 
@@ -320,7 +327,7 @@ serve(async (req) => {
           ${quote.quote_notes ? `
           <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f7f9fc;border-radius:10px;margin-top:16px;">
             <tr><td style="padding:14px 16px;font-size:13px;color:#4a5568;line-height:1.6;">
-              <strong>Notes :</strong><br/>${quote.quote_notes}
+              <strong>Notes :</strong><br/>${htmlEscape(quote.quote_notes)}
             </td></tr>
           </table>` : ''}
 

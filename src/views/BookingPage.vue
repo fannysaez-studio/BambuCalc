@@ -163,6 +163,17 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Home, ArrowLeft, Clock, Video, MapPin, Globe, X, Gift } from 'lucide-vue-next'
+import { useHead } from '@vueuse/head'
+
+useHead({
+  title: 'Prendre rendez-vous — BambuCalc',
+  meta: [
+    { name: 'description', content: 'Prenez rendez-vous avec Fanny Saez pour discuter de votre projet d\'impression 3D. Disponible en visio ou en extérieur.' },
+    { property: 'og:title', content: 'Prendre rendez-vous — BambuCalc' },
+    { property: 'og:description', content: 'Prenez rendez-vous pour discuter de votre projet d\'impression 3D.' },
+    { property: 'og:url', content: 'https://bambucalc.netlify.app/rdv' },
+  ],
+})
 
 const router = useRouter()
 let calScript = null

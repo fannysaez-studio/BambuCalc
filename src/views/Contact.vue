@@ -190,10 +190,22 @@
 import { defineComponent } from 'vue'
 import { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin, LayoutDashboard } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
+import { useHead } from '@vueuse/head'
 
 export default defineComponent({
   name: 'Contact',
   components: { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin, LayoutDashboard },
+  setup() {
+    useHead({
+      title: 'Contact — BambuCalc',
+      meta: [
+        { name: 'description', content: 'Contactez Fanny Saez pour toute question sur BambuCalc. Réponse sous 24h en jours ouvrés.' },
+        { property: 'og:title', content: 'Contact — BambuCalc' },
+        { property: 'og:description', content: 'Contactez Fanny Saez pour toute question sur BambuCalc.' },
+        { property: 'og:url', content: 'https://bambucalc.netlify.app/contact' },
+      ],
+    })
+  },
   data() {
     return {
       tab: 'form',
