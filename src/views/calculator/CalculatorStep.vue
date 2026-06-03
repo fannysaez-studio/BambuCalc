@@ -60,7 +60,6 @@
             v-model:projectLength="store.projectLength"
             v-model:projectWidth="store.projectWidth"
             v-model:projectHeight="store.projectHeight"
-            v-model:projectFinish="store.projectFinish"
             v-model:projectFinishNote="store.projectFinishNote"
           />
 
