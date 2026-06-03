@@ -17,12 +17,12 @@ export const useCalculatorStore = defineStore('calculator', {
     quoteValidityDays: 30,
 
     // Client — identité
-    clientType: 'particulier',   // particulier | auto-entrepreneur | entreprise | association
-    clientCivility: 'M.',        // M. | Mme (affiché pour particulier)
+    clientType: 'particulier',
+    clientCivility: 'M.',
     clientFirstName: '',
     clientLastName: '',
-    clientName: '',              // raison sociale (entreprise/asso) ou nom complet
-    clientContactName: '',       // nom du contact (entreprise/asso)
+    clientName: '',
+    clientContactName: '',
     clientEmail: '',
     clientPhone: '',
 
@@ -37,29 +37,39 @@ export const useCalculatorStore = defineStore('calculator', {
     clientVatNumber: '',
 
     // Projet
-    projectName: '',
     projectType: 'standard',
     projectSeriesType: 'unique',
     projectDescription: '',
-    quantity: 1,
-    printProfile: 'normal',
-    printerModel: 'p2s-combo',
-    nozzleSize: '0.4',
 
     // Conditions devis
-    paymentMethod: 'virement',   // virement | chèque | cb | espèces
+    paymentMethod: 'virement',
     depositPercent: 0,
     quoteNotes: '',
 
-    // Matière
-    materialId: null,
-    material: 'PLA+',
-    costPerKg: 16.99,
-    weight: 0,
-    lossPercent: 5,
-    colorCount: 1,
-    purgeWaste: 0,
-    amsCoefficient: 1.25,
+    // Filament par défaut (sélectionné à l'étape 1, sert de modèle aux nouvelles pièces)
+    defaultMaterialId: null,
+    defaultMaterial: 'PLA+',
+    defaultCostPerKg: 16.99,
+    defaultLossPercent: 5,
+    defaultColorCount: 1,
+
+    // Tableau de pièces (remplace les anciens champs plats projectName/quantity/weight/etc.)
+    pieces: [
+      {
+        id: 'piece-1',
+        name: '',
+        quantity: 1,
+        weight: 0,
+        lossPercent: 5,
+        colorCount: 1,
+        purgeWaste: 0,
+        materialId: null,
+        material: '',
+        costPerKg: 0,
+        referenceImage: null,
+        referenceImageUrl: '',
+      },
+    ],
 
     // Temps
     printHours: 0,
@@ -84,40 +94,20 @@ export const useCalculatorStore = defineStore('calculator', {
     selectedPricing: 'standard',
     customMargin: 50,
 
-    // Image de référence
-    referenceImage: null,
-    referenceImageUrl: '',
+    // Impression
+    printProfile: 'normal',
+    printerModel: 'p2s-combo',
+    nozzleSize: '0.4',
 
-    // Mode édition admin (ID du devis à mettre à jour)
+    // Mode édition admin
     editingQuoteId: null,
   }),
 
   getters: {
-    // Marge en % selon l'option choisie à l'étape 4
+    // Marge en % selon l'option choisie à l'étape 5
     marginPercent(state) {
       const presets = { ami: 15, standard: 40, pro: 65 }
       return presets[state.selectedPricing] ?? Number(state.customMargin) ?? 40
-    },
-
-    // Prix de vente final (marge appliquée sur HT, TVA recalculée)
-    sellingPrices(state) {
-      const costs = this.calculatedCosts
-      const margin = this.marginPercent
-      const qty = Math.max(1, Number(state.quantity) || 1)
-      const taxRate = Number(state.taxRate) || 20
-      const r = (v) => Math.round(v * 100) / 100
-
-      const sellingHT  = costs.subtotal * (1 + margin / 100)
-      const sellingTax = sellingHT * (taxRate / 100)
-      const sellingTTC = sellingHT + sellingTax
-
-      return {
-        margin,
-        subtotalHT:   r(sellingHT),
-        tax:          r(sellingTax),
-        totalTTC:     r(sellingTTC),
-        pricePerUnit: r(sellingTTC / qty),
-      }
     },
 
     // Nom affiché selon le type de client
@@ -129,18 +119,13 @@ export const useCalculatorStore = defineStore('calculator', {
       return state.clientName || ''
     },
 
-    // Indique si le numéro de devis date d'un autre jour (SPA gardée ouverte la nuit)
+    // Indique si le numéro de devis date d'un autre jour
     quoteNumberIsStale(state) {
       const today = new Date()
       const yy = today.getFullYear()
       const mm = String(today.getMonth() + 1).padStart(2, '0')
       const dd = String(today.getDate()).padStart(2, '0')
       return !state.quoteNumber.includes(`${yy}${mm}${dd}`)
-    },
-
-    purgeWeightAuto(state) {
-      if (Number(state.colorCount) <= 1) return 0
-      return Math.round((Number(state.weight) || 0) * ((Number(state.amsCoefficient) || 1.25) - 1))
     },
 
     projectCoeff(state) {
@@ -158,17 +143,32 @@ export const useCalculatorStore = defineStore('calculator', {
     calculatedCosts(state) {
       const r = (v) => Math.round(v * 100) / 100
 
-      const lossWeight   = (Number(state.weight) || 0) * (Number(state.lossPercent) || 0) / 100
-      const purgeWeight  = Number(state.colorCount) > 1 ? (Number(state.purgeWaste) || 0) : 0
-      const totalWeight  = (Number(state.weight) || 0) + lossWeight + purgeWeight
-      const materialCost = (totalWeight / 1000) * (Number(state.costPerKg) || 0)
+      // Coût matière — somme sur toutes les pièces
+      let materialCost = 0
+      let totalWeightAll = 0
+      const piecesDetail = state.pieces.map(p => {
+        const qty   = Math.max(1, Number(p.quantity) || 1)
+        const w     = Number(p.weight) || 0
+        const loss  = (Number(p.lossPercent) || 0) / 100
+        const purge = Number(p.colorCount) > 1 ? (Number(p.purgeWaste) || 0) : 0
+        const pieceWeight   = w * qty * (1 + loss) + purge * qty
+        const pieceMaterial = (pieceWeight / 1000) * (Number(p.costPerKg) || 0)
+        totalWeightAll += pieceWeight
+        materialCost   += pieceMaterial
+        return {
+          id: p.id, name: p.name, quantity: qty,
+          weight: r(pieceWeight), materialCost: r(pieceMaterial),
+        }
+      })
 
+      // Coût équipement — global (basé sur le temps d'impression total)
       const printH       = (Number(state.printHours) || 0) + (Number(state.printMinutes) || 0) / 60
       const electricity  = printH * 0.35 * (Number(state.electricityRate) || 0)
       const amortization = (Number(state.printerCost) || 0) / (Number(state.printerLifeHours) || 4000) * printH
       const maintenance  = (Number(state.maintenanceRate) || 0) * printH
       const equipmentCost = electricity + amortization + maintenance
 
+      // Coût main-d'œuvre — global
       const workMinutes  = (Number(state.prepTime) || 0) + (Number(state.postTime) || 0)
       const workCost     = (workMinutes / 60) * (Number(state.hourlyRate) || 0)
 
@@ -177,11 +177,11 @@ export const useCalculatorStore = defineStore('calculator', {
       const subtotal      = (materialCost + equipmentCost + workCost + packagingCost) * coeff
       const tax           = (subtotal * (Number(state.taxRate) || 0)) / 100
       const totalCost     = subtotal + tax
-      const qty           = Math.max(1, Number(state.quantity) || 1)
+      const totalQty      = Math.max(1, state.pieces.reduce((s, p) => s + (Number(p.quantity) || 1), 0))
 
       return {
-        quantity:      qty,
-        totalWeight:   r(totalWeight),
+        quantity:      totalQty,
+        totalWeight:   r(totalWeightAll),
         materialCost:  r(materialCost),
         electricity:   r(electricity),
         amortization:  r(amortization),
@@ -192,49 +192,80 @@ export const useCalculatorStore = defineStore('calculator', {
         subtotal:      r(subtotal),
         tax:           r(tax),
         totalCost:     r(totalCost),
-        costPerUnit:   r(totalCost / qty),
+        costPerUnit:   r(totalCost / totalQty),
+        pieces:        piecesDetail,
+      }
+    },
+
+    sellingPrices(state) {
+      const costs = this.calculatedCosts
+      const margin = this.marginPercent
+      const qty = costs.quantity
+      const taxRate = Number(state.taxRate) || 20
+      const r = (v) => Math.round(v * 100) / 100
+
+      const sellingHT  = costs.subtotal * (1 + margin / 100)
+      const sellingTax = sellingHT * (taxRate / 100)
+      const sellingTTC = sellingHT + sellingTax
+
+      return {
+        margin,
+        subtotalHT:   r(sellingHT),
+        tax:          r(sellingTax),
+        totalTTC:     r(sellingTTC),
+        pricePerUnit: r(sellingTTC / qty),
       }
     },
   },
 
   actions: {
-    // Remet le store à zéro pour un nouveau devis (garde les paramètres équipement)
     resetForNewQuote() {
       this.$patch({
-        editingQuoteId:    null,
-        quoteNumber:       genQuoteNumber(),
-        quoteDate:         new Date().toISOString().split('T')[0],
-        quoteValidityDays: 30,
-        clientType:        'particulier',
-        clientCivility:    'M.',
-        clientFirstName:   '',
-        clientLastName:    '',
-        clientName:        '',
-        clientContactName: '',
-        clientEmail:       '',
-        clientPhone:       '',
-        clientAddress:     '',
-        clientPostalCode:  '',
-        clientCity:        '',
-        clientCountry:     'France',
-        clientSiret:       '',
-        clientVatNumber:   '',
-        projectName:       '',
-        projectType:       'standard',
-        projectSeriesType: 'unique',
-        projectDescription:'',
-        quantity:          1,
-        paymentMethod:     'virement',
-        depositPercent:    0,
-        quoteNotes:        '',
-        materialId:        null,
-        material:          'PLA+',
-        costPerKg:         16.99,
-        weight:            0,
-        lossPercent:       5,
-        colorCount:        1,
-        purgeWaste:        0,
-        amsCoefficient:    1.25,
+        editingQuoteId:      null,
+        quoteNumber:         genQuoteNumber(),
+        quoteDate:           new Date().toISOString().split('T')[0],
+        quoteValidityDays:   30,
+        clientType:          'particulier',
+        clientCivility:      'M.',
+        clientFirstName:     '',
+        clientLastName:      '',
+        clientName:          '',
+        clientContactName:   '',
+        clientEmail:         '',
+        clientPhone:         '',
+        clientAddress:       '',
+        clientPostalCode:    '',
+        clientCity:          '',
+        clientCountry:       'France',
+        clientSiret:         '',
+        clientVatNumber:     '',
+        projectType:         'standard',
+        projectSeriesType:   'unique',
+        projectDescription:  '',
+        paymentMethod:       'virement',
+        depositPercent:      0,
+        quoteNotes:          '',
+        defaultMaterialId:   null,
+        defaultMaterial:     'PLA+',
+        defaultCostPerKg:    16.99,
+        defaultLossPercent:  5,
+        defaultColorCount:   1,
+        pieces: [
+          {
+            id: 'piece-1',
+            name: '',
+            quantity: 1,
+            weight: 0,
+            lossPercent: 5,
+            colorCount: 1,
+            purgeWaste: 0,
+            materialId: null,
+            material: '',
+            costPerKg: 0,
+            referenceImage: null,
+            referenceImageUrl: '',
+          },
+        ],
         printHours:        0,
         printMinutes:      0,
         prepTime:          15,
@@ -244,8 +275,6 @@ export const useCalculatorStore = defineStore('calculator', {
         packagingCost:     0,
         selectedPricing:   'standard',
         customMargin:      50,
-        referenceImage:    null,
-        referenceImageUrl: '',
       })
     },
   },
