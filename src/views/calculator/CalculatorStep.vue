@@ -245,7 +245,6 @@
           </router-link>
           <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
         </div>
-        </div>
         <div class="step-nav-right">
           <button
             v-if="currentStep < steps.length"
