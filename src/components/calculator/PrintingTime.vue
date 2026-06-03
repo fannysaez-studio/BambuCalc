@@ -1,27 +1,6 @@
 <template>
   <div :class="formStyles.section">
 
-    <!-- Poids de la pièce -->
-    <div :class="formStyles.formGroup">
-      <label :class="formStyles.label" for="weight">Poids estimé de la pièce</label>
-      <div class="input-unit-wrap">
-        <input id="weight" :class="formStyles.input" type="number"
-          :value="weight" @input="$emit('update:weight', parseFloat($event.target.value) || 0)"
-          step="0.1" min="0" placeholder="Ex : 45" />
-        <span class="unit">g</span>
-      </div>
-      <p :class="formStyles.helpText">Visible dans Bambu Studio après slicing. Laissez 0 si inconnu.</p>
-    </div>
-
-    <!-- Badge AMS auto (si multicolore) -->
-    <div v-if="colorCount > 1" class="ams-badge">
-      <span class="ams-icon">🎨</span>
-      <div>
-        <p class="ams-title">Impression multicolore — Purge AMS calculée automatiquement</p>
-        <p class="ams-sub">{{ colorCount }} couleurs → <strong>+{{ purgeWaste }} g</strong> de purge ajoutés</p>
-      </div>
-    </div>
-
     <!-- Options impression (admin uniquement) -->
     <template v-if="isAdmin">
     <button class="toggle-link" @click="showAdvanced = !showAdvanced">
@@ -51,18 +30,6 @@
             <span class="unit">min</span>
           </div>
         </div>
-      </div>
-
-      <!-- Purge manuelle (si multicolore) -->
-      <div v-if="colorCount > 1" :class="formStyles.formGroup">
-        <label :class="formStyles.label" for="purgeWaste">Purge AMS (ajuster si besoin)</label>
-        <div class="input-unit-wrap">
-          <input id="purgeWaste" :class="formStyles.input" type="number"
-            :value="purgeWaste" @input="$emit('update:purgeWaste', parseFloat($event.target.value) || 0)"
-            step="5" min="0" />
-          <span class="unit">g</span>
-        </div>
-        <p :class="formStyles.helpText">Valeur auto (AMS ×1.25) : {{ Math.round(weight * 0.25) }} g — modifiable selon le modèle</p>
       </div>
 
       <div class="sep" />
@@ -117,14 +84,11 @@ export default {
     prepTime:     { type: Number, default: 15 },
     postTime:     { type: Number, default: 0 },
     hourlyRate:   { type: Number, default: 20 },
-    weight:       { type: Number, default: 0 },
-    colorCount:   { type: Number, default: 1 },
-    purgeWaste:   { type: Number, default: 0 },
     isAdmin:      { type: Boolean, default: false },
   },
   emits: [
-    'update:printHours', 'update:printMinutes', 'update:prepTime', 'update:postTime',
-    'update:hourlyRate', 'update:weight', 'update:purgeWaste',
+    'update:printHours', 'update:printMinutes', 'update:prepTime',
+    'update:postTime', 'update:hourlyRate',
   ],
   data() {
     return {
@@ -183,12 +147,4 @@ export default {
 .rate-row { margin-top: 0.75rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .rate-row label { margin-bottom: 0; white-space: nowrap; }
 
-.ams-badge {
-  display: flex; align-items: flex-start; gap: 0.65rem;
-  background: #f0fbfc; border: 1.5px solid #b2e8ef; border-radius: 12px;
-  padding: 0.7rem 1rem; margin-bottom: 0.75rem;
-}
-.ams-icon { font-size: 1.3rem; flex-shrink: 0; }
-.ams-title { font-size: 0.82rem; font-weight: 700; color: #1b2f39; margin: 0 0 0.1rem; }
-.ams-sub { font-size: 0.78rem; color: #718096; margin: 0; }
 </style>
