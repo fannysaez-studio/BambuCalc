@@ -240,7 +240,12 @@
       <!-- ── Navigation bas ── -->
       <div class="step-nav">
         <div class="step-nav-left">
-          <router-link to="/dashboard" class="btn-dash-icon" title="Tableau de bord">
+          <router-link
+            v-if="currentStep === 1 || currentStep === steps.length"
+            to="/dashboard"
+            class="btn-dash-icon"
+            title="Tableau de bord"
+          >
             <LayoutDashboard :size="18" />
           </router-link>
           <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
@@ -861,7 +866,7 @@ export default {
 /* ── Navigation bas ── */
 .step-nav {
   width: 100%;
-  max-width: 580px;
+  max-width: 640px;
   display: flex;
   align-items: center;
   justify-content: space-between;
