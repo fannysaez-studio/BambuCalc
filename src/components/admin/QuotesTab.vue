@@ -271,7 +271,7 @@ function editQuote(q) {
     selectedPricing:     q.selected_pricing    || 'standard',
     customMargin:        q.custom_margin       ?? 50,
     defaultMaterial:     firstPiece.material   || q.material || 'PLA+',
-    defaultCostPerKg:    firstPiece.costPerKg  || q.cost_per_kg ?? 16.99,
+    defaultCostPerKg:    (firstPiece.costPerKg  || q.cost_per_kg) ?? 16.99,
     defaultLossPercent:  firstPiece.lossPercent ?? 5,
     defaultColorCount:   firstPiece.colorCount  ?? 1,
     defaultMaterialId:   firstPiece.materialId  || null,
