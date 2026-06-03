@@ -27,6 +27,16 @@
           <span class="line-label">Filament <span class="line-sub">({{ costs.totalWeight ?? 0 }} g)</span></span>
           <span class="line-value line-value--teal">{{ fmt(costs.materialCost) }}</span>
         </div>
+        <!-- Détail par pièce si plusieurs -->
+        <template v-if="costs.pieces && costs.pieces.length > 1">
+          <div v-for="(p, i) in costs.pieces" :key="p.id || i" class="line line--sub">
+            <span class="line-label line-label--sub">
+              {{ p.name || `Pièce ${i + 1}` }}
+              <span class="line-sub"> × {{ p.quantity }}</span>
+            </span>
+            <span class="line-value">{{ fmt(p.materialCost) }}</span>
+          </div>
+        </template>
 
         <div class="group-label mt">Équipement</div>
         <div class="line">
@@ -226,6 +236,9 @@ export default {
   white-space: nowrap;
 }
 .line-value--teal { color: #2e9cab; }
+
+.line--sub { opacity: 0.85; }
+.line-label--sub { padding-left: 0.75rem; font-size: 0.74rem; color: #718096; }
 
 /* ── Colonne droite ── */
 .col-right {
