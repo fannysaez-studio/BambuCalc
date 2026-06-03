@@ -463,23 +463,30 @@ export default {
 
 /* ── Zone image ── */
 .img-upload-area {
-  position: relative; border: 1.5px dashed #cbd5e0; border-radius: 10px;
-  background: #f7f9fc; cursor: pointer; overflow: hidden; min-height: 70px;
-  display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.2s ease;
+  position: relative; border: 1.5px dashed #cbd5e0; border-radius: 8px;
+  background: #f7f9fc; cursor: pointer; overflow: hidden; height: 50px;
+  display: flex; align-items: center; justify-content: flex-start;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  padding: 0 0.65rem;
 }
 .img-upload-area:hover { border-color: #2e9cab; background: #f0fbfc; }
-.img-upload-area--has { border-style: solid; }
-.img-placeholder { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: 0.75rem; }
-.img-ph-icon { font-size: 1.2rem; }
-.img-ph-text { font-size: 0.72rem; color: #a0aec0; font-weight: 500; text-align: center; }
+.img-upload-area--has { border-style: solid; border-color: #2e9cab; }
+.img-placeholder {
+  display: flex; flex-direction: row; align-items: center;
+  gap: 0.5rem; padding: 0; width: 100%;
+}
+.img-ph-icon { font-size: 1rem; flex-shrink: 0; }
+.img-ph-text { font-size: 0.72rem; color: #a0aec0; font-weight: 500; }
 .img-placeholder--saved .img-ph-text { color: #2e9cab; }
-.img-preview { width: 100%; max-height: 100px; object-fit: contain; display: block; }
+.img-preview {
+  height: 40px; width: 40px; object-fit: contain;
+  display: block; flex-shrink: 0; border-radius: 4px;
+}
 .img-remove {
-  position: absolute; top: 0.3rem; right: 0.3rem; width: 1.3rem; height: 1.3rem;
-  border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: #fff;
-  font-size: 0.9rem; line-height: 1; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  position: absolute; top: 50%; right: 0.4rem; transform: translateY(-50%);
+  width: 1.2rem; height: 1.2rem; border-radius: 50%; border: none;
+  background: rgba(0,0,0,0.45); color: #fff; font-size: 0.85rem; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
 }
 .img-remove:hover { background: rgba(231,76,60,0.85); }
 
