@@ -240,8 +240,8 @@
       <!-- ── Navigation bas ── -->
       <div class="step-nav">
         <div class="step-nav-left">
-          <router-link to="/dashboard" class="btn-dash-left" title="Tableau de bord">
-            <LayoutDashboard :size="16" />
+          <router-link to="/dashboard" class="btn-dash-icon" title="Tableau de bord">
+            <LayoutDashboard :size="18" />
           </router-link>
           <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
         </div>
@@ -877,22 +877,6 @@ export default {
   flex-shrink: 0;
 }
 
-.btn-dash-left {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.1rem;
-  height: 2.1rem;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(10px);
-  color: #718096;
-  text-decoration: none;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-.btn-dash-left:hover { border-color: #2e9cab; color: #2e9cab; background: #e8f7f9; }
 
 .step-nav-right {
   display: flex;
