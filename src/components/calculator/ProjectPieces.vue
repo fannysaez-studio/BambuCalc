@@ -94,12 +94,13 @@
         </div>
       </div>
 
-      <!-- Image de référence -->
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">
-          Image de référence <span class="optional">optionnel</span>
-        </label>
-        <div class="img-upload-area"
+      <!-- Image de référence + bouton Ajouter (même ligne sur la dernière pièce) -->
+      <div class="img-add-row">
+        <div :class="formStyles.formGroup" style="flex:1;min-width:0">
+          <label :class="formStyles.label">
+            Image de référence <span class="optional">optionnel</span>
+          </label>
+          <div class="img-upload-area"
           :class="{ 'img-upload-area--has': piece.referenceImageUrl }"
           @click="triggerInput(idx)"
           @dragover.prevent @drop.prevent="handleDrop($event, idx)">
@@ -123,7 +124,18 @@
         <input type="file" accept="image/*" style="display:none"
           :ref="el => { if(el) imgRefs[idx] = el }"
           @change="handleUpload($event, idx)" />
-      </div>
+        </div><!-- /formGroup image -->
+
+        <!-- Bouton + Ajouter uniquement sur la dernière pièce -->
+        <button
+          v-if="idx === pieces.length - 1"
+          class="btn-add-piece"
+          type="button"
+          @click="addPiece"
+        >
+          + Ajouter une pièce
+        </button>
+      </div><!-- /img-add-row -->
 
     </div><!-- /piece-card -->
 
@@ -134,11 +146,6 @@
         <button class="zoom-close" type="button" @click.stop="zoomImg = ''">✕</button>
       </div>
     </teleport>
-
-    <!-- Bouton ajouter une pièce -->
-    <button class="btn-add-piece" type="button" @click="addPiece">
-      + Ajouter une pièce
-    </button>
 
 
   </div>
@@ -423,11 +430,23 @@ export default {
 }
 .img-remove:hover { background: rgba(231,76,60,0.85); }
 
+/* ── Image + bouton Ajouter sur la même ligne ── */
+.img-add-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
 /* ── Bouton ajouter ── */
 .btn-add-piece {
-  width: 100%; padding: 0.6rem; border: 1.5px dashed #b2e8ef; border-radius: 10px;
-  background: #f0fbfc; color: #2e9cab; font-size: 0.82rem; font-weight: 700;
+  flex-shrink: 0;
+  align-self: flex-end;
+  padding: 0 0.85rem;
+  height: 50px;
+  border: 1.5px dashed #b2e8ef; border-radius: 10px;
+  background: #f0fbfc; color: #2e9cab; font-size: 0.8rem; font-weight: 700;
   font-family: inherit; cursor: pointer; transition: all 0.2s ease;
+  white-space: nowrap;
 }
 .btn-add-piece:hover { background: #e8f7f9; border-color: #2e9cab; }
 
