@@ -23,9 +23,9 @@
         rows="3"
         :value="projectDescription"
         @input="$emit('update:projectDescription', $event.target.value)"
-        placeholder="Décrivez votre projet : dimensions souhaitées, usage, contraintes, finitions attendues, délai souhaité…"
+        placeholder="Décrivez votre projet : usage prévu, contraintes techniques, matière souhaitée si vous avez une idée, délai souhaité, quantité approximative…"
         style="resize:vertical;min-height:72px;" />
-      <p :class="formStyles.helpText">Plus vous êtes précis, plus le devis sera rapide et exact.</p>
+      <p :class="formStyles.helpText">Les dimensions et la finition ont leurs propres champs ci-dessous — décrivez ici l'usage, les contraintes et le contexte.</p>
     </div>
 
     <div class="sep" />

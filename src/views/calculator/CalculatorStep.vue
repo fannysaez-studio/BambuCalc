@@ -239,7 +239,13 @@
 
       <!-- ── Navigation bas ── -->
       <div class="step-nav">
-        <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
+        <div class="step-nav-left">
+          <router-link to="/dashboard" class="btn-dash-left" title="Tableau de bord">
+            <LayoutDashboard :size="16" />
+          </router-link>
+          <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
+        </div>
+        </div>
         <div class="step-nav-right">
           <button
             v-if="currentStep < steps.length"
@@ -271,14 +277,6 @@
               {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
             </span>
           </button>
-          <router-link
-            v-if="currentStep === steps.length"
-            to="/dashboard"
-            class="btn-dash-icon"
-            title="Mon tableau de bord"
-          >
-            <LayoutDashboard :size="18" />
-          </router-link>
         </div>
       </div>
 
@@ -871,6 +869,30 @@ export default {
   gap: 0.75rem;
   flex-shrink: 0;
 }
+
+.step-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.btn-dash-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(10px);
+  color: #718096;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.btn-dash-left:hover { border-color: #2e9cab; color: #2e9cab; background: #e8f7f9; }
 
 .step-nav-right {
   display: flex;
