@@ -40,20 +40,11 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
     # Force HTTPS pour 1 an, inclut les sous-domaines
-    # ⚠️ À activer UNIQUEMENT quand le certificat SSL est validé et stable
-    # Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
 
-    # Content Security Policy — À personnaliser selon les scripts tiers utilisés
-    # Stripe nécessite js.stripe.com et *.stripe.com dans les directives
-    # ⚠️ Décommenter et ajuster après avoir testé en mode "report-only" d'abord
-    # Content-Security-Policy = """
-    #   default-src 'self';
-    #   script-src 'self' https://js.stripe.com;
-    #   frame-src https://js.stripe.com;
-    #   connect-src 'self' https://*.supabase.co https://api.stripe.com;
-    #   style-src 'self' 'unsafe-inline';
-    #   img-src 'self' data: https:;
-    # """
+    # Content Security Policy — mode Report-Only (observe sans bloquer)
+    # Passer en Content-Security-Policy une fois validé en prod
+    Content-Security-Policy-Report-Only = "default-src 'self'; script-src 'self' https://js.stripe.com; frame-src https://js.stripe.com; connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.brevo.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; worker-src blob:"
 
 # ── Variables d'environnement de production ──────────────────────────────────
 # RÈGLE DE SÉCURITÉ :

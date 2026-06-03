@@ -94,6 +94,20 @@ async function sendViaBrevo(payload: object, label: string): Promise<void> {
 serve(async (req) => {
   if (req.method === 'OPTIONS') return handlePreflight(req)
 
+  // ── Authentification obligatoire ──────────────────────────────
+  const authHeader = req.headers.get('Authorization') ?? ''
+  if (!authHeader.startsWith('Bearer ')) {
+    return errorResponse('Token d\'authentification requis', 401)
+  }
+  const userToken = authHeader.replace('Bearer ', '')
+  const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${userToken}` },
+  })
+  if (!userRes.ok) {
+    return errorResponse('Token invalide ou session expirée', 401)
+  }
+  // ──────────────────────────────────────────────────────────────
+
   // ── LOG 1 : Entrée de la fonction ─────────────────────────────
   console.log('═══════════════════════════════════════════════')
   console.log('[INIT] send-quote-email — requête reçue')

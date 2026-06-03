@@ -9,6 +9,22 @@ const BRAND_COLOR    = '#2e9cab'
 serve(async (req) => {
   if (req.method === 'OPTIONS') return handlePreflight(req)
 
+  // ── Authentification obligatoire ──────────────────────────────
+  const SUPABASE_URL  = Deno.env.get('SUPABASE_URL')              ?? ''
+  const SERVICE_KEY   = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  const authHeader = req.headers.get('Authorization') ?? ''
+  if (!authHeader.startsWith('Bearer ')) {
+    return errorResponse('Token d\'authentification requis', 401)
+  }
+  const userToken = authHeader.replace('Bearer ', '')
+  const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${userToken}` },
+  })
+  if (!userRes.ok) {
+    return errorResponse('Token invalide ou session expirée', 401)
+  }
+  // ──────────────────────────────────────────────────────────────
+
   try {
     const { email, firstName, lastName, appUrl = 'https://bambucalc.fr' } = await req.json()
     if (!email) return errorResponse('No email', 400)
