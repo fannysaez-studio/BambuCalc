@@ -76,7 +76,11 @@
           <!-- ═══ OBJET ═══ -->
           <div class="d-objet">
             <span class="d-objet-lbl">OBJET :</span>
-            <span>{{ q.project_name || '—' }}</span>
+            <span>
+              {{ tableItems.length > 1
+                ? `Impression 3D multi-pièces — ${tableItems.length} article(s)`
+                : (q.project_name || '—') }}
+            </span>
           </div>
 
           <!-- ═══ TABLEAU ═══ -->
@@ -85,7 +89,7 @@
             <thead>
               <tr>
                 <th class="th-desc">Désignation / Spécifications</th>
-                <th v-if="q.reference_image_url" class="th-photo">Photo réf.</th>
+                <th v-if="hasAnyImage" class="th-photo">Photo réf.</th>
                 <th class="th-num">Qté</th>
                 <th class="th-num th-hide-mobile">PU HT</th>
                 <th class="th-num th-hide-mobile">TVA {{ taxRate }}%</th>
@@ -93,21 +97,26 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr v-for="item in tableItems" :key="item.id">
                 <td class="td-desc">
-                  <div class="td-title">Impression 3D — {{ q.project_name || '—' }}</div>
+                  <div class="td-title">{{ item.name }}</div>
                   <ul class="td-specs">
-                    <li v-for="spec in specParts" :key="spec">{{ spec }}</li>
+                    <li>Matière : {{ item.material }}</li>
+                    <li v-if="item.weight">Poids total : {{ item.weight }} g</li>
+                    <li v-if="item.colorCount > 1">{{ item.colorCount }} couleurs</li>
                   </ul>
                 </td>
-                <td v-if="q.reference_image_url" class="td-photo">
-                  <img :src="q.reference_image_url" class="d-ref-img" alt="" loading="lazy" />
-                  <div class="d-ref-lbl">Réf. client</div>
+                <td v-if="hasAnyImage" class="td-photo">
+                  <template v-if="item.referenceImageUrl">
+                    <img :src="item.referenceImageUrl" class="d-ref-img" alt="" loading="lazy"
+                      style="cursor:zoom-in" @click="zoomImg = item.referenceImageUrl" />
+                    <div class="d-ref-lbl">Réf. client</div>
+                  </template>
                 </td>
-                <td class="td-c">{{ q.quantity ?? 1 }}</td>
-                <td class="td-r td-hide-mobile">{{ fmtEur(unitPriceHT) }}</td>
-                <td class="td-r td-hide-mobile">{{ fmtEur(totalTVA) }}</td>
-                <td class="td-r td-bold">{{ fmtEur(q.total_cost || 0) }}</td>
+                <td class="td-c">{{ item.quantity }}</td>
+                <td class="td-r td-hide-mobile">{{ fmtEur(item.unitPriceHT) }}</td>
+                <td class="td-r td-hide-mobile">{{ fmtEur(item.tvaPart) }}</td>
+                <td class="td-r td-bold">{{ fmtEur(item.totalTTC) }}</td>
               </tr>
             </tbody>
           </table>
@@ -152,7 +161,7 @@
               </div>
               <div class="d-tot-ttc">
                 <span>Total TTC</span>
-                <span>{{ fmtEur(q.total_cost || 0) }}</span>
+                <span>{{ fmtEur(allTotalTTC) }}</span>
               </div>
             </div>
           </div>
@@ -206,6 +215,13 @@
 
         </div>
       </div>
+
+      <!-- ── Zoom image ── -->
+      <div v-if="zoomImg" class="zoom-overlay" @click="zoomImg = ''">
+        <img :src="zoomImg" class="zoom-img" alt="" />
+        <button class="zoom-close" type="button" @click.stop="zoomImg = ''">✕</button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -243,6 +259,7 @@ defineEmits(['close'])
 
 const co = company
 const downloading = ref(false)
+const zoomImg = ref('')
 
 const q = computed(() => props.quote)
 
@@ -254,17 +271,40 @@ const clientName = computed(() =>
 
 const taxRate = computed(() => q.value.tax_rate ?? 20)
 
+// Rétrocompat : si pas de items[], on crée une ligne unique depuis les anciens champs
+const tableItems = computed(() => {
+  if (q.value.items?.length) return q.value.items
+  const legacyUnitHT = (q.value.cost_per_unit || 0) / (1 + taxRate.value / 100)
+  const legacyTTC    = q.value.total_cost || 0
+  return [{
+    id:               'legacy',
+    name:             `Impression 3D — ${q.value.project_name || '—'}`,
+    quantity:         q.value.quantity ?? 1,
+    weight:           q.value.weight || 0,
+    material:         q.value.material || '—',
+    colorCount:       1,
+    referenceImageUrl: q.value.reference_image_url || '',
+    unitPriceHT:      legacyUnitHT,
+    totalTTC:         legacyTTC,
+    tvaPart:          legacyTTC - legacyUnitHT * (q.value.quantity ?? 1),
+  }]
+})
+
+const hasAnyImage = computed(() => tableItems.value.some(i => i.referenceImageUrl))
+
+const allTotalTTC = computed(() =>
+  tableItems.value.reduce((s, i) => s + (i.totalTTC || 0), 0)
+)
+const allTotalHT = computed(() =>
+  allTotalTTC.value / (1 + taxRate.value / 100)
+)
+const allTotalTVA = computed(() => allTotalTTC.value - allTotalHT.value)
+
+// Gardés pour compatibilité avec d-internal (mode admin)
 const unitPriceHT = computed(() =>
   (q.value.cost_per_unit || 0) / (1 + taxRate.value / 100)
 )
-
-const totalHT = computed(() =>
-  unitPriceHT.value * (q.value.quantity || 1)
-)
-
-const totalTVA = computed(() =>
-  (q.value.total_cost || 0) - totalHT.value
-)
+const totalTVA = computed(() => allTotalTVA.value)
 
 const specParts = computed(() => {
   const printTime = q.value.print_hours || q.value.print_minutes
@@ -297,11 +337,11 @@ const condLines = computed(() => {
 
 const totalsRows = computed(() => {
   const rows = [
-    ['Sous-total HT', fmtEur(totalHT.value)],
-    [`TVA (${taxRate.value}%)`, fmtEur(totalTVA.value)],
+    ['Sous-total HT', fmtEur(allTotalHT.value)],
+    [`TVA (${taxRate.value}%)`, fmtEur(allTotalTVA.value)],
   ]
   if ((q.value.deposit_percent || 0) > 0) {
-    const acompte = (q.value.total_cost || 0) * (q.value.deposit_percent / 100)
+    const acompte = allTotalTTC.value * (q.value.deposit_percent / 100)
     rows.push([`Acompte (${q.value.deposit_percent}%)`, fmtEur(acompte)])
   }
   return rows
@@ -809,6 +849,23 @@ async function handleDownload() {
   color: #718096;
   padding-top: 0.4rem;
   gap: 1rem;
+}
+
+/* ── Zoom image ── */
+.zoom-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+  z-index: 10000; display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out; padding: 1rem;
+}
+.zoom-img {
+  max-width: 90vw; max-height: 90vh; object-fit: contain;
+  border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.zoom-close {
+  position: fixed; top: 1rem; right: 1rem; width: 2.2rem; height: 2.2rem;
+  border: none; border-radius: 50%; background: rgba(255,255,255,0.15);
+  color: #fff; font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
 
 /* ── Responsive ── */
