@@ -74,6 +74,7 @@
         <User class="ctab-icon" />
         <span class="ctab-label-long">Mon profil</span>
         <span class="ctab-label-short">Profil</span>
+        <span v-if="push.isSupported && !push.isSubscribed && push.permission !== 'denied'" class="ctab-push-dot" />
       </button>
     </div>
 
@@ -491,6 +492,30 @@
             <LogOut class="pi-btn-icon" /> Se déconnecter
           </button>
         </div>
+
+        <!-- Notifications push -->
+        <div v-if="push.isSupported" class="pi-col pi-col--push">
+          <p class="pi-col-title">Notifications</p>
+          <div class="pi-push-row">
+            <div class="pi-push-info">
+              <p class="pi-label">Alertes push</p>
+              <p class="pi-push-sub">
+                <template v-if="push.permission === 'denied'">Accès refusé — activez les notifications dans votre navigateur.</template>
+                <template v-else>Recevez une alerte quand votre devis change de statut.</template>
+              </p>
+            </div>
+            <button
+              class="pi-btn-push"
+              :class="{ 'pi-btn-push--on': push.isSubscribed }"
+              :disabled="push.loading || push.permission === 'denied'"
+              @click="push.isSubscribed ? push.unsubscribe() : push.subscribe()"
+            >
+              <BellOff v-if="push.isSubscribed" class="pi-btn-icon" />
+              <Bell v-else class="pi-btn-icon" />
+              {{ push.isSubscribed ? 'Désactiver' : 'Activer' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -539,6 +564,7 @@
 import { ref, computed, watch, markRaw, onUnmounted } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useNavigationStore } from '@/stores/navigation'
+import { usePushNotifications } from '@/composables/usePushNotifications'
 import { getQuotes, getArchivedQuotes, archiveQuote } from '@/utils/quotes'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 import { fmtEur } from '@/utils/formatters'
@@ -548,9 +574,10 @@ import NotificationBell from '@/components/ui/NotificationBell.vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import PasswordField from '@/components/ui/PasswordField.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
-import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save } from 'lucide-vue-next'
+import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save, Bell, BellOff } from 'lucide-vue-next'
 
 const navStore = useNavigationStore()
+const push = usePushNotifications()
 
 // Tab labels pour le trigger mobile
 const tabMeta = {
@@ -746,6 +773,7 @@ onUnmounted(() => {
     userEmail.value = user.email || ''
     const { data: adminRow } = await supabase.from('admins').select('user_id').eq('user_id', user.id).maybeSingle()
     isAdminUser.value = !!adminRow
+    push.init()
     if (isAnonymous.value) {
       displayName.value = 'Invité'
     } else {
@@ -1770,6 +1798,40 @@ async function linkAccount() {
 }
 .pi-btn-logout:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
 .pi-btn-icon { width: 0.85rem; height: 0.85rem; }
+
+/* ── Push notifications ── */
+.pi-col--push {
+  grid-column: 1 / -1;
+  border-top: 1px solid #f0f4f8;
+  border-right: none;
+}
+.pi-push-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 0.75rem 1rem;
+  background: #f7f9fc; border: 1px solid #e2e8f0; border-radius: 12px;
+}
+.pi-push-info { flex: 1; min-width: 0; }
+.pi-push-sub  { font-size: 0.72rem; color: #718096; margin: 0.1rem 0 0; }
+.pi-btn-push {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.9rem; border: 1.5px solid #e2e8f0; border-radius: 999px;
+  background: #fff; color: #718096; font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.2s; flex-shrink: 0;
+}
+.pi-btn-push:hover:not(:disabled) { border-color: #2e9cab; color: #2e9cab; }
+.pi-btn-push--on  { border-color: #2e9cab; background: #e8f7f9; color: #1f7f97; }
+.pi-btn-push:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Badge pulsant sur l'onglet Profil */
+.ctab-push-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  background: #2e9cab;
+  animation: push-pulse 2s ease-in-out infinite;
+}
+@keyframes push-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.45; transform: scale(0.75); }
+}
 
 /* Desktop/tablette : la sidebar gère les onglets */
 @media (min-width: 769px) {
