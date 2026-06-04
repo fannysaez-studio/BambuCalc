@@ -29,10 +29,10 @@ export default {
   },
   computed: {
     isFullscreenRoute() {
-      return ['landing', 'login', 'signup', 'reset-password', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'privacy', 'mentions-legales', 'dashboard', 'profile', 'admin', 'payment'].includes(this.$route?.name)
+      return !this.$route?.name || ['landing', 'login', 'signup', 'reset-password', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'privacy', 'mentions-legales', 'dashboard', 'profile', 'admin', 'payment'].includes(this.$route?.name)
     },
     showSidebar() {
-      return !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'rdv', 'forbidden', 'maintenance', 'calculator-step'].includes(this.$route?.name)
+      return !!this.$route?.name && !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'calculator-step'].includes(this.$route?.name)
     },
   },
   async created() {

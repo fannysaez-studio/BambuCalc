@@ -257,7 +257,7 @@ watch(() => navStore.activeContextTab, (activeId) => {
 }, { immediate: true })
 
 const showNav = computed(() =>
-  !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'rdv', 'forbidden', 'maintenance', 'calculator-step'].includes(route.name)
+  !!route.name && !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'calculator-step'].includes(route.name)
 )
 
 function handleLogout() { emit('logout') }
