@@ -176,7 +176,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, reactive } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, reactive } from 'vue'
 import { CalendarOff, CalendarDays, Pencil, XCircle, Trash2 } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { deriveFormat, ledPresence, getObjectRdv, fmtDate, fmtTime, duration } from '@/utils/rdvUtils'
@@ -294,7 +294,7 @@ async function savePresence(a) {
   await supabase.from('appointments').update({ presence: v }).eq('id', a.id)
 }
 
-const broadcastChannel = supabase.channel('admin-appointments-bus')
+let broadcastChannel = null
 
 async function adminAction(action, id) {
   const { data: { session } } = await supabase.auth.getSession()
@@ -345,7 +345,14 @@ async function saveNote(a, val) {
   await supabase.from('appointments').update({ admin_note: note }).eq('id', a.id)
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+  broadcastChannel = supabase.channel('admin-appointments-bus').subscribe()
+})
+
+onUnmounted(() => {
+  if (broadcastChannel) supabase.removeChannel(broadcastChannel)
+})
 </script>
 
 <style scoped>
