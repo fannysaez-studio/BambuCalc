@@ -10,6 +10,7 @@
  */
 import { serve }  from 'https://deno.land/std@0.224.0/http/server.ts'
 import webpush    from 'npm:web-push'
+import { getAdminSubs, sendPushToSubs } from '../_shared/push-helpers.ts'
 
 const WEBHOOK_SECRET    = Deno.env.get('NOTIFY_WEBHOOK_SECRET')    ?? ''
 const VAPID_PUBLIC_KEY  = Deno.env.get('VAPID_PUBLIC_KEY')         ?? ''
@@ -51,19 +52,14 @@ serve(async (req) => {
 
   console.log('[WEBHOOK] Nouveau devis reçu — id:', quote.id, '—', name, '—', total)
 
-  // ── Récupération des souscriptions push admin ─────────────────────────────
-  const res  = await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions`, {
-    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
-  })
-  const subs = await res.json()
+  // ── Envoi push aux admins uniquement ──────────────────────────────────────
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
-  if (!Array.isArray(subs) || subs.length === 0) {
-    console.log('[PUSH] Aucune souscription active')
+  const adminSubs = await getAdminSubs(SUPABASE_URL, SERVICE_KEY)
+  if (adminSubs.length === 0) {
+    console.log('[PUSH] Aucune souscription admin active')
     return new Response(JSON.stringify({ ok: true, sent: 0 }), { status: 200 })
   }
-
-  // ── Envoi des notifications push ──────────────────────────────────────────
-  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 
   const notifPayload = JSON.stringify({
     title: '🖨️ Nouveau devis reçu',
@@ -71,25 +67,7 @@ serve(async (req) => {
     url:   '/admin',
   })
 
-  let sent = 0
-  for (const sub of subs) {
-    try {
-      await webpush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth_key } },
-        notifPayload,
-      )
-      sent++
-    } catch (err) {
-      console.error('[PUSH] sendNotification:', String(err))
-      if (err?.statusCode === 410) {
-        await fetch(`${SUPABASE_URL}/rest/v1/push_subscriptions?id=eq.${sub.id}`, {
-          method:  'DELETE',
-          headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
-        })
-      }
-    }
-  }
-
+  const sent = await sendPushToSubs(adminSubs, notifPayload, webpush, SUPABASE_URL, SERVICE_KEY)
   console.log('[PUSH] Notifications envoyées:', sent)
   return new Response(JSON.stringify({ ok: true, sent }), { status: 200 })
 })
