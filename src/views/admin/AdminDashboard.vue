@@ -21,6 +21,17 @@
         <div class="hero-bell-mobile">
           <NotificationBell :topPanel="true" />
         </div>
+        <button
+          v-if="pushSupported"
+          class="btn-push-toggle"
+          :class="{ 'btn-push-toggle--active': isSubscribed }"
+          :disabled="pushLoading || pushPermission === 'denied'"
+          :title="isSubscribed ? 'Désactiver les notifications push' : 'Activer les notifications push'"
+          @click="isSubscribed ? unsubscribePush() : subscribePush()"
+        >
+          <BellOff v-if="isSubscribed" class="btn-push-icon" />
+          <Bell v-else class="btn-push-icon" />
+        </button>
         <button class="btn-new-quote" @click="startNewQuote" title="Nouveau devis">
           <Plus class="btn-cta-icon" />
           <span class="btn-cta-text">Nouveau devis</span>
