@@ -38,7 +38,7 @@
         <span class="sidebar-label">Admin</span>
       </router-link>
 
-      <router-link v-if="isAuth && !isAdminUser" to="/dashboard" class="sidebar-item" :class="{ 'sidebar-item--on': isActive(['/dashboard', '/profile']) }">
+      <router-link v-if="isAuth" to="/dashboard" class="sidebar-item" :class="{ 'sidebar-item--on': isActive(['/dashboard', '/profile']) }">
         <span class="sidebar-icon-wrap"><LayoutGrid :size="16" /></span>
         <span class="sidebar-label">{{ displayName || 'Dashboard' }}</span>
       </router-link>
@@ -154,9 +154,8 @@
       <span>Admin</span>
     </router-link>
 
-    <!-- Dashboard : clients uniquement (admin a le ⊞ dans le hero) -->
     <router-link
-      v-if="isAuth && !isAdminUser"
+      v-if="isAuth"
       to="/dashboard"
       class="nav-bar-item"
       :class="{ 'nav-bar-item--on': isActive(['/dashboard', '/profile']) }"

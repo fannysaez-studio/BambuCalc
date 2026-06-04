@@ -619,6 +619,25 @@ const topMaterial = computed(() => {
   return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
 })
 
+// ── RDV computed ──
+function isPastRdv(a) { return a.start_at && new Date(a.start_at) < new Date() }
+
+const rdvTabs = computed(() => [
+  { id: 'upcoming', label: 'À venir',  count: appointments.value.filter(a => !isPastRdv(a) && a.status === 'active').length },
+  { id: 'past',     label: 'Passés',   count: appointments.value.filter(a => isPastRdv(a)   && a.status === 'active').length },
+  { id: 'canceled', label: 'Annulés',  count: appointments.value.filter(a => a.status === 'canceled').length },
+])
+
+const filteredRdv = computed(() => {
+  if (rdvFilter.value === 'upcoming') return appointments.value.filter(a => !isPastRdv(a) && a.status === 'active')
+  if (rdvFilter.value === 'past')     return appointments.value.filter(a => isPastRdv(a)   && a.status === 'active')
+  return appointments.value.filter(a => a.status === 'canceled')
+})
+
+const linkedQuotes = computed(() =>
+  quotes.value.filter(q => !q.archived && q.client_email === userEmail.value)
+)
+
 // ── Onglets contextuels sidebar ──
 const clientContextTabs = computed(() => [
   { id: 'quotes',  label: 'Mes devis',        icon: markRaw(FileText),  count: quotes.value.length },
@@ -639,25 +658,6 @@ watch(activeTab, (val) => {
 })
 
 onUnmounted(() => navStore.clearContext())
-
-// ── RDV computed ──
-function isPastRdv(a) { return a.start_at && new Date(a.start_at) < new Date() }
-
-const rdvTabs = computed(() => [
-  { id: 'upcoming', label: 'À venir',  count: appointments.value.filter(a => !isPastRdv(a) && a.status === 'active').length },
-  { id: 'past',     label: 'Passés',   count: appointments.value.filter(a => isPastRdv(a)   && a.status === 'active').length },
-  { id: 'canceled', label: 'Annulés',  count: appointments.value.filter(a => a.status === 'canceled').length },
-])
-
-const filteredRdv = computed(() => {
-  if (rdvFilter.value === 'upcoming') return appointments.value.filter(a => !isPastRdv(a) && a.status === 'active')
-  if (rdvFilter.value === 'past')     return appointments.value.filter(a => isPastRdv(a)   && a.status === 'active')
-  return appointments.value.filter(a => a.status === 'canceled')
-})
-
-const linkedQuotes = computed(() =>
-  quotes.value.filter(q => !q.archived && q.client_email === userEmail.value)
-)
 
 const archivedByYear = computed(() => {
   const grouped = {}

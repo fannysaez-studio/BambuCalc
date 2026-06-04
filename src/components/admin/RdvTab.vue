@@ -132,10 +132,10 @@
               <div class="rdv-select-wrap">
                 <span :class="['led-glow', `led-glow--${ledPresence(a)}`]" />
                 <select
+                  v-model="a.presence"
                   :class="['rdv-select', `rdv-select--${ledPresence(a)}`]"
-                  :value="a.presence ?? ''"
                   :disabled="a.status === 'canceled'"
-                  @change="savePresence(a, $event.target.value)"
+                  @change="savePresence(a)"
                 >
                   <option value="">À confirmer</option>
                   <option value="present">Présent(e)</option>
@@ -274,7 +274,7 @@ async function load() {
   appointments.value = (data ?? []).map(a => ({
     ...a,
     format:   a.format   ?? deriveFormat(a),
-    presence: a.presence ?? null,
+    presence: a.presence ?? '',
   }))
   emit('count-change', appointments.value.filter(a => !isPast(a) && a.status === 'active').length)
   loading.value = false
@@ -289,9 +289,8 @@ async function saveFormat(a) {
   await supabase.from('appointments').update({ format: a.format }).eq('id', a.id)
 }
 
-async function savePresence(a, val) {
-  const v = val === '' ? null : val
-  a.presence = v
+async function savePresence(a) {
+  const v = a.presence === '' ? null : a.presence
   await supabase.from('appointments').update({ presence: v }).eq('id', a.id)
 }
 

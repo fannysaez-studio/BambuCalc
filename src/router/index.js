@@ -50,7 +50,7 @@ router.beforeEach(async (to) => {
   const { data } = await supabase.auth.getSession()
   const isAuth = !!data.session
 
-  if (isAuth && (to.name === 'login' || to.name === 'signup')) {
+  if (isAuth && (to.name === 'login' || to.name === 'signup' || to.name === 'landing')) {
     const { data: isAdmin } = await supabase.rpc('is_admin')
     return { path: isAdmin ? '/admin' : '/dashboard' }
   }
