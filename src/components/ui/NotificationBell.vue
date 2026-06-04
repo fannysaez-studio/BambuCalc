@@ -181,12 +181,22 @@ function handleClickOutside(e) {
   }
 }
 
-onMounted(() => {
-  // Attendre que la session soit restaurée avant de charger
+onMounted(async () => {
+  // Chargement initial direct (évite le double-appel via INITIAL_SESSION
+  // quand plusieurs instances sont montées en même temps)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    await loadNotifications()
+    await setupRealtime()
+  }
+
   const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
+    if (event === 'SIGNED_IN') {
       await loadNotifications()
       await setupRealtime()
+    } else if (event === 'SIGNED_OUT') {
+      if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null }
+      notifications.value = []
     }
   })
   authSubscription = subscription
@@ -195,7 +205,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+  if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null }
   if (authSubscription) authSubscription.unsubscribe()
   document.removeEventListener('click', handleClickOutside)
   window.removeEventListener('resize', onResize)
