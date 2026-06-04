@@ -14,11 +14,16 @@
  *   CALENDLY_API_TOKEN    — Calendly Dashboard → API & Webhooks → Personal Access Token
  */
 import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
+import webpush from 'npm:web-push'
+import { getAdminSubs, getClientSubsByEmail, sendPushToSubs, formatRdvDate } from '../_shared/push-helpers.ts'
 
-const WEBHOOK_SECRET = Deno.env.get('CALENDLY_WEBHOOK_SECRET')     ?? ''
-const SUPABASE_URL   = Deno.env.get('SUPABASE_URL')                ?? ''
-const SERVICE_KEY    = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')   ?? ''
-const CAL_TOKEN      = Deno.env.get('CALENDLY_API_TOKEN')          ?? ''
+const WEBHOOK_SECRET    = Deno.env.get('CALENDLY_WEBHOOK_SECRET')      ?? ''
+const SUPABASE_URL      = Deno.env.get('SUPABASE_URL')                 ?? ''
+const SERVICE_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')    ?? ''
+const CAL_TOKEN         = Deno.env.get('CALENDLY_API_TOKEN')           ?? ''
+const VAPID_PUBLIC_KEY  = Deno.env.get('VAPID_PUBLIC_KEY')             ?? ''
+const VAPID_PRIVATE_KEY = Deno.env.get('VAPID_PRIVATE_KEY')            ?? ''
+const VAPID_SUBJECT     = 'mailto:fannysaez.pro@gmail.com'
 
 const headers = (extra = {}) => ({
   'Content-Type': 'application/json',
@@ -105,7 +110,33 @@ serve(async (req) => {
     return new Response(err, { status: 500 })
   }
 
-  // Pas de notification dans la cloche — le CalendarPanel gère l'affichage des RDV
+  // ── Push notifications ────────────────────────────────────────────────────
+  if (!isCanceled && VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+    try {
+      webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+      const dateStr = formatRdvDate(startAt)
+
+      const adminSubs = await getAdminSubs(SUPABASE_URL, SERVICE_KEY)
+      if (adminSubs.length > 0) {
+        await sendPushToSubs(
+          adminSubs,
+          JSON.stringify({ title: '📅 Nouveau rendez-vous', body: `${inviteeName} — ${dateStr}`, url: '/admin' }),
+          webpush, SUPABASE_URL, SERVICE_KEY
+        )
+      }
+
+      const clientSubs = await getClientSubsByEmail(inviteeEmail, SUPABASE_URL, SERVICE_KEY)
+      if (clientSubs.length > 0) {
+        await sendPushToSubs(
+          clientSubs,
+          JSON.stringify({ title: '✅ RDV confirmé', body: `Votre rendez-vous du ${dateStr} est enregistré`, url: '/dashboard' }),
+          webpush, SUPABASE_URL, SERVICE_KEY
+        )
+      }
+    } catch (pushErr) {
+      console.error('[PUSH] Erreur envoi RDV:', String(pushErr))
+    }
+  }
 
   console.log(`[CALENDLY] ${eventType} — ${inviteeName} (${inviteeEmail})`)
   return new Response(JSON.stringify({ ok: true }), { status: 200 })
