@@ -1,7 +1,7 @@
 // BambuCalc Service Worker — PWA (install/activate/fetch) + Web Push Notifications
 
 const CACHE_NAME = 'bambucalc-v1'
-const PRECACHE = ['/', '/favicon.ico', '/manifest.json', '/icons/icon.svg', '/icons/icon-maskable.svg']
+const PRECACHE = ['/', '/favicon.ico', '/manifest.json', '/assets/icons/icon.svg', '/assets/icons/icon-maskable.svg']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
