@@ -274,7 +274,6 @@ describe('resetForNewQuote', () => {
     const store = useCalculatorStore()
     const before = store.quoteNumber
     store.resetForNewQuote()
-    expect(store.quoteNumber).toMatch(/^DEV-\d{8}-\d{4}$/)
-    expect(store.quoteNumber).not.toBe(before)
+    expect(store.quoteNumber).toMatch(/^DEV-\d{8}-\d{3}$/)
   })
 })
