@@ -753,11 +753,26 @@ export default defineComponent({
     margin-top: 1.5rem;
   }
 
-  /* 5. Contenu dans la partie haute de la carte */
+  /* 5. Titre en haut, formulaire centré dans l'espace restant */
   .auth-card {
     padding: 4rem 2.5rem 2rem;
     justify-content: flex-start;
     overflow: hidden;
+  }
+
+  /* Header reste en haut */
+  .auth-header {
+    margin-bottom: 0;
+  }
+
+  /* Formulaire centré dans l'espace sous le header */
+  .auth-form {
+    margin-top: auto;
+  }
+
+  /* Bouton Google pousse vers le bas pour équilibrer */
+  .social-grid {
+    margin-bottom: auto;
   }
 
   /* 6. Formulaire bien aéré */
