@@ -760,57 +760,57 @@ export default defineComponent({
     overflow: hidden;
   }
 
-  /* 6. Formulaire aéré */
+  /* 6. Formulaire bien aéré */
   .auth-form {
-    margin-top: 1.5rem;
-    gap: 1rem;
+    margin-top: 1.75rem;
+    gap: 1.25rem;
   }
 
-  /* 7. Header avec respiration */
+  /* 7. Header respirant */
   .auth-header {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
   }
   .auth-header h2 {
-    font-size: 1.75rem;
+    font-size: 1.9rem;
   }
   .auth-header p {
-    margin-top: 0.4rem;
-    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
   }
 
   /* 8. Inputs confortables */
   .field input {
-    min-height: 2.6rem;
-    padding: 0.6rem 0.95rem;
-    font-size: 0.9rem;
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.92rem;
   }
   .field label {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
   }
 
-  /* 9. Bouton bien proportionné */
+  /* 9. Bouton généreux */
   .primary-btn {
-    min-height: 2.65rem;
-    margin-top: 0.25rem;
-    font-size: 0.92rem;
+    min-height: 2.85rem;
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
   }
 
   /* 10. Séparateur aéré */
   .auth-divider {
-    margin: 0.85rem 0;
-    font-size: 0.85rem;
+    margin: 1rem 0;
+    font-size: 0.88rem;
   }
 
   /* 11. Bouton Google proportionné */
   .social-btn {
-    min-height: 2.6rem;
-    font-size: 0.82rem;
+    min-height: 2.75rem;
+    font-size: 0.85rem;
   }
 
   /* 12. GDPR lisible */
   .gdpr-check {
-    font-size: 0.75rem;
-    gap: 0.5rem;
+    font-size: 0.78rem;
+    gap: 0.55rem;
   }
 
   /* 13. Critères mot de passe sur 2 colonnes pour économiser la hauteur */
