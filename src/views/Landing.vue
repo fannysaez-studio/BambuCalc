@@ -47,24 +47,24 @@
         <div class="landing-features">
           <div class="feature-card">
             <BarChart3 class="feature-icon" />
-            <div class="feature-title">Calcul précis</div>
+            <h3 class="feature-title">Calcul précis</h3>
             <div class="feature-text">
               Matériau, équipement et main-d'œuvre regroupés dans un seul calcul.
             </div>
           </div>
           <div class="feature-card">
             <DollarSign class="feature-icon" />
-            <div class="feature-title">Tarification flexible</div>
+            <h3 class="feature-title">Tarification flexible</h3>
             <div class="feature-text">Adaptez vos marges selon le volume et le type de projet.</div>
           </div>
           <div class="feature-card">
             <Zap class="feature-icon" />
-            <div class="feature-title">Séries maîtrisées</div>
+            <h3 class="feature-title">Séries maîtrisées</h3>
             <div class="feature-text">Pilotez les remises et les coûts de production en série.</div>
           </div>
           <div class="feature-card">
             <Download class="feature-icon" />
-            <div class="feature-title">Devis exportables</div>
+            <h3 class="feature-title">Devis exportables</h3>
             <div class="feature-text">Préparez et partagez vos devis en quelques secondes.</div>
           </div>
         </div>
