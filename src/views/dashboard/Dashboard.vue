@@ -583,6 +583,7 @@
 </template>
 
 <script setup>
+import { useHead } from '@vueuse/head'
 import { ref, computed, watch, markRaw, onUnmounted, reactive } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useNavigationStore } from '@/stores/navigation'
@@ -597,6 +598,8 @@ import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 import PasswordField from '@/components/ui/PasswordField.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save, Bell, BellOff } from 'lucide-vue-next'
+
+useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
 const navStore = useNavigationStore()
 const push = reactive(usePushNotifications())

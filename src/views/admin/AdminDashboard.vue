@@ -451,6 +451,7 @@
 </template>
 
 <script setup>
+import { useHead } from '@vueuse/head'
 import { ref, computed, watch, markRaw, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useNavigationStore } from '@/stores/navigation'
@@ -499,6 +500,8 @@ import {
   Plus,
   LayoutDashboard,
 } from 'lucide-vue-next'
+
+useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
 const router = useRouter()
 const calculatorStore = useCalculatorStore()
