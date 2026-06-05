@@ -176,6 +176,7 @@ export default defineComponent({
         { property: 'og:title', content: 'Inscription — BambuCalc' },
         { property: 'og:description', content: 'Rejoignez BambuCalc et gérez vos projets 3D.' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/signup' }],
     })
   },
   data() {

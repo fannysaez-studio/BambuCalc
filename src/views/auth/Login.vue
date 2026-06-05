@@ -183,6 +183,7 @@ export default defineComponent({
         { property: 'og:title', content: 'Connexion — BambuCalc' },
         { property: 'og:description', content: 'Accédez à votre espace BambuCalc.' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/login' }],
     })
   },
   data() {

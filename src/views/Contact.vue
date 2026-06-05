@@ -200,10 +200,12 @@ export default defineComponent({
       title: 'Contact — BambuCalc',
       meta: [
         { name: 'description', content: 'Contactez Fanny Saez pour toute question sur BambuCalc. Réponse sous 24h en jours ouvrés.' },
+        { name: 'robots', content: 'index, follow' },
         { property: 'og:title', content: 'Contact — BambuCalc' },
         { property: 'og:description', content: 'Contactez Fanny Saez pour toute question sur BambuCalc.' },
         { property: 'og:url', content: 'https://bambucalc.netlify.app/contact' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/contact' }],
     })
   },
   data() {

@@ -12,6 +12,7 @@ useHead({
     { name: 'description', content: 'Réinitialisez votre mot de passe BambuCalc.' },
     { name: 'robots', content: 'noindex, nofollow' },
   ],
+  link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/reset-password' }],
 })
 
 const router = useRouter()

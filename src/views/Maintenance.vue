@@ -65,6 +65,7 @@ export default {
         { name: 'description', content: 'BambuCalc est temporairement en maintenance. Nous revenons bientôt.' },
         { name: 'robots', content: 'noindex, nofollow' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/maintenance' }],
     })
   },
   computed: {

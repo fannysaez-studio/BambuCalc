@@ -330,10 +330,12 @@ export default {
       title: "Calculateur d'impression 3D — BambuCalc",
       meta: [
         { name: 'description', content: "Calculez vos coûts d'impression 3D : matériaux, temps machine, amortissement. Obtenez votre devis en quelques clics." },
+        { name: 'robots', content: 'index, follow' },
         { property: 'og:title', content: "Calculateur d'impression 3D — BambuCalc" },
         { property: 'og:description', content: "Calculez vos coûts d'impression 3D : matériaux, temps machine, amortissement." },
         { property: 'og:url', content: 'https://bambucalc.netlify.app/calculator/1' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/calculator/1' }],
     })
     return { store: useCalculatorStore() }
   },

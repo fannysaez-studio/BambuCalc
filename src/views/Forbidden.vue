@@ -53,6 +53,7 @@ export default {
         { name: 'description', content: 'Vous n\'avez pas les droits pour accéder à cette page.' },
         { name: 'robots', content: 'noindex, nofollow' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/403' }],
     })
   },
   mounted()   { document.body.classList.add('page-403') },

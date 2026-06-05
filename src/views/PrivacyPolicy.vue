@@ -190,10 +190,11 @@ export default {
       title: 'Politique de confidentialité — BambuCalc',
       meta: [
         { name: 'description', content: 'Politique de confidentialité de BambuCalc. Informations sur la collecte, l\'utilisation et la protection de vos données personnelles.' },
+        { name: 'robots', content: 'noindex, follow' },
         { property: 'og:title', content: 'Politique de confidentialité — BambuCalc' },
         { property: 'og:url', content: 'https://bambucalc.netlify.app/privacy' },
-        { name: 'robots', content: 'noindex, follow' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/privacy' }],
     })
   },
   data() {

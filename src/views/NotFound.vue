@@ -57,6 +57,7 @@ export default {
         { name: 'description', content: 'Cette page n\'existe pas ou a été déplacée.' },
         { name: 'robots', content: 'noindex, nofollow' },
       ],
+      link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/404' }],
     })
   },
   data() { return { isAuth: false } },

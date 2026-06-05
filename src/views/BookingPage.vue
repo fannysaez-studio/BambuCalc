@@ -169,10 +169,12 @@ useHead({
   title: 'Prendre rendez-vous — BambuCalc',
   meta: [
     { name: 'description', content: 'Prenez rendez-vous avec Fanny Saez pour discuter de votre projet d\'impression 3D. Disponible en visio ou en extérieur.' },
+    { name: 'robots', content: 'index, follow' },
     { property: 'og:title', content: 'Prendre rendez-vous — BambuCalc' },
     { property: 'og:description', content: 'Prenez rendez-vous pour discuter de votre projet d\'impression 3D.' },
     { property: 'og:url', content: 'https://bambucalc.netlify.app/rdv' },
   ],
+  link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/rdv' }],
 })
 
 const router = useRouter()
