@@ -400,7 +400,7 @@ export default {
   padding: 0.4rem; /* réduit */
   text-align: center;
   box-shadow: 0 10px 20px rgba(29, 18, 43, 0.04);
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -477,7 +477,7 @@ export default {
   font-weight: 600;
   font-size: 0.9rem; /* réduit */
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
   display: inline-block;
   cursor: pointer;
   border: none;
@@ -498,7 +498,6 @@ export default {
   background: linear-gradient(180deg, #3fb2bf 0%, #2e9cab 100%);
   color: #fff;
   border: 0;
-  backdrop-filter: blur(10px);
   box-shadow: 0 10px 22px rgba(25, 108, 133, 0.28);
 }
 
