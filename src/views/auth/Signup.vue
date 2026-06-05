@@ -760,28 +760,7 @@ export default defineComponent({
     overflow: hidden;
   }
 
-  /* Header reste en haut */
-  .auth-header {
-    margin-bottom: 0;
-  }
-
-  /* Formulaire centré dans l'espace sous le header */
-  .auth-form {
-    margin-top: auto;
-  }
-
-  /* Bouton Google pousse vers le bas pour équilibrer */
-  .social-grid {
-    margin-bottom: auto;
-  }
-
-  /* 6. Formulaire bien aéré */
-  .auth-form {
-    margin-top: 1.75rem;
-    gap: 1.25rem;
-  }
-
-  /* 7. Header respirant */
+  /* 6. Header en haut */
   .auth-header {
     margin-bottom: 0.5rem;
   }
@@ -791,6 +770,17 @@ export default defineComponent({
   .auth-header p {
     margin-top: 0.5rem;
     font-size: 0.95rem;
+  }
+
+  /* 7. Formulaire centré dans l'espace restant sous le header */
+  .auth-form {
+    margin-top: auto;
+    gap: 1.25rem;
+  }
+
+  /* Google pousse vers le bas pour équilibrer */
+  .social-grid {
+    margin-bottom: auto;
   }
 
   /* 8. Inputs confortables */
