@@ -37,10 +37,9 @@ serve(async (req) => {
     const { title = 'BambuCalc', message = '', url = '/admin', userId } = body
 
     // Récupère les souscriptions (filtrées par userId si fourni, sinon toutes)
-    const filter   = userId ? `user_id=eq.${userId}` : 'select=*'
     const endpoint = userId
-      ? `${SUPABASE_URL}/rest/v1/push_subscriptions?${filter}`
-      : `${SUPABASE_URL}/rest/v1/push_subscriptions`
+      ? `${SUPABASE_URL}/rest/v1/push_subscriptions?select=*&user_id=eq.${userId}`
+      : `${SUPABASE_URL}/rest/v1/push_subscriptions?select=*`
 
     const res  = await fetch(endpoint, {
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },

@@ -45,16 +45,21 @@ export function usePushNotifications() {
       if (!user) return
 
       const j = sub.toJSON()
-      await supabase.from('push_subscriptions').upsert({
+      const { error } = await supabase.from('push_subscriptions').upsert({
         user_id:  user.id,
         endpoint: j.endpoint,
         p256dh:   j.keys.p256dh,
         auth_key: j.keys.auth,
       }, { onConflict: 'user_id,endpoint' })
 
+      if (error) {
+        console.error('[Push] subscribe — erreur Supabase:', error.message, error)
+        return
+      }
+
       isSubscribed.value = true
     } catch (e) {
-      console.warn('[Push] subscribe:', e)
+      console.error('[Push] subscribe:', e)
     } finally {
       loading.value = false
     }
@@ -70,16 +75,17 @@ export function usePushNotifications() {
         await sub.unsubscribe()
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          await supabase.from('push_subscriptions')
+          const { error } = await supabase.from('push_subscriptions')
             .delete()
             .eq('user_id', user.id)
             .eq('endpoint', sub.endpoint)
+          if (error) console.error('[Push] unsubscribe — erreur Supabase:', error.message, error)
         }
       }
-      isSubscribed.value = false
     } catch (e) {
-      console.warn('[Push] unsubscribe:', e)
+      console.error('[Push] unsubscribe:', e)
     } finally {
+      isSubscribed.value = false
       loading.value = false
     }
   }

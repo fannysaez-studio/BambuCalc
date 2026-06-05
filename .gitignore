@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# Scripts de test locaux (contiennent des tokens)
+test-push.mjs
+
 # Build & Distribution
 dist/
 dist-ssr/

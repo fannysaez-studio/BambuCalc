@@ -561,7 +561,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, markRaw, onUnmounted } from 'vue'
+import { ref, computed, watch, markRaw, onUnmounted, reactive } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { useNavigationStore } from '@/stores/navigation'
 import { usePushNotifications } from '@/composables/usePushNotifications'
@@ -577,7 +577,7 @@ import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save, Bell, BellOff } from 'lucide-vue-next'
 
 const navStore = useNavigationStore()
-const push = usePushNotifications()
+const push = reactive(usePushNotifications())
 
 // Tab labels pour le trigger mobile
 const tabMeta = {

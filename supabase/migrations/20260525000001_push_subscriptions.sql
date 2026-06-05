@@ -18,3 +18,8 @@ create policy "push_sub_owner" on public.push_subscriptions
 -- Le service role peut tout lire (pour l'envoi par la Edge Function)
 create policy "push_sub_service" on public.push_subscriptions
   for all to service_role using (true);
+
+-- Privileges table pour les rôles Supabase
+grant select, insert, update, delete on public.push_subscriptions to authenticated;
+grant select, insert, update, delete on public.push_subscriptions to anon;
+grant select, insert, update, delete on public.push_subscriptions to service_role;

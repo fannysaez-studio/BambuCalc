@@ -41,7 +41,7 @@ serve(async (req) => {
   }
 
   // ── Parsing du payload ────────────────────────────────────────────────────
-  let payload: { type: string; record: Record<string, unknown> }
+  let payload: { type: string; record: Record<string, unknown>; old_record?: Record<string, unknown> }
   try {
     payload = await req.json()
   } catch {
@@ -54,7 +54,13 @@ serve(async (req) => {
 
   const record   = payload.record
   const status   = String(record.status ?? '')
+  const oldStatus = String(payload.old_record?.status ?? '')
   const userId   = record.user_id as string | null
+
+  if (status === oldStatus) {
+    console.log('[SKIP] Statut inchangé:', status)
+    return new Response(JSON.stringify({ ok: true, skipped: true }), { status: 200 })
+  }
   const quoteNum = String(record.quote_number ?? record.id ?? '—')
 
   // Skip devis anonymes ou statuts inconnus
