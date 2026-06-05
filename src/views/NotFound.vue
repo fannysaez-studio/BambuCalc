@@ -6,7 +6,7 @@
       <router-link to="/" class="nf-icon-btn nf-icon-tl" aria-label="Page d'accueil" title="Page d'accueil">
         <Home class="nf-icon" aria-hidden="true" />
       </router-link>
-      <img src="/404.svg" class="nf-illustration" alt="Illustration 404" aria-hidden="true" width="500" height="500" fetchpriority="high" />
+      <img src="/assets/svg/errors/404.svg" class="nf-illustration" alt="Illustration 404" aria-hidden="true" width="500" height="500" fetchpriority="high" />
     </section>
 
     <!-- ── Panneau droit : contenu ── -->
