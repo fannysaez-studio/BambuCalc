@@ -755,7 +755,7 @@ export default defineComponent({
 
   /* 5. Titre en haut, formulaire centré dans l'espace restant */
   .auth-card {
-    padding: 3.75rem 2.5rem 1.5rem;
+    padding: 2.75rem 2.5rem 1.5rem;
     justify-content: flex-start;
     overflow: hidden;
   }
