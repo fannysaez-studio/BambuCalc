@@ -32,7 +32,7 @@ export default {
       return !this.$route?.name || ['landing', 'login', 'signup', 'reset-password', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'privacy', 'mentions-legales', 'dashboard', 'profile', 'admin', 'payment'].includes(this.$route?.name)
     },
     showSidebar() {
-      return !!this.$route?.name && !['landing', 'login', 'signup', 'privacy', 'mentions-legales', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'calculator-step'].includes(this.$route?.name)
+      return !!this.$route?.name && !['landing', 'login', 'signup', 'reset-password', 'privacy', 'mentions-legales', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'calculator-step'].includes(this.$route?.name)
     },
   },
   async created() {
