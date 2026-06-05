@@ -753,34 +753,24 @@ export default defineComponent({
     margin-top: 1.5rem;
   }
 
-  /* 5. Carte — formulaire centré, header dans la barre du haut */
+  /* 5. Titre en haut, formulaire centré dans l'espace restant */
   .auth-card {
-    padding: 5rem 2.5rem 1.5rem;
-    justify-content: center;
+    padding: 3.75rem 2.5rem 1.5rem;
+    justify-content: flex-start;
     overflow: hidden;
   }
 
-  /* 6. Titre aligné avec les icônes dans la barre du haut */
+  /* 6. Header en haut dans le flux */
   .auth-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0 10rem;
-    margin-bottom: 0;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    flex-shrink: 0;
+    margin-bottom: 1.75rem;
   }
-  .auth-header h2 { font-size: 1.5rem; margin: 0; letter-spacing: -0.02em; }
-  .auth-header p  { font-size: 0.88rem; margin: 0.2rem 0 0; color: #718096; }
+  .auth-header h2 { font-size: 1.9rem; }
+  .auth-header p  { margin-top: 0.5rem; font-size: 0.95rem; }
 
-  /* 7. Formulaire centré dans l'espace sous la barre */
-  .auth-form   { gap: 1.25rem; }
-  .social-grid { }
+  /* 7. Formulaire + suite centrés dans l'espace sous le header */
+  .auth-form     { margin-top: auto; gap: 1.25rem; }
+  .social-grid   { margin-bottom: auto; }
 
   /* 8. Inputs confortables */
   .field input {
