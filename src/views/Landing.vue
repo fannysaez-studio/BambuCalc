@@ -17,7 +17,7 @@
       <div class="visual-illustration">
         <div class="visual-composition">
           <img
-            src="/bambu lab P2S Combo.webp"
+            src="/assets/webp/landing/bambu lab P2S Combo.webp"
             alt="Bambu Lab P2S Combo"
             class="visual-printer"
             width="170" height="235"
@@ -25,7 +25,7 @@
             loading="lazy"
           />
           <img
-            src="/bambuLab Filament.webp"
+            src="/assets/webp/landing/bambuLab Filament.webp"
             alt="Illustration organique turquoise"
             class="visual-main"
             fetchpriority="high"
