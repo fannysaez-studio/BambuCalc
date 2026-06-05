@@ -177,13 +177,21 @@ export default {
   border-radius: 50%;
   background: #2e9cab;
   flex-shrink: 0;
+  position: relative;
+}
+.mt-led-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(46,156,171,0.7);
   animation: ledPulse 2s infinite;
 }
 
 @keyframes ledPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(46,156,171,0.7); }
-  70%  { box-shadow: 0 0 0 8px rgba(46,156,171,0); }
-  100% { box-shadow: 0 0 0 0 rgba(46,156,171,0); }
+  0%   { transform: scale(1);   opacity: 0.7; }
+  70%  { transform: scale(2.5); opacity: 0;   }
+  100% { transform: scale(2.5); opacity: 0;   }
 }
 
 /* ── Contenu centré ── */
