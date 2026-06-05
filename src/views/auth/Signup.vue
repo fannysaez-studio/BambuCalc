@@ -751,9 +751,9 @@ export default defineComponent({
     margin-top: 1.5rem;
   }
 
-  /* 5. Carte centrée verticalement */
+  /* 5. Carte centrée verticalement — padding symétrique */
   .auth-card {
-    padding: 3.5rem 2.5rem 1rem;
+    padding: 3.5rem 2.5rem 3.5rem;
     justify-content: center;
     overflow: hidden;
   }
