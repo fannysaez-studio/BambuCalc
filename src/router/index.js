@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Landing from '@/views/Landing.vue'
 import { supabase } from '@/lib/supabase'
 
 const routes = [
-  { path: '/', name: 'landing', component: Landing, meta: { layout: 'landing' } },
+  { path: '/', name: 'landing', component: () => import('@/views/Landing.vue'), meta: { layout: 'landing' } },
   { path: '/calculator', redirect: '/calculator/1' },
   { path: '/calculator/:step', name: 'calculator-step', component: () => import('@/views/calculator/CalculatorStep.vue') },
   { path: '/login',  name: 'login',  component: () => import('@/views/auth/Login.vue') },
