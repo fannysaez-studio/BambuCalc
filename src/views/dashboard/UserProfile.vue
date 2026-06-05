@@ -1,4 +1,5 @@
 <script setup>
+import { useHead } from '@vueuse/head'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, Save, FileText, Clock, CheckCircle2, Download, Shield, TrendingUp, LogOut } from 'lucide-vue-next'
@@ -6,6 +7,8 @@ import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
+
+useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
 const router = useRouter()
 

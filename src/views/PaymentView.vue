@@ -118,11 +118,14 @@
 </template>
 
 <script setup>
+import { useHead } from '@vueuse/head'
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ShieldOff, AlertCircle, CheckCircle, CreditCard, Lock, Shield } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import { loadStripeConditionally, hasStripeConsent } from '@/utils/stripe'
+
+useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 
 const route  = useRoute()
 const router = useRouter()
