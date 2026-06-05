@@ -6,7 +6,7 @@
       <router-link to="/" class="nf-icon-btn nf-icon-tl" aria-label="Page d'accueil" title="Page d'accueil">
         <Home class="nf-icon" aria-hidden="true" />
       </router-link>
-      <img src="/404.svg" class="nf-illustration" alt="Illustration 404" aria-hidden="true" width="500" height="500" />
+      <img src="/404.svg" class="nf-illustration" alt="Illustration 404" aria-hidden="true" width="500" height="500" fetchpriority="high" />
     </section>
 
     <!-- ── Panneau droit : contenu ── -->
@@ -31,7 +31,7 @@
           </p>
           <div class="nf-actions">
             <router-link to="/" class="btn-home">← Accueil</router-link>
-            <router-link v-if="isAuth" to="/dashboard" class="btn-dash">Mon tableau de bord</router-link>
+            <router-link to="/dashboard" class="btn-dash">Mon tableau de bord</router-link>
           </div>
         </div>
 
@@ -44,7 +44,6 @@
 
 <script>
 import { Home, LogIn, MessageSquare } from 'lucide-vue-next'
-import { supabase } from '../lib/supabase'
 import { useHead } from '@vueuse/head'
 
 export default {
@@ -59,11 +58,6 @@ export default {
       ],
       link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/404' }],
     })
-  },
-  data() { return { isAuth: false } },
-  async created() {
-    const { data } = await supabase.auth.getSession()
-    this.isAuth = !!data.session
   },
   mounted()   { document.body.classList.add('page-404') },
   unmounted() { document.body.classList.remove('page-404') },

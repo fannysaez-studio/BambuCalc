@@ -17,7 +17,7 @@
 
       <div class="visual-illustration">
         <div class="visual-illustration-glow"></div>
-        <img src="/contact-hero.svg" alt="Prenez contact avec l'équipe BambuCalc" width="500" height="500" />
+        <img src="/contact-hero.svg" alt="Prenez contact avec l'équipe BambuCalc" width="500" height="500" fetchpriority="high" />
       </div>
 
       <div class="contact-info-list">
