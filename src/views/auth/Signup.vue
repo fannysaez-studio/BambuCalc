@@ -751,38 +751,64 @@ export default defineComponent({
     margin-top: 1.5rem;
   }
 
-  /* 5. Réduire le padding de la carte formulaire + scroll interne si contenu trop haut */
+  /* 5. Carte sans scroll — tout doit rentrer */
   .auth-card {
-    padding: 4rem 2.5rem 1.5rem;
+    padding: 3.5rem 2.5rem 1rem;
     justify-content: flex-start;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
-  /* 6. Réduire les espaces internes du formulaire */
+  /* 6. Formulaire très compact */
   .auth-form {
-    margin-top: 1.25rem;
-    gap: 0.75rem;
+    margin-top: 0.75rem;
+    gap: 0.5rem;
   }
 
-  /* 7. Sous-titre du header moins espacé */
+  /* 7. Header compact */
+  .auth-header {
+    margin-bottom: 0;
+  }
+  .auth-header h2 {
+    font-size: 1.6rem;
+  }
   .auth-header p {
-    margin-top: 0.5rem;
+    margin-top: 0.3rem;
+    font-size: 0.85rem;
   }
 
-  /* 8. Inputs légèrement moins hauts */
+  /* 8. Inputs plus petits */
   .field input {
-    min-height: 2.6rem;
-    padding: 0.6rem 0.95rem;
+    min-height: 2.3rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.88rem;
+  }
+  .field label {
+    font-size: 0.65rem;
   }
 
-  /* 9. Bouton principal légèrement moins haut */
+  /* 9. Bouton compact */
   .primary-btn {
-    min-height: 2.6rem;
+    min-height: 2.3rem;
+    margin-top: 0.2rem;
+    font-size: 0.88rem;
   }
 
-  /* 10. Séparateur "ou" plus compact */
+  /* 10. Séparateur minimal */
   .auth-divider {
-    margin: 0.7rem 0;
+    margin: 0.4rem 0;
+    font-size: 0.82rem;
+  }
+
+  /* 11. Bouton Google compact */
+  .social-btn {
+    min-height: 2.3rem;
+    font-size: 0.78rem;
+  }
+
+  /* 12. GDPR plus petit */
+  .gdpr-check {
+    font-size: 0.7rem;
+    gap: 0.4rem;
   }
 }
 
