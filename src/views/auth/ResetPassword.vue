@@ -389,9 +389,6 @@ async function onSubmit() {
 
 /* ── Desktop ≥ 769px : aération + labels gauche ── */
 @media (min-width: 769px) {
-  .rp-page {
-    padding-left: calc(var(--sidebar-w) + 8px + 1rem);
-  }
   .rp-main {
     width: 100%;
     max-width: 380px;
