@@ -131,23 +131,30 @@ async function loadNotifications() {
   loading.value = false
 }
 
+let settingUpRealtime = false
 async function setupRealtime() {
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
-  if (realtimeChannel) { await supabase.removeChannel(realtimeChannel); realtimeChannel = null }
-  const userId = user.id
-  realtimeChannel = supabase
-    .channel(`notif-bell-${userId}-${Date.now()}`)
-    .on(
-      'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
-      (payload) => {
-        notifications.value = [payload.new, ...notifications.value]
-      }
-    )
-    .subscribe(status => {
-      if (status === 'CHANNEL_ERROR') console.warn('[NotificationBell] realtime indisponible')
-    })
+  if (settingUpRealtime) return
+  settingUpRealtime = true
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    if (realtimeChannel) { await supabase.removeChannel(realtimeChannel); realtimeChannel = null }
+    const userId = user.id
+    realtimeChannel = supabase
+      .channel(`notif-bell-${userId}-${Date.now()}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
+        (payload) => {
+          notifications.value = [payload.new, ...notifications.value]
+        }
+      )
+      .subscribe(status => {
+        if (status === 'CHANNEL_ERROR') console.warn('[NotificationBell] realtime indisponible')
+      })
+  } finally {
+    settingUpRealtime = false
+  }
 }
 
 async function markRead(n) {
