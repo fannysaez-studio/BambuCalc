@@ -154,7 +154,9 @@
     <div v-show="activeTab === 'quotes'" class="quotes-card">
       <div class="quotes-header">
         <h2 class="quotes-title"><FileText class="qh-icon" /> Mes devis</h2>
-        <span class="quotes-count">{{ quotes.length }} devis</span>
+        <span class="quotes-count">
+          {{ filteredQuotes.length }}{{ filteredQuotes.length < quotes.length ? ` / ${quotes.length}` : '' }} devis
+        </span>
       </div>
 
       <!-- Chargement -->
