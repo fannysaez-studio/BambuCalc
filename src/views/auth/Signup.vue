@@ -812,6 +812,11 @@ export default defineComponent({
     font-size: 0.75rem;
     gap: 0.5rem;
   }
+
+  /* 13. Masquer les critères détaillés du mot de passe — seule la barre reste */
+  :deep(.pf-rules) {
+    display: none;
+  }
 }
 
 /* ===== Tablette : 769px – 1100px ===== */
