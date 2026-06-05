@@ -125,7 +125,14 @@ import { ShieldOff, AlertCircle, CheckCircle, CreditCard, Lock, Shield } from 'l
 import { supabase } from '@/lib/supabase'
 import { loadStripeConditionally, hasStripeConsent } from '@/utils/stripe'
 
-useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
+useHead({
+  title: 'Paiement — BambuCalc',
+  meta: [
+    { name: 'description', content: 'Réglez votre devis d\'impression 3D en ligne de façon sécurisée via Stripe.' },
+    { name: 'robots', content: 'index, follow' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/pay' }],
+})
 
 const route  = useRoute()
 const router = useRouter()

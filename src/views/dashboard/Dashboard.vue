@@ -599,7 +599,14 @@ import PasswordField from '@/components/ui/PasswordField.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { User, Plus, FileText, TrendingUp, Package, Wallet, Archive, ChevronDown, Download, UserX, CreditCard, Eye, Calendar, Shield, LogOut, Save, Bell, BellOff } from 'lucide-vue-next'
 
-useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
+useHead({
+  title: 'Mon espace — BambuCalc',
+  meta: [
+    { name: 'description', content: 'Gérez vos devis, rendez-vous et paramètres de compte sur BambuCalc.' },
+    { name: 'robots', content: 'index, follow' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/dashboard' }],
+})
 
 const navStore = useNavigationStore()
 const push = reactive(usePushNotifications())

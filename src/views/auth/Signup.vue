@@ -172,7 +172,7 @@ export default defineComponent({
       title: 'Inscription — BambuCalc',
       meta: [
         { name: 'description', content: 'Créez votre compte BambuCalc et gérez vos devis d\'impression 3D en ligne.' },
-        { name: 'robots', content: 'noindex, follow' },
+        { name: 'robots', content: 'index, follow' },
         { property: 'og:title', content: 'Inscription — BambuCalc' },
         { property: 'og:description', content: 'Rejoignez BambuCalc et gérez vos projets 3D.' },
       ],

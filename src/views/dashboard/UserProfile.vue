@@ -8,7 +8,14 @@ import PasswordField from '@/components/ui/PasswordField.vue'
 import ToastMessage from '@/components/ui/ToastMessage.vue'
 import { generateQuotePDF } from '@/utils/generateQuotePDF'
 
-useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
+useHead({
+  title: 'Mon profil — BambuCalc',
+  meta: [
+    { name: 'description', content: 'Gérez vos informations personnelles et votre mot de passe sur BambuCalc.' },
+    { name: 'robots', content: 'index, follow' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/profile' }],
+})
 
 const router = useRouter()
 

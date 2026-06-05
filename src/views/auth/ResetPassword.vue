@@ -10,7 +10,7 @@ useHead({
   title: 'Nouveau mot de passe — BambuCalc',
   meta: [
     { name: 'description', content: 'Réinitialisez votre mot de passe BambuCalc.' },
-    { name: 'robots', content: 'noindex, nofollow' },
+    { name: 'robots', content: 'index, follow' },
   ],
   link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/reset-password' }],
 })

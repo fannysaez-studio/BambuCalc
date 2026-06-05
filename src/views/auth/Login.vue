@@ -179,7 +179,7 @@ export default defineComponent({
       title: 'Connexion — BambuCalc',
       meta: [
         { name: 'description', content: 'Connectez-vous à BambuCalc pour accéder à vos devis d\'impression 3D.' },
-        { name: 'robots', content: 'noindex, follow' },
+        { name: 'robots', content: 'index, follow' },
         { property: 'og:title', content: 'Connexion — BambuCalc' },
         { property: 'og:description', content: 'Accédez à votre espace BambuCalc.' },
       ],

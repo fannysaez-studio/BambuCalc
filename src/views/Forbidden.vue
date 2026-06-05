@@ -51,7 +51,7 @@ export default {
       title: 'Accès restreint — BambuCalc',
       meta: [
         { name: 'description', content: 'Vous n\'avez pas les droits pour accéder à cette page.' },
-        { name: 'robots', content: 'noindex, nofollow' },
+        { name: 'robots', content: 'index, follow' },
       ],
       link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/403' }],
     })

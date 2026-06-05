@@ -111,7 +111,7 @@ export default {
       title: 'Mentions légales — BambuCalc',
       meta: [
         { name: 'description', content: 'Mentions légales de BambuCalc. Informations sur l\'éditeur, l\'hébergeur et les conditions d\'utilisation du service.' },
-        { name: 'robots', content: 'noindex, follow' },
+        { name: 'robots', content: 'index, follow' },
         { property: 'og:title', content: 'Mentions légales — BambuCalc' },
         { property: 'og:url', content: 'https://bambucalc.netlify.app/mentions-legales' },
       ],

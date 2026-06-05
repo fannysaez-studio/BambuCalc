@@ -55,7 +55,7 @@ export default {
       title: 'Page introuvable — BambuCalc',
       meta: [
         { name: 'description', content: 'Cette page n\'existe pas ou a été déplacée.' },
-        { name: 'robots', content: 'noindex, nofollow' },
+        { name: 'robots', content: 'index, follow' },
       ],
       link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/404' }],
     })

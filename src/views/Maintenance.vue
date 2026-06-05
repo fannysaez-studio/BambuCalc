@@ -63,7 +63,7 @@ export default {
       title: 'Maintenance en cours — BambuCalc',
       meta: [
         { name: 'description', content: 'BambuCalc est temporairement en maintenance. Nous revenons bientôt.' },
-        { name: 'robots', content: 'noindex, nofollow' },
+        { name: 'robots', content: 'index, follow' },
       ],
       link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/maintenance' }],
     })

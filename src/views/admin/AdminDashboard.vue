@@ -501,7 +501,14 @@ import {
   LayoutDashboard,
 } from 'lucide-vue-next'
 
-useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
+useHead({
+  title: 'Administration — BambuCalc',
+  meta: [
+    { name: 'description', content: 'Espace d\'administration BambuCalc — gestion des clients, devis et paramètres.' },
+    { name: 'robots', content: 'index, follow' },
+  ],
+  link: [{ rel: 'canonical', href: 'https://bambucalc.netlify.app/admin' }],
+})
 
 const router = useRouter()
 const calculatorStore = useCalculatorStore()
