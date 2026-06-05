@@ -20,11 +20,11 @@ const VAPID_SUBJECT     = 'mailto:fannysaez.pro@gmail.com'
 const SUPABASE_URL      = Deno.env.get('SUPABASE_URL')              ?? ''
 const SERVICE_KEY       = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 
-const STATUS_MESSAGES: Record<string, { title: string; body: (num: string) => string }> = {
-  pending:  { title: "⏳ Devis en cours d'examen", body: (n) => `Votre devis #${n} est en cours d'examen` },
-  sent:     { title: '📄 Devis disponible',         body: (n) => `Votre devis #${n} est prêt à consulter` },
-  accepted: { title: '✅ Devis accepté',             body: (n) => `Votre devis #${n} a été accepté` },
-  refused:  { title: '❌ Devis refusé',              body: (n) => `Votre devis #${n} a été refusé` },
+const STATUS_MESSAGES: Record<string, { title: string; body: (num: string, name: string) => string }> = {
+  pending:  { title: "⏳ Devis en cours d'examen", body: (n, name) => `"${name || `Devis #${n}`}" est en cours d'examen` },
+  sent:     { title: '📄 Devis disponible',         body: (n, name) => `"${name || `Devis #${n}`}" est prêt à consulter` },
+  accepted: { title: '✅ Devis accepté',             body: (n, name) => `"${name || `Devis #${n}`}" a été accepté 🎉` },
+  refused:  { title: '❌ Devis refusé',              body: (n, name) => `"${name || `Devis #${n}`}" a été refusé` },
 }
 
 serve(async (req) => {
@@ -61,7 +61,8 @@ serve(async (req) => {
     console.log('[SKIP] Statut inchangé:', status)
     return new Response(JSON.stringify({ ok: true, skipped: true }), { status: 200 })
   }
-  const quoteNum = String(record.quote_number ?? record.id ?? '—')
+  const quoteNum  = String(record.quote_number ?? record.id ?? '—')
+  const quoteName = String(record.project_name ?? '')
 
   // Skip devis anonymes ou statuts inconnus
   if (!userId || !STATUS_MESSAGES[status]) {
@@ -80,7 +81,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ ok: true, sent: 0 }), { status: 200 })
   }
 
-  const notifPayload = JSON.stringify({ title: msg.title, body: msg.body(quoteNum), url: '/dashboard' })
+  const notifPayload = JSON.stringify({ title: msg.title, body: msg.body(quoteNum, quoteName), url: '/dashboard' })
   const sent = await sendPushToSubs(subs, notifPayload, webpush, SUPABASE_URL, SERVICE_KEY)
 
   console.log(`[PUSH] Devis ${quoteNum} (${status}) → ${sent} push envoyé(s)`)

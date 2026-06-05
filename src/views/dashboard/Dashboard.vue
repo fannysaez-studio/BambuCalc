@@ -518,6 +518,26 @@
             </button>
           </div>
         </div>
+
+        <!-- Zone danger -->
+        <div class="pi-col pi-col--danger">
+          <p class="pi-col-title pi-col-title--danger">Zone danger</p>
+          <p class="pi-danger-sub">La suppression est définitive — vos devis et données seront effacés.</p>
+          <div v-if="!confirmDelete">
+            <button class="pi-btn-danger" @click="confirmDelete = true">
+              <UserX class="pi-btn-icon" /> Supprimer mon compte
+            </button>
+          </div>
+          <div v-else class="pi-danger-confirm">
+            <p class="pi-danger-confirm-msg">Confirmer la suppression de votre compte ?</p>
+            <div class="pi-danger-actions">
+              <button class="pi-btn-danger" :disabled="deletingAccount" @click="deleteAccount">
+                {{ deletingAccount ? 'Suppression…' : 'Oui, supprimer définitivement' }}
+              </button>
+              <button class="pi-btn-outline" @click="confirmDelete = false">Annuler</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -629,6 +649,8 @@ const linking = ref(false)
 const linkSuccess = ref(false)
 const linkError = ref(null)
 const toast = ref(null)
+const confirmDelete = ref(false)
+const deletingAccount = ref(false)
 
 // ── Computed ──
 const filteredQuotes = computed(() => {
@@ -825,7 +847,7 @@ async function doArchive() {
     quotes.value = quotes.value.filter(q => q.id !== archiveTarget.value.id)
     archivedCount.value++
     if (showArchives.value) archivedQuotes.value = await getArchivedQuotes()
-    toast.value?.show('Devis archivé.', 'success', 2500)
+    toast.value?.show(`"${archiveTarget.value?.project_name || 'Devis'}" archivé ✓`, 'success', 2500)
     archiveTarget.value = null
   } catch {
     toast.value?.show("Erreur lors de l'archivage.", 'error')
@@ -861,7 +883,7 @@ async function saveProfile() {
     if (data.user) await supabase.from('profiles').update({ full_name: full }).eq('id', data.user.id)
   }
   saving.value = false
-  toast.value?.show(error ? 'Erreur lors de la sauvegarde.' : 'Profil mis à jour !', error ? 'error' : 'success')
+  toast.value?.show(error ? 'Erreur lors de la sauvegarde.' : `Profil mis à jour${firstName.value ? ', ' + firstName.value : ''} !`, error ? 'error' : 'success')
 }
 
 async function savePassword() {
@@ -872,12 +894,28 @@ async function savePassword() {
   const { error } = await supabase.auth.updateUser({ password: newPassword.value })
   savingPwd.value = false
   if (error) { pwdError.value = error.message || 'Erreur lors du changement.' }
-  else { newPassword.value = ''; confirmPwd.value = ''; toast.value?.show('Mot de passe modifié !', 'success') }
+  else { newPassword.value = ''; confirmPwd.value = ''; toast.value?.show('Mot de passe modifié avec succès !', 'success') }
 }
 
 async function logout() {
   await supabase.auth.signOut()
   window.location.href = '/login'
+}
+
+async function deleteAccount() {
+  deletingAccount.value = true
+  try {
+    const { error } = await supabase.rpc('delete_own_account')
+    if (error) {
+      toast.value?.show('Erreur lors de la suppression.', 'error')
+      console.error('[deleteAccount]', error)
+      return
+    }
+    await supabase.auth.signOut()
+    window.location.href = '/'
+  } finally {
+    deletingAccount.value = false
+  }
 }
 
 async function linkAccount() {
@@ -1809,6 +1847,21 @@ async function linkAccount() {
 }
 .pi-btn-logout:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
 .pi-btn-icon { width: 0.85rem; height: 0.85rem; }
+
+/* ── Zone danger ── */
+.pi-col--danger { grid-column: 1 / -1; border: 1.5px solid #fed7d7; border-radius: 14px; padding: 1rem 1.25rem; background: #fff5f5; }
+.pi-col-title--danger { color: #c53030; }
+.pi-danger-sub { font-size: 0.8rem; color: #718096; margin: 0 0 0.75rem; }
+.pi-btn-danger {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1.1rem; border: 1.5px solid #e53e3e; border-radius: 999px;
+  background: transparent; color: #e53e3e; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: all 0.2s;
+}
+.pi-btn-danger:hover:not(:disabled) { background: #e53e3e; color: #fff; }
+.pi-btn-danger:disabled { opacity: 0.65; cursor: not-allowed; }
+.pi-danger-confirm-msg { font-size: 0.85rem; font-weight: 700; color: #c53030; margin: 0 0 0.75rem; }
+.pi-danger-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
 /* ── Push notifications ── */
 .pi-col--push {
