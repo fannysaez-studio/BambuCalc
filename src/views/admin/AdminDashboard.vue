@@ -36,10 +36,6 @@
           <Plus class="btn-cta-icon" />
           <span class="btn-cta-text">Nouveau devis</span>
         </button>
-        <router-link to="/dashboard" class="btn-back-dash" title="Mon dashboard">
-          <LayoutDashboard class="btn-cta-icon" />
-          <span class="btn-cta-text">Mon dashboard</span>
-        </router-link>
       </div>
     </div>
 
