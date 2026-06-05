@@ -18,7 +18,7 @@
 
       <div class="visual-illustration">
         <div class="visual-illustration-glow"></div>
-        <img src="/prendre-rdv.svg" alt="Illustration rendez-vous" />
+        <img src="/prendre-rdv.svg" alt="Réservez votre rendez-vous de devis d'impression 3D" />
       </div>
 
       <div class="rdv-info-list">
