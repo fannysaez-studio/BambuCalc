@@ -24,7 +24,7 @@
   margin: -1.5rem -1.5rem 0; /* n'échappe que le padding interne, pas le padding-top du page-wrap */
   flex-shrink: 0;
   background:
-    url('/hero-adminDashboard.svg') center / cover no-repeat,
+    url('/assets/svg/dashboard/hero-adminDashboard.svg') center / cover no-repeat,
     linear-gradient(135deg, #7c3aed 0%, #8b5cf6 60%, #3fb2bf 100%);
 }
 

@@ -412,7 +412,7 @@ function fmtDate(iso) {
 .pp-banner {
   height: 6.5rem;
   background:
-    url('/hero-userDashboard.svg') center / cover no-repeat,
+    url('/assets/svg/dashboard/hero-userDashboard.svg') center / cover no-repeat,
     linear-gradient(135deg, #3fb2bf 0%, #2e9cab 60%, #667eea 100%);
   border-radius: 24px 24px 0 0;
   flex-shrink: 0;
