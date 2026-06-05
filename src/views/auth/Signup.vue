@@ -763,7 +763,7 @@ export default defineComponent({
   /* 6. Header en haut dans le flux */
   .auth-header {
     flex-shrink: 0;
-    margin-bottom: 0;
+    margin-bottom: 1.75rem;
   }
   .auth-header h2 { font-size: 1.9rem; }
   .auth-header p  { margin-top: 0.5rem; font-size: 0.95rem; }
