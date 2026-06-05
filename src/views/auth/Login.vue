@@ -852,18 +852,27 @@ export default defineComponent({
     margin-top: 1.5rem;
   }
 
-  /* 5. Réduire le padding de la carte formulaire + scroll interne si contenu trop haut */
+  /* 5. Titre en haut, formulaire centré dans l'espace restant (même pattern que Signup) */
   .auth-card {
-    padding: 4rem 2.5rem 1.5rem;
+    padding: 2.75rem 2.5rem 1.5rem;
     justify-content: flex-start;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
-  /* 6. Réduire l'espacement interne du formulaire */
+  /* 6. Header ancré en haut */
+  .auth-header {
+    flex-shrink: 0;
+    margin-bottom: 0;
+  }
+  .auth-header h2 { font-size: 1.9rem; }
+  .auth-header p  { margin-top: 0.5rem; font-size: 0.95rem; }
+
+  /* 7. Formulaire + suite centrés dans l'espace sous le header */
   .auth-form {
-    margin-top: 1.5rem;
+    margin-top: auto;
     gap: 0.75rem;
   }
+  .social-grid { margin-bottom: auto; }
 
   /* forgot-wrap : plus d'air entre champ et bouton sur desktop */
   .forgot-wrap .auth-form {
@@ -871,11 +880,6 @@ export default defineComponent({
   }
   .forgot-header {
     margin-bottom: 2.5rem;
-  }
-
-  /* 7. Sous-titre du header moins espacé */
-  .auth-header p {
-    margin-top: 0.5rem;
   }
 
   /* 8. Inputs légèrement moins hauts */
