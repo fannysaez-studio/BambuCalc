@@ -96,7 +96,7 @@ export default {
   background-color: #ffffff;
   background-image:
     linear-gradient(rgba(255,255,255,0.78), rgba(255,255,255,0.78)),
-    url('/hero-vagues.svg');
+    url('/assets/svg/shared/hero-vagues.svg');
   background-repeat: no-repeat;
   background-size: 100% auto;
   background-position: center top;

@@ -75,7 +75,7 @@ export default {
   grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
   padding: 1rem;
   gap: 0;
-  background-image: url('/hero-vagues.svg');
+  background-image: url('/assets/svg/shared/hero-vagues.svg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;

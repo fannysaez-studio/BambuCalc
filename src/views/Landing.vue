@@ -115,7 +115,7 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 1rem;
-  background-image: url('/hero-vagues.svg');
+  background-image: url('/assets/svg/shared/hero-vagues.svg');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
