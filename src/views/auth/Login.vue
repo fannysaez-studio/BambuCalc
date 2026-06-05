@@ -840,9 +840,11 @@ export default defineComponent({
     margin-top: 1.5rem;
   }
 
-  /* 5. Réduire le padding de la carte formulaire */
+  /* 5. Réduire le padding de la carte formulaire + scroll interne si contenu trop haut */
   .auth-card {
-    padding: 2rem 2.5rem 1.5rem;
+    padding: 4rem 2.5rem 1.5rem;
+    justify-content: flex-start;
+    overflow-y: auto;
   }
 
   /* 6. Réduire l'espacement interne du formulaire */
