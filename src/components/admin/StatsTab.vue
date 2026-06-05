@@ -3,7 +3,7 @@
     <div class="panel-header">
       <h2 class="panel-title"><TrendingUp class="ptitle-icon" /> Statistiques & Business</h2>
     </div>
-    <div v-if="loading" class="empty-state"><div class="spinner" /><p>Chargement…</p></div>
+    <div v-if="loading || rdvLoading" class="empty-state"><div class="spinner" /><p>Chargement…</p></div>
     <div v-else class="stats-panel">
 
       <!-- KPIs -->
@@ -84,18 +84,137 @@
         </div>
       </div>
 
+      <!-- ── Rendez-vous ── -->
+      <div class="stats-section-divider" />
+
+      <!-- KPIs RDV -->
+      <div class="stat-kpi-grid">
+        <div class="stat-kpi">
+          <p class="stat-kpi-label">RDV actifs</p>
+          <p class="stat-kpi-value stat-kpi-value--teal">{{ rdvActifs }}</p>
+        </div>
+        <div class="stat-kpi">
+          <p class="stat-kpi-label">À venir</p>
+          <p class="stat-kpi-value stat-kpi-value--blue">{{ rdvAVenir }}</p>
+        </div>
+        <div class="stat-kpi">
+          <p class="stat-kpi-label">Taux de présence</p>
+          <p class="stat-kpi-value stat-kpi-value--green">{{ rdvTauxPresence }}%</p>
+        </div>
+        <div class="stat-kpi">
+          <p class="stat-kpi-label">Annulés</p>
+          <p class="stat-kpi-value stat-kpi-value--red">{{ rdvAnnules }}</p>
+        </div>
+      </div>
+
+      <!-- Présence -->
+      <div class="stats-section" v-if="rdvActifs > 0">
+        <p class="stats-section-title">Présence aux rendez-vous passés</p>
+        <div class="stats-status-bar">
+          <div v-if="rdvPresent" class="stats-status-seg stats-status-seg--green"
+            :style="{ width: (rdvPresent / rdvAvecPresence * 100) + '%' }" title="Présent" />
+          <div v-if="rdvAbsent" class="stats-status-seg stats-status-seg--red"
+            :style="{ width: (rdvAbsent / rdvAvecPresence * 100) + '%' }" title="Absent" />
+        </div>
+        <div class="stats-status-legend">
+          <span class="stats-legend-dot stats-legend-dot--green" />Présent ({{ rdvPresent }})
+          <span class="stats-legend-dot stats-legend-dot--red" />Absent ({{ rdvAbsent }})
+          <span v-if="rdvSansPresence" style="color:#a0aec0">· {{ rdvSansPresence }} non renseigné(s)</span>
+        </div>
+      </div>
+
+      <!-- Format -->
+      <div class="stats-section" v-if="rdvAvecFormat > 0">
+        <p class="stats-section-title">Format des rendez-vous</p>
+        <div class="stats-bar-list">
+          <div class="stats-bar-row">
+            <span class="stats-bar-label">En ligne</span>
+            <div class="stats-bar-track">
+              <div class="stats-bar-fill stats-bar-fill--purple"
+                :style="{ width: (rdvOnline / rdvAvecFormat * 100) + '%' }" />
+            </div>
+            <span class="stats-bar-count">{{ rdvOnline }}</span>
+          </div>
+          <div class="stats-bar-row">
+            <span class="stats-bar-label">Présentiel</span>
+            <div class="stats-bar-track">
+              <div class="stats-bar-fill"
+                :style="{ width: (rdvInperson / rdvAvecFormat * 100) + '%' }" />
+            </div>
+            <span class="stats-bar-count">{{ rdvInperson }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RDV par mois -->
+      <div class="stats-section" v-if="rdvParMois.length">
+        <p class="stats-section-title">Rendez-vous par mois (6 derniers mois)</p>
+        <div class="stats-bar-list">
+          <div v-for="m in rdvParMois" :key="m.label" class="stats-bar-row">
+            <span class="stats-bar-label">{{ m.label }}</span>
+            <div class="stats-bar-track">
+              <div class="stats-bar-fill stats-bar-fill--purple"
+                :style="{ width: rdvParMoisMax > 0 ? (m.count / rdvParMoisMax * 100) + '%' : '0%' }" />
+            </div>
+            <span class="stats-bar-count">{{ m.count }}</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { TrendingUp } from 'lucide-vue-next'
+import { supabase } from '@/lib/supabase'
 
 const props = defineProps({
   quotes:  { type: Array,   default: () => [] },
   loading: { type: Boolean, default: false },
 })
+
+// ── Appointments ──────────────────────────────────────────────────────────────
+const rdvLoading = ref(true)
+const appointments = ref([])
+
+onMounted(async () => {
+  const { data } = await supabase
+    .from('appointments')
+    .select('id, start_at, status, presence, format')
+    .order('start_at', { ascending: false })
+  appointments.value = data ?? []
+  rdvLoading.value = false
+})
+
+const now = new Date()
+const rdvActifs    = computed(() => appointments.value.filter(a => a.status === 'active').length)
+const rdvAnnules   = computed(() => appointments.value.filter(a => a.status === 'canceled').length)
+const rdvAVenir    = computed(() => appointments.value.filter(a => a.status === 'active' && new Date(a.start_at) > now).length)
+const rdvPresent   = computed(() => appointments.value.filter(a => a.presence === 'present').length)
+const rdvAbsent    = computed(() => appointments.value.filter(a => a.presence === 'absent').length)
+const rdvAvecPresence = computed(() => rdvPresent.value + rdvAbsent.value)
+const rdvSansPresence = computed(() => appointments.value.filter(a => a.status === 'active' && !a.presence && new Date(a.start_at) < now).length)
+const rdvTauxPresence = computed(() => rdvAvecPresence.value ? Math.round(rdvPresent.value / rdvAvecPresence.value * 100) : 0)
+const rdvOnline    = computed(() => appointments.value.filter(a => a.format === 'online').length)
+const rdvInperson  = computed(() => appointments.value.filter(a => a.format === 'inperson').length)
+const rdvAvecFormat = computed(() => rdvOnline.value + rdvInperson.value)
+
+const rdvParMois = computed(() => {
+  const months = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const label = d.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
+    const count = appointments.value.filter(a => {
+      const s = new Date(a.start_at)
+      return s.getFullYear() === d.getFullYear() && s.getMonth() === d.getMonth()
+    }).length
+    months.push({ label, count })
+  }
+  return months
+})
+const rdvParMoisMax = computed(() => Math.max(...rdvParMois.value.map(m => m.count), 1))
 
 const statsAccepted        = computed(() => props.quotes.filter(q => ['accepted','Accepté'].includes(q.status)).length)
 const statsRefused         = computed(() => props.quotes.filter(q => q.status === 'refused').length)
@@ -208,6 +327,12 @@ function fmtEur(v) { return new Intl.NumberFormat('fr-FR', { style: 'currency', 
 .stats-bar-fill {
   height: 100%; background: linear-gradient(90deg, #3fb2bf 0%, #2e9cab 100%);
   border-radius: 999px; transition: width 0.4s ease;
+}
+.stats-bar-fill--purple {
+  background: linear-gradient(90deg, #9f7aea 0%, #7c3aed 100%);
+}
+.stats-section-divider {
+  border: none; border-top: 2px dashed #e2e8f0; margin: 0.25rem 0;
 }
 .stats-bar-value { font-size: 0.78rem; font-weight: 800; color: #2e9cab; white-space: nowrap; width: 80px; text-align: right; flex-shrink: 0; }
 .stats-bar-count { font-size: 0.67rem; color: #a0aec0; white-space: nowrap; flex-shrink: 0; }
