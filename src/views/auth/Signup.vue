@@ -55,26 +55,28 @@
         </div>
 
         <form @submit.prevent="onSubmit" class="auth-form">
-          <div class="field">
-            <label for="signup-full-name">Prénom / Nom</label>
-            <input
-              id="signup-full-name"
-              v-model="fullName"
-              type="text"
-              placeholder="Jean Dupont"
-              required
-            />
-          </div>
+          <div class="field-grid">
+            <div class="field">
+              <label for="signup-full-name">Prénom / Nom</label>
+              <input
+                id="signup-full-name"
+                v-model="fullName"
+                type="text"
+                placeholder="Jean Dupont"
+                required
+              />
+            </div>
 
-          <div class="field">
-            <label for="signup-email">E-mail</label>
-            <input
-              id="signup-email"
-              v-model="email"
-              type="email"
-              placeholder="vous@exemple.com"
-              required
-            />
+            <div class="field">
+              <label for="signup-email">E-mail</label>
+              <input
+                id="signup-email"
+                v-model="email"
+                type="email"
+                placeholder="vous@exemple.com"
+                required
+              />
+            </div>
           </div>
 
           <PasswordField
@@ -959,6 +961,7 @@ export default defineComponent({
   }
 
   .field-grid {
+    grid-template-columns: 1fr;
     gap: 0.65rem;
   }
 
