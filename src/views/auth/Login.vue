@@ -143,6 +143,12 @@
             </form>
           </div>
         </template>
+
+        <p class="auth-legal">
+          <router-link to="/mentions-legales" target="_blank">Mentions légales</router-link>
+          ·
+          <router-link to="/privacy" target="_blank">Politique de confidentialité</router-link>
+        </p>
       </div>
     </section>
 
@@ -605,6 +611,20 @@ export default defineComponent({
 .field input:focus {
   border-color: #2e9cab;
   box-shadow: 0 0 0 3px rgba(46, 154, 171, 0.16);
+}
+
+.auth-legal {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.auth-legal a {
+  color: #94a3b8;
+  text-decoration: underline;
+}
+.auth-legal a:hover {
+  color: #2e9cab;
 }
 
 .auth-error {

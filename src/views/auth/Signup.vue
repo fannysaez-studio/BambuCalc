@@ -91,9 +91,9 @@
             <input type="checkbox" v-model="gdprAccepted" />
             <span>
               J'accepte la
-              <router-link to="/privacy" target="_blank" class="gdpr-link"
-                >politique de confidentialité</router-link
-              >
+              <router-link to="/privacy" target="_blank" class="gdpr-link">politique de confidentialité</router-link>
+              et les
+              <router-link to="/mentions-legales" target="_blank" class="gdpr-link">mentions légales</router-link>
             </span>
           </label>
 
