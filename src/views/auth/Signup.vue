@@ -141,6 +141,7 @@ import { Home, Lock, UserPlus, UserX } from 'lucide-vue-next'
 import { signup, loginWithGoogle } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
+import { useHead } from '@vueuse/head'
 
 function sendWelcomeEmail(email, firstName, lastName) {
   supabase.functions
@@ -166,6 +167,17 @@ function notifyAdminNewClient(firstName, lastName, email) {
 export default defineComponent({
   name: 'Signup',
   components: { Home, Lock, UserPlus, UserX, PasswordField },
+  setup() {
+    useHead({
+      title: 'Inscription — BambuCalc',
+      meta: [
+        { name: 'description', content: 'Créez votre compte BambuCalc et gérez vos devis d\'impression 3D en ligne.' },
+        { name: 'robots', content: 'noindex, follow' },
+        { property: 'og:title', content: 'Inscription — BambuCalc' },
+        { property: 'og:description', content: 'Rejoignez BambuCalc et gérez vos projets 3D.' },
+      ],
+    })
+  },
   data() {
     return {
       fullName: '',

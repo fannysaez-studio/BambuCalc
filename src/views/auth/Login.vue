@@ -169,10 +169,22 @@ import { defineComponent } from 'vue'
 import { Home, Lock, UserPlus, UserX, Mail } from 'lucide-vue-next'
 import { login, loginWithGoogle, resetPasswordForEmail, checkIsAdmin } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
+import { useHead } from '@vueuse/head'
 
 export default defineComponent({
   name: 'Login',
   components: { Home, Lock, UserPlus, UserX, Mail },
+  setup() {
+    useHead({
+      title: 'Connexion — BambuCalc',
+      meta: [
+        { name: 'description', content: 'Connectez-vous à BambuCalc pour accéder à vos devis d\'impression 3D.' },
+        { name: 'robots', content: 'noindex, follow' },
+        { property: 'og:title', content: 'Connexion — BambuCalc' },
+        { property: 'og:description', content: 'Accédez à votre espace BambuCalc.' },
+      ],
+    })
+  },
   data() {
     return {
       email: '',

@@ -53,10 +53,20 @@
 
 <script>
 import { Home, Github, Linkedin, Mail } from 'lucide-vue-next'
+import { useHead } from '@vueuse/head'
 
 export default {
   name: 'Maintenance',
   components: { Home, Github, Linkedin, Mail },
+  setup() {
+    useHead({
+      title: 'Maintenance en cours — BambuCalc',
+      meta: [
+        { name: 'description', content: 'BambuCalc est temporairement en maintenance. Nous revenons bientôt.' },
+        { name: 'robots', content: 'noindex, nofollow' },
+      ],
+    })
+  },
   computed: {
     showHomeBtn() {
       return import.meta.env.VITE_MAINTENANCE_MODE !== 'true'

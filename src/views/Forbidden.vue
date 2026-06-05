@@ -41,10 +41,20 @@
 
 <script>
 import { Home, LayoutDashboard, MessageSquare } from 'lucide-vue-next'
+import { useHead } from '@vueuse/head'
 
 export default {
   name: 'Forbidden',
   components: { Home, LayoutDashboard, MessageSquare },
+  setup() {
+    useHead({
+      title: 'Accès restreint — BambuCalc',
+      meta: [
+        { name: 'description', content: 'Vous n\'avez pas les droits pour accéder à cette page.' },
+        { name: 'robots', content: 'noindex, nofollow' },
+      ],
+    })
+  },
   mounted()   { document.body.classList.add('page-403') },
   unmounted() { document.body.classList.remove('page-403') },
 }

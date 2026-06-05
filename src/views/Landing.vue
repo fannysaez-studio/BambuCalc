@@ -22,6 +22,7 @@
             class="visual-printer"
             width="170" height="235"
             fetchpriority="low"
+            loading="lazy"
           />
           <img
             src="/bambuLab Filament.webp"

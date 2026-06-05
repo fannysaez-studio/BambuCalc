@@ -45,10 +45,20 @@
 <script>
 import { Home, LogIn, MessageSquare } from 'lucide-vue-next'
 import { supabase } from '../lib/supabase'
+import { useHead } from '@vueuse/head'
 
 export default {
   name: 'NotFound',
   components: { Home, LogIn, MessageSquare },
+  setup() {
+    useHead({
+      title: 'Page introuvable — BambuCalc',
+      meta: [
+        { name: 'description', content: 'Cette page n\'existe pas ou a été déplacée.' },
+        { name: 'robots', content: 'noindex, nofollow' },
+      ],
+    })
+  },
   data() { return { isAuth: false } },
   async created() {
     const { data } = await supabase.auth.getSession()

@@ -4,6 +4,15 @@ import { useRouter } from 'vue-router'
 import { Home, LogIn, MessageSquare, CheckCircle } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
+import { useHead } from '@vueuse/head'
+
+useHead({
+  title: 'Nouveau mot de passe — BambuCalc',
+  meta: [
+    { name: 'description', content: 'Réinitialisez votre mot de passe BambuCalc.' },
+    { name: 'robots', content: 'noindex, nofollow' },
+  ],
+})
 
 const router = useRouter()
 
