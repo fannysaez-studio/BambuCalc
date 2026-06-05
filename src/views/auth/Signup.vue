@@ -813,9 +813,11 @@ export default defineComponent({
     gap: 0.5rem;
   }
 
-  /* 13. Masquer les critères détaillés du mot de passe — seule la barre reste */
+  /* 13. Critères mot de passe sur 2 colonnes pour économiser la hauteur */
   :deep(.pf-rules) {
-    display: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.1rem 0.75rem;
   }
 }
 
