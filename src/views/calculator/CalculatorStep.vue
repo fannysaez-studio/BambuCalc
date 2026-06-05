@@ -313,6 +313,7 @@ import PricingSuggestions from '@/components/calculator/PricingSuggestions.vue'
 import CostBreakdown     from '@/components/calculator/CostBreakdown.vue'
 import ToastMessage      from '@/components/ui/ToastMessage.vue'
 import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard, FileText, Palette } from 'lucide-vue-next'
+import { useHead } from '@vueuse/head'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 
 export default {
@@ -325,6 +326,15 @@ export default {
     FileText, Palette,
   },
   setup() {
+    useHead({
+      title: "Calculateur d'impression 3D — BambuCalc",
+      meta: [
+        { name: 'description', content: "Calculez vos coûts d'impression 3D : matériaux, temps machine, amortissement. Obtenez votre devis en quelques clics." },
+        { property: 'og:title', content: "Calculateur d'impression 3D — BambuCalc" },
+        { property: 'og:description', content: "Calculez vos coûts d'impression 3D : matériaux, temps machine, amortissement." },
+        { property: 'og:url', content: 'https://bambucalc.netlify.app/calculator/1' },
+      ],
+    })
     return { store: useCalculatorStore() }
   },
   async created() {
