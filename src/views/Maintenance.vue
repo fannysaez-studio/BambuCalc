@@ -23,7 +23,7 @@
 
     <!-- Contenu centré -->
     <div class="mt-content">
-      <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" />
+      <img src="/maintenance.svg" class="mt-illustration" alt="" aria-hidden="true" width="750" height="500" />
       <h1 class="mt-title">Bientôt disponible</h1>
       <p class="mt-sub">Je peaufine les derniers détails pour vous offrir la meilleure expérience. À très vite !</p>
     </div>

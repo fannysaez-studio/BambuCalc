@@ -158,7 +158,7 @@
       </div>
 
       <div class="visual-illustration">
-        <img src="/login-hero.svg" alt="Clé de connexion" />
+        <img src="/login-hero.svg" alt="Clé de connexion" width="1606" height="1342" />
       </div>
     </section>
   </div>

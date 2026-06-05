@@ -113,7 +113,7 @@ async function onSubmit() {
           </form>
         </div>
 
-        <img src="/new-password-hero.svg" class="rp-mobile-illus" alt="" aria-hidden="true" />
+        <img src="/new-password-hero.svg" class="rp-mobile-illus" alt="" aria-hidden="true" width="500" height="500" />
 
         <p class="rp-brand">BambuCalc</p>
       </div>
@@ -129,7 +129,7 @@ async function onSubmit() {
           <LogIn class="rp-icon" aria-hidden="true" />
         </router-link>
       </div>
-      <img src="/new-password-hero.svg" class="rp-illustration" alt="Réinitialisation du mot de passe" aria-hidden="true" />
+      <img src="/new-password-hero.svg" class="rp-illustration" alt="Réinitialisation du mot de passe" aria-hidden="true" width="500" height="500" />
     </section>
 
   </div>

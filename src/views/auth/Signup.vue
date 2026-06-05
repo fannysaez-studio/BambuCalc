@@ -12,7 +12,7 @@
       </div>
 
       <div class="visual-illustration">
-        <img src="/signUp-hero.svg" alt="Illustration de création de compte" />
+        <img src="/signUp-hero.svg" alt="Illustration de création de compte" width="500" height="500" />
       </div>
     </section>
 
