@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Maintenance from '@/views/Maintenance.vue'
 import { supabase } from '@/lib/supabase'
 
 const routes = [
@@ -25,7 +26,7 @@ const routes = [
   { path: '/guest/calculator/:step', redirect: to => `/calculator/${to.params.step}` },
   { path: '/guest/dashboard', redirect: '/dashboard' },
   { path: '/403', name: 'forbidden', component: () => import('@/views/Forbidden.vue') },
-  { path: '/maintenance', name: 'maintenance', component: () => import('@/views/Maintenance.vue') },
+  { path: '/maintenance', name: 'maintenance', component: Maintenance },
   { path: '/404', name: 'not-found', component: () => import('@/views/NotFound.vue') },
   { path: '/:pathMatch(.*)*', redirect: '/404' },
 ]
@@ -46,6 +47,8 @@ router.beforeEach(async (to) => {
       return { name: 'maintenance' }
     }
   }
+
+  if (to.name === 'maintenance') return
 
   const { data } = await supabase.auth.getSession()
   const isAuth = !!data.session
