@@ -74,6 +74,7 @@ const props = defineProps({
   profiles:      { type: Array,   default: () => [] },
   loading:       { type: Boolean, default: false },
   currentUserId: { type: String,  default: null },
+  search:        { type: String,  default: '' },
 })
 const emit = defineEmits(['delete-user', 'go-to-quotes'])
 
@@ -100,9 +101,16 @@ const guestProfiles = computed(() =>
   visibleProfiles.value.filter(p => !p.full_name && !p.email)
 )
 const filteredProfiles = computed(() => {
-  if (userFilter.value === 'clients') return clientProfiles.value
-  if (userFilter.value === 'guests')  return guestProfiles.value
-  return visibleProfiles.value.filter(p => p.id !== props.currentUserId)
+  let list
+  if (userFilter.value === 'clients') list = clientProfiles.value
+  else if (userFilter.value === 'guests') list = guestProfiles.value
+  else list = visibleProfiles.value.filter(p => p.id !== props.currentUserId)
+  if (!props.search) return list
+  const q = props.search.toLowerCase()
+  return list.filter(p =>
+    (p.full_name || '').toLowerCase().includes(q) ||
+    (p.email     || '').toLowerCase().includes(q)
+  )
 })
 const userFilters = computed(() => {
   const total = visibleProfiles.value.filter(p => p.id !== props.currentUserId).length

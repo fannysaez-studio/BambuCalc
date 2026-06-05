@@ -167,6 +167,7 @@ const props = defineProps({
   loading:             { type: Boolean, default: false },
   initialFilterUserId: { type: String,  default: '' },
   highlightedQuoteId:  { type: String,  default: null },
+  search:              { type: String,  default: '' },
 })
 const emit = defineEmits(['delete-quote', 'open-send-modal', 'reload'])
 
@@ -194,11 +195,19 @@ const visibleProfiles = computed(() =>
     return isAnon ? props.quotes.some(q => q.user_id === p.id) : true
   })
 )
-const filteredQuotes = computed(() =>
-  filterUserId.value
+const filteredQuotes = computed(() => {
+  let list = filterUserId.value
     ? props.quotes.filter(q => q.user_id === filterUserId.value)
     : props.quotes
-)
+  if (!props.search) return list
+  const q = props.search.toLowerCase()
+  return list.filter(r =>
+    (r.project_name  || '').toLowerCase().includes(q) ||
+    (r.client_name   || '').toLowerCase().includes(q) ||
+    (r.client_email  || '').toLowerCase().includes(q) ||
+    String(r.quote_number || '').toLowerCase().includes(q)
+  )
+})
 const paginatedQuotes = computed(() => {
   const start = (quotesPage.value - 1) * quotesPerPage
   return filteredQuotes.value.slice(start, start + quotesPerPage)

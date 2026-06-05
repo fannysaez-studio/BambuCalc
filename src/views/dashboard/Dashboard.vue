@@ -164,7 +164,7 @@
       </div>
 
       <!-- Vide -->
-      <div v-else-if="quotes.length === 0" class="empty-state">
+      <div v-else-if="filteredQuotes.length === 0" class="empty-state">
         <FileText class="empty-icon" />
         <p class="empty-title">Aucun devis pour l'instant</p>
         <p class="empty-sub">Lance le calculateur pour créer ton premier devis.</p>
@@ -189,7 +189,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="q in quotes" :key="q.id">
+              <tr v-for="q in filteredQuotes" :key="q.id">
                 <td class="td-num">{{ q.quote_number || '—' }}</td>
                 <td class="td-name">{{ q.project_name || '—' }}</td>
                 <td class="td-photo">
@@ -230,7 +230,7 @@
 
         <!-- Cartes — Mobile (≤640px) -->
         <div class="dq-cards-view">
-          <div v-for="q in quotes" :key="q.id" class="dqcard">
+          <div v-for="q in filteredQuotes" :key="q.id" class="dqcard">
             <div class="dqcard-top">
               <div class="dqcard-left">
                 <p class="dqcard-name">{{ q.project_name || '—' }}</p>
@@ -629,6 +629,15 @@ const linkError = ref(null)
 const toast = ref(null)
 
 // ── Computed ──
+const filteredQuotes = computed(() => {
+  const q = navStore.searchQuery?.toLowerCase() || ''
+  if (!q) return quotes.value
+  return quotes.value.filter(r =>
+    (r.project_name || '').toLowerCase().includes(q) ||
+    String(r.quote_number || '').toLowerCase().includes(q)
+  )
+})
+
 const avgCost = computed(() => {
   if (!quotes.value.length) return 0
   const sum = quotes.value.reduce((a, q) => a + (q.total_cost || 0), 0)

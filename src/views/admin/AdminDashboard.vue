@@ -275,6 +275,7 @@
       :profiles="profiles"
       :loading="loading"
       :current-user-id="currentUserId"
+      :search="navStore.searchQuery"
       @delete-user="confirmDeleteUser($event)"
       @go-to-quotes="onGoToQuotes($event)"
     />
@@ -287,6 +288,7 @@
       :loading="loading"
       :initial-filter-user-id="quotesFilterUserId"
       :highlighted-quote-id="highlightedQuoteId"
+      :search="navStore.searchQuery"
       @delete-quote="confirmDeleteQuote($event)"
       @open-send-modal="sendTarget = $event"
       @reload="loadData"
