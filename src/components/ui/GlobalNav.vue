@@ -4,7 +4,7 @@
 
     <!-- ── En-tête fixe : logo BambuCalc ── -->
     <div class="sidebar-logo">
-      <img src="/icons/icon.svg" class="sidebar-logo-img" alt="BambuCalc" />
+      <img src="/icons/icon.svg" class="sidebar-logo-img" alt="BambuCalc" width="32" height="32" />
       <span class="sidebar-label sidebar-logo-name">BambuCalc</span>
     </div>
     <div class="sidebar-logo-sep" />

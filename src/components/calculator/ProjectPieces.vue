@@ -59,7 +59,7 @@
                 :class="['mat-pastille', piece.materialId === mat.id && 'mat-pastille--on']"
                 @click="selectMaterial(idx, mat)">
                 <span v-if="mat.imageUrl" class="pastille-swatch pastille-swatch--img">
-                  <img :src="mat.imageUrl" :alt="mat.name" @error="$event.target.style.opacity='0.3'" />
+                  <img :src="mat.imageUrl" :alt="mat.name" width="30" height="30" @error="$event.target.style.opacity='0.3'" />
                 </span>
                 <span v-else class="pastille-swatch" :style="{ background: mat.color }"></span>
                 <span class="pastille-label">{{ mat.label }}</span>
@@ -105,7 +105,7 @@
           @click="triggerInput(idx)"
           @dragover.prevent @drop.prevent="handleDrop($event, idx)">
           <template v-if="piece.referenceImageUrl">
-            <img :src="piece.referenceImageUrl" class="img-preview" alt=""
+            <img :src="piece.referenceImageUrl" class="img-preview" alt="" width="40" height="40"
               @error="imgErrors[idx] = true" @load="imgErrors[idx] = false"
               @click.stop="zoomImg = piece.referenceImageUrl"
               title="Cliquez pour agrandir" style="cursor:zoom-in" />

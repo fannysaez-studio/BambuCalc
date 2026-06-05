@@ -13,6 +13,7 @@
                class="mat-indicator mat-indicator--img"
                :src="selectedMaterialObj.image_url || selectedMaterialObj.color_or_image"
                :alt="selectedMaterialObj.name"
+               width="22" height="22"
                @error="$event.target.style.opacity='0.25'" />
           <span v-else-if="selectedMaterialObj"
                 class="mat-indicator mat-indicator--swatch"

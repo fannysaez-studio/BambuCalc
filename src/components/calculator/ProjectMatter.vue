@@ -43,7 +43,7 @@
           @click="toggleMaterial(mat)">
           <!-- Visuel couleur -->
           <span v-if="mat.imageUrl" class="pastille-swatch pastille-swatch--img">
-            <img :src="mat.imageUrl" :alt="mat.name" @error="$event.target.style.opacity='0.3'" />
+            <img :src="mat.imageUrl" :alt="mat.name" width="36" height="36" @error="$event.target.style.opacity='0.3'" />
           </span>
           <span v-else class="pastille-swatch" :style="{ background: mat.color }"></span>
           <!-- Nom court -->

@@ -195,7 +195,7 @@
                 <td class="td-num">{{ q.quote_number || '—' }}</td>
                 <td class="td-name">{{ q.project_name || '—' }}</td>
                 <td class="td-photo">
-                  <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                  <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" width="36" height="36" @click="zoomedImageUrl = q.reference_image_url" />
                   <span v-else class="ref-thumb-empty" title="Aucune photo"></span>
                 </td>
                 <td class="td-client">{{ q.client_name || '—' }}</td>
@@ -239,7 +239,7 @@
                 <p class="dqcard-num">{{ q.quote_number || '—' }}</p>
               </div>
               <div class="dqcard-top-right">
-                <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" width="42" height="42" @click="zoomedImageUrl = q.reference_image_url" />
                 <span :class="['status-badge', 'status-' + (q.status || 'pending')]">{{ statusLabel(q.status) }}</span>
               </div>
             </div>
@@ -420,7 +420,7 @@
                     <p class="dqcard-num">{{ q.quote_number || '—' }}</p>
                   </div>
                   <div class="dqcard-top-right">
-                    <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" />
+                    <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" width="42" height="42" />
                   </div>
                 </div>
                 <div class="dqcard-mid">

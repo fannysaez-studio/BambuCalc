@@ -56,7 +56,7 @@
                   <td class="td-num">{{ q.quote_number || '—' }}</td>
                   <td class="td-name">{{ q.project_name || '—' }}</td>
                   <td class="td-photo">
-                    <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                    <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb" :alt="q.project_name" loading="lazy" width="36" height="36" @click="zoomedImageUrl = q.reference_image_url" />
                     <span v-else class="ref-thumb-empty"></span>
                   </td>
                   <td class="td-client">{{ q.client_name || '—' }}</td>
@@ -217,7 +217,7 @@
                   <p class="mcard-piece">{{ q.project_name || '—' }}</p>
                   <p class="mcard-sub">N° {{ q.quote_number || '—' }} · {{ q.material || '—' }}</p>
                 </div>
-                <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" @click="zoomedImageUrl = q.reference_image_url" />
+                <img v-if="q.reference_image_url" :src="q.reference_image_url" class="ref-thumb-card" :alt="q.project_name" loading="lazy" width="42" height="42" @click="zoomedImageUrl = q.reference_image_url" />
                 <span v-else class="ref-thumb-empty ref-thumb-card-empty"></span>
               </div>
             </div>

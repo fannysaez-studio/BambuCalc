@@ -108,7 +108,7 @@
                 </td>
                 <td v-if="hasAnyImage" class="td-photo">
                   <template v-if="item.referenceImageUrl">
-                    <img :src="item.referenceImageUrl" class="d-ref-img" alt="" loading="lazy"
+                    <img :src="item.referenceImageUrl" class="d-ref-img" alt="" loading="lazy" width="80" height="70"
                       style="cursor:zoom-in" @click="zoomImg = item.referenceImageUrl" />
                     <div class="d-ref-lbl">Réf. client</div>
                   </template>

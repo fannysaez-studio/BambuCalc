@@ -473,7 +473,7 @@
             <option value="Réapprovisionnement">Réappro.</option>
           </select>
           <label class="cat-icn-btn card-photo-lbl" title="Photo bobine">
-            <img v-if="mat.image_url" class="card-mini-thumb" :src="mat.image_url" :alt="mat.name" />
+            <img v-if="mat.image_url" class="card-mini-thumb" :src="mat.image_url" :alt="mat.name" width="34" height="34" />
             <Upload v-else :size="14" />
             <input type="file" accept="image/*" style="display:none" @change="$emit('upload', mat, $event)" />
           </label>
