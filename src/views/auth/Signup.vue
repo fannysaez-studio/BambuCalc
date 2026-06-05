@@ -760,57 +760,57 @@ export default defineComponent({
     overflow: hidden;
   }
 
-  /* 6. Formulaire très compact */
+  /* 6. Formulaire aéré */
   .auth-form {
-    margin-top: 0.75rem;
-    gap: 0.5rem;
+    margin-top: 1.5rem;
+    gap: 1rem;
   }
 
-  /* 7. Header compact */
+  /* 7. Header avec respiration */
   .auth-header {
-    margin-bottom: 0;
+    margin-bottom: 0.25rem;
   }
   .auth-header h2 {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
   }
   .auth-header p {
-    margin-top: 0.3rem;
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+  }
+
+  /* 8. Inputs confortables */
+  .field input {
+    min-height: 2.6rem;
+    padding: 0.6rem 0.95rem;
+    font-size: 0.9rem;
+  }
+  .field label {
+    font-size: 0.68rem;
+  }
+
+  /* 9. Bouton bien proportionné */
+  .primary-btn {
+    min-height: 2.65rem;
+    margin-top: 0.25rem;
+    font-size: 0.92rem;
+  }
+
+  /* 10. Séparateur aéré */
+  .auth-divider {
+    margin: 0.85rem 0;
     font-size: 0.85rem;
   }
 
-  /* 8. Inputs plus petits */
-  .field input {
-    min-height: 2.3rem;
-    padding: 0.45rem 0.85rem;
-    font-size: 0.88rem;
-  }
-  .field label {
-    font-size: 0.65rem;
-  }
-
-  /* 9. Bouton compact */
-  .primary-btn {
-    min-height: 2.3rem;
-    margin-top: 0.2rem;
-    font-size: 0.88rem;
-  }
-
-  /* 10. Séparateur minimal */
-  .auth-divider {
-    margin: 0.4rem 0;
+  /* 11. Bouton Google proportionné */
+  .social-btn {
+    min-height: 2.6rem;
     font-size: 0.82rem;
   }
 
-  /* 11. Bouton Google compact */
-  .social-btn {
-    min-height: 2.3rem;
-    font-size: 0.78rem;
-  }
-
-  /* 12. GDPR plus petit */
+  /* 12. GDPR lisible */
   .gdpr-check {
-    font-size: 0.7rem;
-    gap: 0.4rem;
+    font-size: 0.75rem;
+    gap: 0.5rem;
   }
 }
 
