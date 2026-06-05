@@ -775,8 +775,8 @@ export default defineComponent({
     margin-bottom: 0;
     border-bottom: 1px solid rgba(0,0,0,0.06);
   }
-  .auth-header h2 { font-size: 1.1rem; margin: 0; letter-spacing: -0.01em; }
-  .auth-header p  { font-size: 0.75rem; margin: 0.15rem 0 0; color: #718096; }
+  .auth-header h2 { font-size: 1.5rem; margin: 0; letter-spacing: -0.02em; }
+  .auth-header p  { font-size: 0.88rem; margin: 0.2rem 0 0; color: #718096; }
 
   /* 7. Formulaire centré dans l'espace sous la barre */
   .auth-form   { gap: 1.25rem; }
