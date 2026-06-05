@@ -12,6 +12,14 @@
   # Node 20 LTS — requis par Vite 5 et les dépendances modernes
   NODE_VERSION = "22"
 
+# ── Page 404 — code HTTP réel ────────────────────────────────────────────────
+# Netlify sert index.html avec status 404 pour les crawlers Google.
+# Doit être AVANT la règle SPA (Netlify évalue dans l'ordre).
+[[redirects]]
+  from   = "/404"
+  to     = "/index.html"
+  status = 404
+
 # ── Redirection SPA ──────────────────────────────────────────────────────────
 # Vue Router en mode history : chaque URL doit pointer vers index.html.
 # Sans cette règle, tout rechargement hors "/" renvoie une 404 Netlify.

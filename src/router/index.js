@@ -27,7 +27,8 @@ const routes = [
   { path: '/guest/dashboard', redirect: '/dashboard' },
   { path: '/403', name: 'forbidden', component: () => import('@/views/Forbidden.vue') },
   { path: '/maintenance', name: 'maintenance', component: () => import('@/views/Maintenance.vue') },
-  { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/NotFound.vue') },
+  { path: '/404', name: 'not-found', component: () => import('@/views/NotFound.vue') },
+  { path: '/:pathMatch(.*)*', redirect: '/404' },
 ]
 
 const router = createRouter({
