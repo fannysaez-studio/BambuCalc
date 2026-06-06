@@ -1792,18 +1792,18 @@ async function linkAccount() {
 .rdv-devis-count { font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
 .client-devis-select {
   padding: 0.28rem 0.4rem;
-  border: 1.5px solid #b2e8ef;
+  border: 1.5px solid #fde8c8;
   border-radius: 7px;
   font-size: 0.75rem;
   font-family: inherit;
-  color: #2e9cab;
+  color: #ea6c0a;
   background: #fff;
   cursor: pointer;
   min-width: 110px;
   max-width: 160px;
 }
 .client-devis-select:focus,
-.client-devis-select:focus-visible { outline: none; border-color: #2e9cab; }
+.client-devis-select:focus-visible { outline: none; border-color: #ea6c0a; }
 .client-devis-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .rdv-fmt-badge {
