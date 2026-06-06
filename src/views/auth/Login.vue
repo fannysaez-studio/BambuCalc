@@ -175,7 +175,7 @@ import { defineComponent } from 'vue'
 import { Home, Lock, UserPlus, UserX, Mail } from 'lucide-vue-next'
 import { login, loginWithGoogle, resetPasswordForEmail, checkIsAdmin } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 export default defineComponent({
   name: 'Login',

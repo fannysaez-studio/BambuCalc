@@ -141,7 +141,7 @@ import { Home, Lock, UserPlus, UserX } from 'lucide-vue-next'
 import { signup, loginWithGoogle } from '@/utils/auth'
 import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 function sendWelcomeEmail(email, firstName, lastName) {
   supabase.functions

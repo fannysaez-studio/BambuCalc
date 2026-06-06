@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { Home, LogIn, MessageSquare, CheckCircle } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 import PasswordField from '@/components/ui/PasswordField.vue'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Nouveau mot de passe — BambuCalc',

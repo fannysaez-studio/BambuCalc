@@ -118,7 +118,7 @@
 </template>
 
 <script setup>
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ShieldOff, AlertCircle, CheckCircle, CreditCard, Lock, Shield } from 'lucide-vue-next'

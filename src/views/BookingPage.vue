@@ -163,7 +163,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Home, ArrowLeft, Clock, Video, MapPin, Globe, X, Gift } from 'lucide-vue-next'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 useHead({
   title: 'Prendre rendez-vous — BambuCalc',

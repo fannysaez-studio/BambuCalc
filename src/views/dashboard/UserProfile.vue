@@ -1,5 +1,5 @@
 <script setup>
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ArrowLeft, Save, FileText, Clock, CheckCircle2, Download, Shield, TrendingUp, LogOut } from 'lucide-vue-next'

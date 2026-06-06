@@ -44,7 +44,7 @@
 
 <script>
 import { Home, LogIn, MessageSquare } from 'lucide-vue-next'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 export default {
   name: 'NotFound',

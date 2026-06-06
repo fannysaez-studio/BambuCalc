@@ -190,7 +190,7 @@
 import { defineComponent } from 'vue'
 import { Home, MessageSquare, HelpCircle, Calendar, MapPin, Clock, Check, Linkedin, LayoutDashboard } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 
 export default defineComponent({
   name: 'Contact',

@@ -348,7 +348,7 @@ import PricingSuggestions from '@/components/calculator/PricingSuggestions.vue'
 import CostBreakdown     from '@/components/calculator/CostBreakdown.vue'
 import ToastMessage      from '@/components/ui/ToastMessage.vue'
 import { Layers, Package, Clock, Tag, BarChart3, User, CheckCircle, Eye, LayoutDashboard, FileText, Palette } from 'lucide-vue-next'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 import QuotePreviewModal from '@/components/ui/QuotePreviewModal.vue'
 
 export default {
