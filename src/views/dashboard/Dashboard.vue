@@ -1792,7 +1792,7 @@ async function linkAccount() {
 .rdv-devis-count { font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
 .client-devis-select {
   padding: 0.28rem 0.4rem;
-  border: 1px solid #e2e8f0;
+  border: 1.5px solid #b2e8ef;
   border-radius: 7px;
   font-size: 0.75rem;
   font-family: inherit;
