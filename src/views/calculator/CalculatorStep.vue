@@ -701,7 +701,7 @@ export default {
 
         // Upload de toutes les images en parallèle
         s.pieces = await Promise.all(s.pieces.map(async (piece, i) => {
-          if (!piece.referenceImage) return piece
+          if (!(piece.referenceImage instanceof File)) return { ...piece, referenceImage: null }
           const ext  = piece.referenceImage.name.split('.').pop()
           const path = `${Date.now()}-${i}-${Math.random().toString(36).slice(2)}.${ext}`
           const { error: upErr } = await supabase.storage

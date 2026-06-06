@@ -316,5 +316,16 @@ export const useCalculatorStore = defineStore('calculator', {
       'printProfile', 'printerModel', 'nozzleSize',
       'editingQuoteId',
     ],
+    serializer: {
+      // Les objets File ne sont pas sérialisables — on les vide avant la persistance
+      serialize: (state) => {
+        const clean = { ...state }
+        if (clean.pieces) {
+          clean.pieces = clean.pieces.map(p => ({ ...p, referenceImage: null }))
+        }
+        return JSON.stringify(clean)
+      },
+      deserialize: JSON.parse,
+    },
   },
 })
