@@ -885,6 +885,7 @@ export default {
   max-width: 760px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.65rem;
   flex: 1;
   min-height: 0;
@@ -1053,8 +1054,7 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
+  max-height: 100%;
 }
 
 .step-card-header {
