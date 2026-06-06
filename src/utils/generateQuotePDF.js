@@ -517,6 +517,32 @@ async function _buildDoc(quote, mode = 'client') {
 
   curY += 4
 
+  // ── VÉRIFICATION D'ESPACE avant "Pour valider" + signatures (~86mm) ──
+  if (curY + 86 > 265) {
+    doc.setDrawColor(...TEAL)
+    doc.setLineWidth(0.4)
+    doc.line(margin, 279, W - margin, 279)
+    if (company.legalMention) {
+      doc.setFontSize(6.5)
+      doc.setTextColor(...GREY)
+      doc.setFont('helvetica', 'italic')
+      doc.text(company.legalMention, W / 2, 283, { align: 'center' })
+    }
+    doc.setFontSize(7)
+    doc.setTextColor(...GREY)
+    doc.setFont('helvetica', 'normal')
+    const fp2 = [company.name, company.ownerName,
+      company.siret ? `SIRET : ${company.siret}` : null, company.email].filter(Boolean)
+    doc.text(fp2.join(' — '), W / 2, 290, { align: 'center' })
+    if (mode === 'internal') {
+      doc.setFontSize(6.5)
+      doc.setTextColor(229, 62, 62)
+      doc.text('DOCUMENT INTERNE — NE PAS DIFFUSER AU CLIENT', W / 2, 294.5, { align: 'center' })
+    }
+    doc.addPage()
+    curY = 20
+  }
+
   // ── BLOC "COMMENT VALIDER CE DEVIS" ───────────────────────────
   // Hauteur dynamique : titre (6) + cercle (8) + texte max 2 lignes (8) + padding (6)
   const stepBgH = 28
@@ -579,6 +605,34 @@ async function _buildDoc(quote, mode = 'client') {
     ].filter(Boolean).join('   ')
     doc.text(ibanParts, margin + 3, curY + 12)
     curY += ibanH + 6
+  }
+
+  // ── VÉRIFICATION D'ESPACE avant signatures ────────────────────
+  // Besoin : séparateur (8) + sigY (18) + lignes (15) + marge (5) = ~46mm
+  if (curY + 46 > 265) {
+    // Fermer la page courante avec le footer
+    doc.setDrawColor(...TEAL)
+    doc.setLineWidth(0.4)
+    doc.line(margin, 279, W - margin, 279)
+    if (company.legalMention) {
+      doc.setFontSize(6.5)
+      doc.setTextColor(...GREY)
+      doc.setFont('helvetica', 'italic')
+      doc.text(company.legalMention, W / 2, 283, { align: 'center' })
+    }
+    doc.setFontSize(7)
+    doc.setTextColor(...GREY)
+    doc.setFont('helvetica', 'normal')
+    const fp = [company.name, company.ownerName,
+      company.siret ? `SIRET : ${company.siret}` : null, company.email].filter(Boolean)
+    doc.text(fp.join(' — '), W / 2, 290, { align: 'center' })
+    if (mode === 'internal') {
+      doc.setFontSize(6.5)
+      doc.setTextColor(229, 62, 62)
+      doc.text('DOCUMENT INTERNE — NE PAS DIFFUSER AU CLIENT', W / 2, 294.5, { align: 'center' })
+    }
+    doc.addPage()
+    curY = 20
   }
 
   // ── SÉPARATEUR avant signatures ───────────────────────────────

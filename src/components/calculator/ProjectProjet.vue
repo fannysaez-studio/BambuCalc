@@ -28,40 +28,6 @@
       <p :class="formStyles.helpText">Les dimensions et la finition ont leurs propres champs ci-dessous — décrivez ici l'usage, les contraintes et le contexte.</p>
     </div>
 
-    <div class="sep" />
-
-    <!-- Dimensions -->
-    <div class="section-label">Dimensions souhaitées <span class="optional">optionnel</span></div>
-    <div class="grid-3">
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Longueur</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="projectLength"
-            @input="$emit('update:projectLength', parseFloat($event.target.value) || null)"
-            min="0" step="1" placeholder="—" />
-          <span class="unit">mm</span>
-        </div>
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Largeur</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="projectWidth"
-            @input="$emit('update:projectWidth', parseFloat($event.target.value) || null)"
-            min="0" step="1" placeholder="—" />
-          <span class="unit">mm</span>
-        </div>
-      </div>
-      <div :class="formStyles.formGroup">
-        <label :class="formStyles.label">Hauteur</label>
-        <div class="input-unit-wrap">
-          <input :class="formStyles.input" type="number" :value="projectHeight"
-            @input="$emit('update:projectHeight', parseFloat($event.target.value) || null)"
-            min="0" step="1" placeholder="—" />
-          <span class="unit">mm</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Finition -->
     <div :class="formStyles.formGroup">
       <label :class="formStyles.label">Finition souhaitée <span class="optional">optionnel</span></label>

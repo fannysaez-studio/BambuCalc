@@ -34,8 +34,9 @@
     </div>
 
     <!-- ── Contenu de l'étape ── -->
-    <div class="content-area">
+    <div :class="['content-area', showLateralPanel && 'content-area--dual']">
 
+      <div class="main-col">
       <!-- Carte de l'étape -->
       <div class="step-card">
 
@@ -284,6 +285,33 @@
         </div>
       </div>
 
+      </div><!-- /.main-col -->
+
+      <!-- ── Panel récapitulatif (admin, étape 4 Pièces) ── -->
+      <aside v-if="showLateralPanel" class="recap-aside">
+        <div class="recap-aside-header">
+          <span class="recap-aside-title">Récapitulatif</span>
+          <span class="recap-aside-count">{{ store.pieces.length }} pièce{{ store.pieces.length > 1 ? 's' : '' }}</span>
+        </div>
+        <div class="recap-aside-body">
+          <p v-if="piecesRecap.length === 0" class="recap-aside-empty">Aucune pièce ajoutée.</p>
+          <div v-for="(item, i) in piecesRecap" :key="item.id || i" class="recap-piece">
+            <div class="recap-piece-row">
+              <span class="recap-piece-num">{{ i + 1 }}</span>
+              <div class="recap-piece-info">
+                <span class="recap-piece-name">{{ item.name }}</span>
+                <span class="recap-piece-sub">{{ item.material }} · {{ item.weight }}g{{ item.qty > 1 ? ` × ${item.qty}` : '' }}</span>
+              </div>
+              <span class="recap-piece-price">{{ fmtEur(item.totalTTC) }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="recap-aside-footer">
+          <span class="recap-aside-total-label">Total estimé TTC</span>
+          <span class="recap-aside-total">{{ fmtEur(store.sellingPrices.totalTTC) }}</span>
+        </div>
+      </aside>
+
     </div>
 
     <ToastMessage ref="toast" />
@@ -466,6 +494,40 @@ export default {
       }
     },
 
+    showLateralPanel() {
+      return this.currentStep === 4 && this.isAdmin
+    },
+
+    piecesRecap() {
+      const s  = this.store
+      const c  = s.calculatedCosts
+      const sp = s.sellingPrices
+      if (!c || !sp || s.pieces.length === 0) return []
+      const margin    = (sp.margin  || 0) / 100
+      const taxRate   = ((s.taxRate || 20) / 100)
+      const coeff     = s.projectCoeff || 1
+      const overhead  = (c.equipmentCost || 0) + (c.workCost || 0) + (c.packagingCost || 0)
+      const totalMat  = c.materialCost || 0.001
+      const r = v => Math.round(v * 100) / 100
+      return s.pieces.map(p => {
+        const qty        = Math.max(1, p.quantity || 1)
+        const loss       = (p.lossPercent || 0) / 100
+        const purge      = p.colorCount > 1 ? (p.purgeWaste || 0) : 0
+        const pieceW     = (p.weight || 0) * qty * (1 + loss) + purge * qty
+        const pieceMat   = (pieceW / 1000) * (p.costPerKg || 0)
+        const pieceOver  = totalMat > 0 ? (pieceMat / totalMat) * overhead : 0
+        const pieceTTC   = (pieceMat + pieceOver) * coeff * (1 + margin) * (1 + taxRate)
+        return {
+          id:       p.id,
+          name:     p.name || `Pièce ${s.pieces.indexOf(p) + 1}`,
+          material: p.material || '—',
+          weight:   Math.round(pieceW * 10) / 10,
+          qty,
+          totalTTC: r(pieceTTC),
+        }
+      })
+    },
+
     steps() {
       if (this.isAdmin) {
         return [
@@ -490,7 +552,19 @@ export default {
 
   },
 
+  watch: {
+    currentStep() {
+      this.$nextTick(() => {
+        this.$el?.querySelector('.step-card-body')?.scrollTo({ top: 0, behavior: 'instant' })
+      })
+    },
+  },
+
   methods: {
+    fmtEur(v) {
+      return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(v || 0)
+    },
+
     navigateToStep(step) {
       if (step >= this.currentStep) return
       this.$router.push(`/calculator/${step}`)
@@ -597,27 +671,29 @@ export default {
           : s.clientName
 
         const editId = s.editingQuoteId || this.$route.query.editId || null
-        const quoteNumber = editId ? s.quoteNumber : await this.generateSequentialQuoteNumber()
+        const quoteNumber = editId
+          ? s.quoteNumber
+          : (s.quoteNumber && !s.quoteNumberIsStale && !s.quoteNumber.endsWith('-000')
+              ? s.quoteNumber
+              : await this.generateSequentialQuoteNumber())
         if (!editId) s.quoteNumber = quoteNumber
 
-        // Upload images pour toutes les pièces
-        for (let i = 0; i < s.pieces.length; i++) {
-          const piece = s.pieces[i]
-          // Nettoyer les blob URLs périmées
-          if ((piece.referenceImageUrl || '').startsWith('blob:')) {
-            s.pieces[i] = { ...piece, referenceImageUrl: '' }
-          }
-          if (piece.referenceImage) {
-            const ext  = piece.referenceImage.name.split('.').pop()
-            const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-            const { error: upErr } = await supabase.storage
-              .from('quote-images').upload(path, piece.referenceImage, { upsert: true })
-            if (!upErr) {
-              const { data: urlData } = supabase.storage.from('quote-images').getPublicUrl(path)
-              s.pieces[i] = { ...s.pieces[i], referenceImageUrl: urlData.publicUrl, referenceImage: null }
-            }
-          }
-        }
+        // Nettoyer les blob URLs périmées
+        s.pieces = s.pieces.map(p =>
+          (p.referenceImageUrl || '').startsWith('blob:') ? { ...p, referenceImageUrl: '' } : p
+        )
+
+        // Upload de toutes les images en parallèle
+        s.pieces = await Promise.all(s.pieces.map(async (piece, i) => {
+          if (!piece.referenceImage) return piece
+          const ext  = piece.referenceImage.name.split('.').pop()
+          const path = `${Date.now()}-${i}-${Math.random().toString(36).slice(2)}.${ext}`
+          const { error: upErr } = await supabase.storage
+            .from('quote-images').upload(path, piece.referenceImage, { upsert: true })
+          if (upErr) return piece
+          const { data: urlData } = supabase.storage.from('quote-images').getPublicUrl(path)
+          return { ...piece, referenceImageUrl: urlData.publicUrl, referenceImage: null }
+        }))
 
         const payload = {
           quote_number: quoteNumber, quote_date: s.quoteDate,
@@ -799,6 +875,146 @@ export default {
   flex-direction: column;
   gap: 0.65rem;
   flex-shrink: 0;
+}
+
+/* Mode dual (étape 4 Pièces admin) */
+.content-area--dual {
+  max-width: 940px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+/* Panel récapitulatif latéral */
+.recap-aside {
+  width: 250px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 172px);
+  overflow: hidden;
+}
+.recap-aside-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f0f4f8;
+  background: linear-gradient(135deg, #f8fffe 0%, #fff 100%);
+  flex-shrink: 0;
+}
+.recap-aside-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #1b2f39;
+}
+.recap-aside-count {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #2e9cab;
+  background: #e8f7f9;
+  border-radius: 6px;
+  padding: 0.12rem 0.45rem;
+}
+.recap-aside-body {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 0.25rem 0;
+}
+.recap-aside-empty {
+  font-size: 0.72rem;
+  color: #a0aec0;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  margin: 0;
+}
+.recap-piece {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid #f7fafc;
+}
+.recap-piece:last-child { border-bottom: none; }
+.recap-piece-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+.recap-piece-num {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: #e8f7f9;
+  color: #2e9cab;
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+.recap-piece-info {
+  flex: 1;
+  min-width: 0;
+}
+.recap-piece-name {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #1b2f39;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recap-piece-sub {
+  display: block;
+  font-size: 0.64rem;
+  color: #718096;
+  margin-top: 0.08rem;
+}
+.recap-piece-price {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #1b2f39;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.recap-aside-footer {
+  padding: 0.7rem 1rem;
+  border-top: 1.5px solid #e2e8f0;
+  background: linear-gradient(135deg, #f8fffe 0%, #fff 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+.recap-aside-total-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #718096;
+}
+.recap-aside-total {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #2e9cab;
+}
+@media (max-width: 800px) {
+  .content-area--dual {
+    flex-direction: column;
+    max-width: 640px;
+  }
+  .recap-aside { display: none; }
 }
 
 /* ── Carte de l'étape ── */

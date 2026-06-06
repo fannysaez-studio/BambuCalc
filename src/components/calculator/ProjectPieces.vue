@@ -6,11 +6,26 @@
 
     <div v-for="(piece, idx) in pieces" :key="piece.id" class="piece-card">
 
-      <!-- Header -->
-      <div class="piece-card-header">
-        <span class="piece-num">Pièce {{ idx + 1 }}</span>
-        <button v-if="pieces.length > 1" class="btn-remove" type="button" @click="removePiece(idx)">×</button>
+      <!-- Header — accordéon -->
+      <div class="piece-card-header" @click="toggleExpand(piece.id)">
+        <div class="piece-head-left">
+          <span class="piece-num">Pièce {{ idx + 1 }}</span>
+          <span v-if="piece.name" class="piece-head-name">{{ piece.name }}</span>
+          <span v-if="piece.material" class="piece-head-badge">
+            <span class="piece-mat-dot" :style="{ background: swatchColor(piece) }"></span>
+            {{ piece.material }}
+          </span>
+          <span v-if="piece.weight" class="piece-head-badge">{{ piece.weight }}g</span>
+          <span v-if="(piece.quantity || 1) > 1" class="piece-head-badge">×{{ piece.quantity }}</span>
+        </div>
+        <div class="piece-head-right">
+          <button v-if="pieces.length > 1" class="btn-remove" type="button" @click.stop="removePiece(idx)">×</button>
+          <span :class="['piece-chevron', isExpanded(piece.id) && 'piece-chevron--up']">▾</span>
+        </div>
       </div>
+
+      <!-- Contenu pliable -->
+      <div v-if="isExpanded(piece.id)" class="piece-card-body">
 
       <!-- Nom + Quantité -->
       <div class="grid-2">
@@ -126,16 +141,17 @@
           @change="handleUpload($event, idx)" />
         </div><!-- /formGroup image -->
 
-        <!-- Bouton + Ajouter uniquement sur la dernière pièce -->
-        <button
-          v-if="idx === pieces.length - 1"
-          class="btn-add-piece"
-          type="button"
-          @click="addPiece"
-        >
+      </div><!-- /img-add-row -->
+
+      </div><!-- /accordéon -->
+
+      <!-- Bouton Ajouter — toujours visible sur la dernière pièce -->
+      <div v-if="idx === pieces.length - 1" class="piece-add-row">
+        <button v-if="pieces.length < MAX_PIECES" class="btn-add-piece" type="button" @click="addPiece">
           + Ajouter une pièce
         </button>
-      </div><!-- /img-add-row -->
+        <p v-else class="limit-msg">Limite de {{ MAX_PIECES }} pièces atteinte</p>
+      </div>
 
     </div><!-- /piece-card -->
 
@@ -175,6 +191,8 @@ export default {
       imgRefs:      {},
       imgErrors:    {},
       zoomImg:      '',
+      expandedIds:  [],
+      MAX_PIECES:   10,
     }
   },
   computed: {
@@ -192,7 +210,16 @@ export default {
         }))
     },
   },
+  watch: {
+    pieces(newPieces) {
+      newPieces.forEach(p => {
+        if (p.id && !this.expandedIds.includes(p.id)) this.expandedIds.push(p.id)
+      })
+    },
+  },
+
   async mounted() {
+    this.pieces.forEach(p => { if (p.id) this.expandedIds.push(p.id) })
     this.loading = true
     try {
       const { data } = await supabase
@@ -224,8 +251,10 @@ export default {
         i === idx ? { ...p, colorCount, purgeWaste } : p))
     },
     addPiece() {
+      const newId = `piece-${Date.now()}`
+      this.expandedIds.push(newId)
       this.$emit('update:pieces', [...this.pieces, {
-        id:               `piece-${Date.now()}`,
+        id:               newId,
         name:             '',
         quantity:         1,
         weight:           0,
@@ -283,6 +312,12 @@ export default {
       const mat = this.catalog.find(m => m.id === piece.materialId)
       return mat?.color || '#e2e8f0'
     },
+    isExpanded(id) { return this.expandedIds.includes(id) },
+    toggleExpand(id) {
+      const i = this.expandedIds.indexOf(id)
+      if (i >= 0) this.expandedIds.splice(i, 1)
+      else this.expandedIds.push(id)
+    },
     isHex(v) { return typeof v === 'string' && /^#[0-9A-Fa-f]{3,6}$/.test(v) },
     isUrl(v) {
       return typeof v === 'string' && (
@@ -309,19 +344,60 @@ export default {
   margin-left: 0.25rem; vertical-align: middle;
 }
 
-/* ── Carte pièce ── */
+/* ── Carte pièce — accordéon ── */
 .piece-card {
   border: 1.5px solid #e2e8f0; border-radius: 14px;
-  padding: 0.85rem 1rem; margin-bottom: 0.75rem;
-  background: #fafcff;
+  padding: 0; margin-bottom: 0.6rem; background: #fafcff; overflow: hidden;
 }
 .piece-card-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 0.65rem;
+  padding: 0.6rem 0.85rem; cursor: pointer;
+  transition: background 0.15s ease;
+  gap: 0.5rem;
+}
+.piece-card-header:hover { background: #f0fbfc; }
+.piece-head-left {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; flex: 1; min-width: 0;
+}
+.piece-head-right {
+  display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0;
 }
 .piece-num {
   font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.1em; color: #2e9cab;
+  letter-spacing: 0.1em; color: #2e9cab; flex-shrink: 0;
+}
+.piece-head-name {
+  font-size: 0.74rem; font-weight: 700; color: #1b2f39;
+  max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.piece-head-badge {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  font-size: 0.67rem; font-weight: 600; color: #4a5568;
+  background: #f0f4f8; border-radius: 5px; padding: 0.1rem 0.35rem;
+}
+.piece-mat-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+.piece-chevron {
+  font-size: 0.75rem; color: #a0aec0;
+  transition: transform 0.2s ease; display: inline-block;
+}
+.piece-chevron--up { transform: rotate(-180deg); }
+
+/* Contenu pliable */
+.piece-card-body {
+  padding: 0.6rem 0.85rem 0.75rem;
+  border-top: 1px solid #f0f4f8;
+}
+
+/* Bouton Ajouter + limite */
+.piece-add-row {
+  padding: 0.5rem 0.85rem 0.75rem; border-top: 1px solid #f0f4f8;
+}
+.limit-msg {
+  font-size: 0.72rem; color: #a0aec0; text-align: center;
+  margin: 0; padding: 0.4rem 0;
 }
 .btn-remove {
   width: 1.4rem; height: 1.4rem; border-radius: 50%; border: 1px solid #e2e8f0;
