@@ -98,7 +98,7 @@ async function _buildDoc(quote, mode = 'client') {
     items = quote.items.map(item => ({
       name:             item.name || '—',
       quantity:         item.quantity ?? 1,
-      weight:           item.rawWeight ?? item.weight ?? 0, // poids brut saisi par l'utilisateur
+      weight:           item.weight ?? 0,
       material:         item.material || '—',
       colorCount:       item.colorCount || 1,
       referenceImageUrl:item.referenceImageUrl || '',

@@ -91,8 +91,8 @@
                 <th class="th-desc">Désignation / Spécifications</th>
                 <th v-if="hasAnyImage" class="th-photo">Photo réf.</th>
                 <th class="th-num">Qté</th>
-                <th class="th-num th-hide-mobile">PU HT</th>
-                <th class="th-num th-hide-mobile">TVA {{ taxRate }}%</th>
+                <th class="th-num th-hide-mobile">{{ taxRate > 0 ? 'PU HT' : 'PU TTC' }}</th>
+                <th v-if="taxRate > 0" class="th-num th-hide-mobile">TVA {{ taxRate }}%</th>
                 <th class="th-num th-ttc">Total TTC</th>
               </tr>
             </thead>
@@ -102,7 +102,7 @@
                   <div class="td-title">{{ item.name }}</div>
                   <ul class="td-specs">
                     <li>Matière : {{ item.material }}</li>
-                    <li v-if="item.weight">Poids total : {{ item.weight }} g</li>
+                    <li v-if="item.weight">Poids : {{ item.weight }} g/pièce</li>
                     <li v-if="item.colorCount > 1">{{ item.colorCount }} couleurs</li>
                   </ul>
                 </td>
@@ -115,7 +115,7 @@
                 </td>
                 <td class="td-c">{{ item.quantity }}</td>
                 <td class="td-r td-hide-mobile">{{ fmtEur(item.unitPriceHT) }}</td>
-                <td class="td-r td-hide-mobile">{{ fmtEur(item.tvaPart) }}</td>
+                <td v-if="taxRate > 0" class="td-r td-hide-mobile">{{ fmtEur(item.tvaPart) }}</td>
                 <td class="td-r td-bold">{{ fmtEur(item.totalTTC) }}</td>
               </tr>
             </tbody>
@@ -336,10 +336,11 @@ const condLines = computed(() => {
 })
 
 const totalsRows = computed(() => {
-  const rows = [
-    ['Sous-total HT', fmtEur(allTotalHT.value)],
-    [`TVA (${taxRate.value}%)`, fmtEur(allTotalTVA.value)],
-  ]
+  const rows = []
+  if (taxRate.value > 0) {
+    rows.push(['Sous-total HT', fmtEur(allTotalHT.value)])
+    rows.push([`TVA (${taxRate.value}%)`, fmtEur(allTotalTVA.value)])
+  }
   if ((q.value.deposit_percent || 0) > 0) {
     const acompte = allTotalTTC.value * (q.value.deposit_percent / 100)
     rows.push([`Acompte (${q.value.deposit_percent}%)`, fmtEur(acompte)])

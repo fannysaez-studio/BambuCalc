@@ -239,6 +239,53 @@
         </div>
       </div>
 
+      <!-- ── Navigation bas ── -->
+      <div class="step-nav">
+        <div class="step-nav-left">
+          <router-link
+            v-if="currentStep === 1 || currentStep === steps.length"
+            to="/dashboard"
+            class="btn-dash-icon"
+            title="Tableau de bord"
+          >
+            <LayoutDashboard :size="18" />
+          </router-link>
+          <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
+        </div>
+        <div class="step-nav-right">
+          <button
+            v-if="currentStep === steps.length && isAdmin"
+            class="btn-preview-devis"
+            @click="showPreview = true"
+            title="Aperçu du devis"
+          >
+            <Eye class="btn-preview-icon" />
+            <span>Aperçu</span>
+          </button>
+          <button
+            v-if="currentStep === steps.length"
+            :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
+            :disabled="saving"
+            @click="saveQuote"
+          >
+            <span v-if="saving">Sauvegarde…</span>
+            <span v-else-if="saveStatus === 'ok'">
+              ✓ {{ isEditMode ? 'Devis mis à jour !' : (isAdmin ? 'Devis sauvegardé !' : 'Demande envoyée !') }}
+            </span>
+            <span v-else>
+              {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
+            </span>
+          </button>
+          <button
+            v-if="currentStep < steps.length"
+            class="btn-next"
+            @click="goNext"
+          >
+            Suivant →
+          </button>
+        </div>
+      </div>
+
       </div><!-- /.main-col -->
 
       <!-- ── Panel récapitulatif (admin, étape 4 Pièces) ── -->
@@ -272,53 +319,6 @@
         </div>
       </aside>
 
-    </div>
-
-    <!-- ── Navigation bas (hors content-area pour couvrir la full width en dual) ── -->
-    <div :class="['step-nav', showLateralPanel && 'step-nav--wide']">
-      <div class="step-nav-left">
-        <router-link
-          v-if="currentStep === 1 || currentStep === steps.length"
-          to="/dashboard"
-          class="btn-dash-icon"
-          title="Tableau de bord"
-        >
-          <LayoutDashboard :size="18" />
-        </router-link>
-        <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
-      </div>
-      <div class="step-nav-right">
-        <button
-          v-if="currentStep === steps.length && isAdmin"
-          class="btn-preview-devis"
-          @click="showPreview = true"
-          title="Aperçu du devis"
-        >
-          <Eye class="btn-preview-icon" />
-          <span>Aperçu</span>
-        </button>
-        <button
-          v-if="currentStep === steps.length"
-          :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
-          :disabled="saving"
-          @click="saveQuote"
-        >
-          <span v-if="saving">Sauvegarde…</span>
-          <span v-else-if="saveStatus === 'ok'">
-            ✓ {{ isEditMode ? 'Devis mis à jour !' : (isAdmin ? 'Devis sauvegardé !' : 'Demande envoyée !') }}
-          </span>
-          <span v-else>
-            {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
-          </span>
-        </button>
-        <button
-          v-if="currentStep < steps.length"
-          class="btn-next"
-          @click="goNext"
-        >
-          Suivant →
-        </button>
-      </div>
     </div>
 
     <ToastMessage ref="toast" />
@@ -448,8 +448,7 @@ export default {
           id:               p.id,
           name:             p.name || '—',
           quantity:         qty,
-          weight:           r(pieceWeight),   // poids calculé (avec pertes) — utilisé pour les coûts
-          rawWeight:        w,                // poids brut saisi — affiché dans le PDF
+          weight:           w,
           material:         p.material || '—',
           colorCount:       p.colorCount || 1,
           referenceImageUrl: p.referenceImageUrl || '',
@@ -917,8 +916,10 @@ export default {
 .main-col {
   flex: 1;
   min-width: 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
 }
 
 /* Panel récapitulatif latéral */
@@ -1062,6 +1063,8 @@ export default {
 /* ── Carte de l'étape ── */
 .step-card {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   background: #fff;
   border-radius: 20px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.09);
@@ -1069,7 +1072,6 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
 }
 
 .step-card-header {
