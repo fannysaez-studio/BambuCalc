@@ -38,10 +38,12 @@ export function buildPiecesFromQuote(q) {
 // ── Opérations utilisateur ────────────────────────────────────────────────────
 
 export async function saveQuote(quote) {
-  const { data: { user } } = await supabase.auth.getUser()
+  // getSession() utilise le cache local (pas de requête réseau) → évite les blocages
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session?.user) throw new Error('Session expirée — reconnectez-vous')
   const { data, error } = await supabase
     .from('quotes')
-    .insert({ ...quote, user_id: user.id })
+    .insert({ ...quote, user_id: session.user.id })
     .select()
     .single()
   if (error) throw error

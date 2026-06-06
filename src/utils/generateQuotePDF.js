@@ -98,7 +98,7 @@ async function _buildDoc(quote, mode = 'client') {
     items = quote.items.map(item => ({
       name:             item.name || '—',
       quantity:         item.quantity ?? 1,
-      weight:           item.weight || 0,
+      weight:           item.rawWeight ?? item.weight ?? 0, // poids brut saisi par l'utilisateur
       material:         item.material || '—',
       colorCount:       item.colorCount || 1,
       referenceImageUrl:item.referenceImageUrl || '',
@@ -323,7 +323,7 @@ async function _buildDoc(quote, mode = 'client') {
         const item = items[rowIdx]
         const specs = [
           `Matière : ${item.material}`,
-          item.weight ? `Poids total : ${item.weight} g` : null,
+          item.weight ? `Poids : ${item.weight} g/pièce` : null,
           item.colorCount > 1 ? `${item.colorCount} couleurs` : null,
         ].filter(Boolean)
         data.cell.styles.minCellHeight = Math.max(ROW_H, 10 + specs.length * 5)

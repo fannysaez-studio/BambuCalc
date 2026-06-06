@@ -41,7 +41,7 @@
       <div class="step-card">
 
         <div class="step-card-header">
-          <div class="step-card-icon-wrap">
+          <div class="step-card-header-icon">
             <component :is="currentStepDef.icon" class="step-card-icon" />
           </div>
           <div>
@@ -239,53 +239,6 @@
         </div>
       </div>
 
-      <!-- ── Navigation bas ── -->
-      <div class="step-nav">
-        <div class="step-nav-left">
-          <router-link
-            v-if="currentStep === 1 || currentStep === steps.length"
-            to="/dashboard"
-            class="btn-dash-icon"
-            title="Tableau de bord"
-          >
-            <LayoutDashboard :size="18" />
-          </router-link>
-          <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
-        </div>
-        <div class="step-nav-right">
-          <button
-            v-if="currentStep === steps.length && isAdmin"
-            class="btn-preview-devis"
-            @click="showPreview = true"
-            title="Aperçu du devis"
-          >
-            <Eye class="btn-preview-icon" />
-            <span>Aperçu</span>
-          </button>
-          <button
-            v-if="currentStep === steps.length"
-            :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
-            :disabled="saving"
-            @click="saveQuote"
-          >
-            <span v-if="saving">Sauvegarde…</span>
-            <span v-else-if="saveStatus === 'ok'">
-              ✓ {{ isEditMode ? 'Devis mis à jour !' : (isAdmin ? 'Devis sauvegardé !' : 'Demande envoyée !') }}
-            </span>
-            <span v-else>
-              {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
-            </span>
-          </button>
-          <button
-            v-if="currentStep < steps.length"
-            class="btn-next"
-            @click="goNext"
-          >
-            Suivant →
-          </button>
-        </div>
-      </div>
-
       </div><!-- /.main-col -->
 
       <!-- ── Panel récapitulatif (admin, étape 4 Pièces) ── -->
@@ -319,6 +272,53 @@
         </div>
       </aside>
 
+    </div>
+
+    <!-- ── Navigation bas (hors content-area pour couvrir la full width en dual) ── -->
+    <div :class="['step-nav', showLateralPanel && 'step-nav--wide']">
+      <div class="step-nav-left">
+        <router-link
+          v-if="currentStep === 1 || currentStep === steps.length"
+          to="/dashboard"
+          class="btn-dash-icon"
+          title="Tableau de bord"
+        >
+          <LayoutDashboard :size="18" />
+        </router-link>
+        <button v-if="currentStep > 1" class="btn-back" @click="goBack">← Retour</button>
+      </div>
+      <div class="step-nav-right">
+        <button
+          v-if="currentStep === steps.length && isAdmin"
+          class="btn-preview-devis"
+          @click="showPreview = true"
+          title="Aperçu du devis"
+        >
+          <Eye class="btn-preview-icon" />
+          <span>Aperçu</span>
+        </button>
+        <button
+          v-if="currentStep === steps.length"
+          :class="['btn-save', saveStatus === 'ok' && 'btn-save-ok']"
+          :disabled="saving"
+          @click="saveQuote"
+        >
+          <span v-if="saving">Sauvegarde…</span>
+          <span v-else-if="saveStatus === 'ok'">
+            ✓ {{ isEditMode ? 'Devis mis à jour !' : (isAdmin ? 'Devis sauvegardé !' : 'Demande envoyée !') }}
+          </span>
+          <span v-else>
+            {{ isEditMode ? 'Mettre à jour le devis' : (isAdmin ? 'Sauvegarder le devis' : 'Envoyer ma demande') }}
+          </span>
+        </button>
+        <button
+          v-if="currentStep < steps.length"
+          class="btn-next"
+          @click="goNext"
+        >
+          Suivant →
+        </button>
+      </div>
     </div>
 
     <ToastMessage ref="toast" />
@@ -448,7 +448,8 @@ export default {
           id:               p.id,
           name:             p.name || '—',
           quantity:         qty,
-          weight:           r(pieceWeight),
+          weight:           r(pieceWeight),   // poids calculé (avec pertes) — utilisé pour les coûts
+          rawWeight:        w,                // poids brut saisi — affiché dans le PDF
           material:         p.material || '—',
           colorCount:       p.colorCount || 1,
           referenceImageUrl: p.referenceImageUrl || '',
@@ -807,7 +808,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
+  gap: 1.1rem;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
 }
 
@@ -918,7 +919,6 @@ export default {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
 }
 
 /* Panel récapitulatif latéral */
@@ -1075,18 +1075,18 @@ export default {
 .step-card-header {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
-  padding: 0.9rem 1.25rem;
-  border-bottom: 1px solid #f0f4f8;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 2px solid #f0f4f8;
   background: linear-gradient(135deg, #f8fffe 0%, #fff 100%);
   flex-shrink: 0;
 }
 
-.step-card-icon-wrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #e8f7f9 0%, #d0f0f5 100%);
+.step-card-header-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: #e8f7f9;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1094,8 +1094,8 @@ export default {
 }
 
 .step-card-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.05rem;
+  height: 1.05rem;
   color: #2e9cab;
 }
 
@@ -1142,14 +1142,8 @@ export default {
   gap: 0.75rem;
   flex-shrink: 0;
 }
-
-.step-nav-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
+/* En mode dual (étape 4 Pièces), step-nav couvre les deux colonnes */
+.step-nav--wide { max-width: 940px; }
 
 .step-nav-left {
   display: flex;

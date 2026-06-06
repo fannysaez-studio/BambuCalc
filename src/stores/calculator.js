@@ -325,7 +325,18 @@ export const useCalculatorStore = defineStore('calculator', {
         }
         return JSON.stringify(clean)
       },
-      deserialize: JSON.parse,
+      // Les blob URLs deviennent invalides après un rechargement de page
+      deserialize: (str) => {
+        const state = JSON.parse(str)
+        if (state.pieces) {
+          state.pieces = state.pieces.map(p => ({
+            ...p,
+            referenceImage: null,
+            referenceImageUrl: (p.referenceImageUrl || '').startsWith('blob:') ? '' : (p.referenceImageUrl || ''),
+          }))
+        }
+        return state
+      },
     },
   },
 })
