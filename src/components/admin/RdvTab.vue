@@ -408,7 +408,7 @@ onUnmounted(() => {
 .rdv-devis-select {
   padding: 0.26rem 0.32rem;
   border: 1.5px solid #ddd6fe; border-radius: 7px;
-  font-size: 0.72rem; font-family: inherit; color: #2d3748;
+  font-size: 0.72rem; font-family: inherit; color: #7961E9;
   background: #fff; cursor: pointer;
   min-width: 110px; max-width: 150px;
 }

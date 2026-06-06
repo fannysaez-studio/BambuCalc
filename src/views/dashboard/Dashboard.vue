@@ -1796,7 +1796,7 @@ async function linkAccount() {
   border-radius: 7px;
   font-size: 0.75rem;
   font-family: inherit;
-  color: #2d3748;
+  color: #2e9cab;
   background: #fff;
   cursor: pointer;
   min-width: 110px;
