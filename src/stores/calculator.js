@@ -296,4 +296,25 @@ export const useCalculatorStore = defineStore('calculator', {
       })
     },
   },
+
+  persist: {
+    key: 'bambucalc-calculator',
+    storage: localStorage,
+    pick: [
+      'quoteNumber', 'quoteDate', 'quoteValidityDays',
+      'paymentMethod', 'depositPercent', 'processingDelay', 'deliveryDelay', 'quoteNotes',
+      'clientType', 'clientCivility', 'clientFirstName', 'clientLastName',
+      'clientContactName', 'clientEmail', 'clientPhone',
+      'clientAddress', 'clientPostalCode', 'clientCity', 'clientCountry',
+      'clientSiret', 'clientVatNumber',
+      'projectType', 'projectSeriesType', 'projectDescription',
+      'projectLength', 'projectWidth', 'projectHeight', 'projectFinish', 'projectFinishNote',
+      'defaultMaterial', 'defaultCostPerKg', 'defaultWastePercent', 'defaultColorCount',
+      'pieces',
+      'printHours', 'printMinutes', 'prepTime', 'postTime', 'hourlyRate',
+      'packagingCost', 'taxRate', 'selectedPricing', 'customMargin',
+      'printProfile', 'printerModel', 'nozzleSize',
+      'editingQuoteId',
+    ],
+  },
 })

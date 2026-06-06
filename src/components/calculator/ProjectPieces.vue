@@ -7,7 +7,7 @@
     <div v-for="(piece, idx) in pieces" :key="piece.id" class="piece-card">
 
       <!-- Header — accordéon -->
-      <div class="piece-card-header" @click="toggleExpand(piece.id)">
+      <div class="piece-card-header">
         <div class="piece-head-left">
           <span class="piece-num">Pièce {{ idx + 1 }}</span>
           <span v-if="piece.name" class="piece-head-name">{{ piece.name }}</span>
@@ -20,7 +20,9 @@
         </div>
         <div class="piece-head-right">
           <button v-if="pieces.length > 1" class="btn-remove" type="button" @click.stop="removePiece(idx)">×</button>
-          <span :class="['piece-chevron', isExpanded(piece.id) && 'piece-chevron--up']">▾</span>
+          <button class="btn-toggle" type="button" @click="toggleExpand(piece.id)" :title="isExpanded(piece.id) ? 'Réduire' : 'Développer'">
+            {{ isExpanded(piece.id) ? '−' : '+' }}
+          </button>
         </div>
       </div>
 
@@ -219,8 +221,6 @@ export default {
   },
 
   async mounted() {
-    const last = this.pieces[this.pieces.length - 1]
-    if (last?.id) this.expandedIds = [last.id]
     this.loading = true
     try {
       const { data } = await supabase
@@ -253,7 +253,6 @@ export default {
     },
     addPiece() {
       const newId = `piece-${Date.now()}`
-      this.expandedIds = [newId]
       this.$emit('update:pieces', [...this.pieces, {
         id:               newId,
         name:             '',
@@ -380,11 +379,14 @@ export default {
   width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
   border: 1px solid rgba(0,0,0,0.1);
 }
-.piece-chevron {
-  font-size: 0.75rem; color: #a0aec0;
-  transition: transform 0.2s ease; display: inline-block;
+.btn-toggle {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 1.5px solid #cbd5e0; background: #fff;
+  color: #4a5568; font-size: 1rem; font-weight: 700;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  line-height: 1; transition: all 0.18s ease; flex-shrink: 0;
 }
-.piece-chevron--up { transform: rotate(-180deg); }
+.btn-toggle:hover { border-color: #2e9cab; color: #2e9cab; background: #e8f7f9; }
 
 /* Contenu pliable */
 .piece-card-body {

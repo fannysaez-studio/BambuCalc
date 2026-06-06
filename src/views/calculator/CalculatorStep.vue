@@ -510,7 +510,7 @@ export default {
       const sp = s.sellingPrices
       if (!c || !sp || s.pieces.length === 0) return []
       const margin    = (sp.margin  || 0) / 100
-      const taxRate   = ((s.taxRate || 20) / 100)
+      const taxRate   = ((s.taxRate != null ? Number(s.taxRate) : 0) / 100)
       const coeff     = s.projectCoeff || 1
       const overhead  = (c.equipmentCost || 0) + (c.workCost || 0) + (c.packagingCost || 0)
       const totalMat  = c.materialCost
@@ -531,7 +531,7 @@ export default {
           id:           p.id,
           name:         p.name || `Pièce ${idx + 1}`,
           material:     p.material || '—',
-          weight:       Math.round(pieceW * 10) / 10,
+          weight:       p.weight || 0,
           qty,
           totalTTC:     r(pieceTTC),
           imageUrl:     p.referenceImageUrl || null,
