@@ -642,8 +642,11 @@ export default {
         'Temps enregistré ✓',
         'Tarif sélectionné ✓',
       ]
-      this.$refs.toast.show(messages[this.currentStep - 1] || 'Étape validée ✓', 'success', 2000)
       const nextStep = this.currentStep + 1
+      // Pas de toast sur la dernière étape : il masquerait le bouton Sauvegarder (z-index 9999)
+      if (nextStep < this.steps.length) {
+        this.$refs.toast.show(messages[this.currentStep - 1] || 'Étape validée ✓', 'success', 2000)
+      }
       this.$router.push(`/calculator/${nextStep}`)
         .then(failure => { if (failure) window.location.assign(`/calculator/${nextStep}`) })
         .catch(() => { window.location.assign(`/calculator/${nextStep}`) })

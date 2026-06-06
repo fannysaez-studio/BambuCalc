@@ -412,7 +412,8 @@ onUnmounted(() => {
   background: #fff; cursor: pointer;
   min-width: 110px; max-width: 150px;
 }
-.rdv-devis-select:focus { outline: none; border-color: #a78bfa; }
+.rdv-devis-select:focus,
+.rdv-devis-select:focus-visible { outline: none; border-color: #a78bfa; }
 .rdv-devis-select:disabled { opacity: 0.45; cursor: not-allowed; }
 .devis-none { color: #a0aec0; font-size: 0.72rem; }
 .td-format, .td-presence { white-space: nowrap; }
@@ -447,7 +448,8 @@ onUnmounted(() => {
   background: #fff; cursor: pointer;
   min-width: 90px;
 }
-.rdv-select:focus { outline: none; border-color: #a78bfa; }
+.rdv-select:focus,
+.rdv-select:focus-visible { outline: none; border-color: #a78bfa; }
 .rdv-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ── Note ── */

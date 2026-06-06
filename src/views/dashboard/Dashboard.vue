@@ -1802,7 +1802,8 @@ async function linkAccount() {
   min-width: 110px;
   max-width: 160px;
 }
-.client-devis-select:focus { outline: none; border-color: #2e9cab; }
+.client-devis-select:focus,
+.client-devis-select:focus-visible { outline: none; border-color: #2e9cab; }
 .client-devis-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .rdv-fmt-badge {
