@@ -219,7 +219,8 @@ export default {
   },
 
   async mounted() {
-    this.pieces.forEach(p => { if (p.id) this.expandedIds.push(p.id) })
+    const last = this.pieces[this.pieces.length - 1]
+    if (last?.id) this.expandedIds = [last.id]
     this.loading = true
     try {
       const { data } = await supabase
@@ -252,7 +253,7 @@ export default {
     },
     addPiece() {
       const newId = `piece-${Date.now()}`
-      this.expandedIds.push(newId)
+      this.expandedIds = [newId]
       this.$emit('update:pieces', [...this.pieces, {
         id:               newId,
         name:             '',

@@ -300,8 +300,14 @@
               <span class="recap-piece-num">{{ i + 1 }}</span>
               <div class="recap-piece-info">
                 <span class="recap-piece-name">{{ item.name }}</span>
-                <span class="recap-piece-sub">{{ item.material }} · {{ item.weight }}g{{ item.qty > 1 ? ` × ${item.qty}` : '' }}</span>
+                <span class="recap-piece-sub">
+                  {{ item.material }} ·
+                  <span v-if="item.weightMissing" class="recap-weight-warn" title="Entrez le poids après slicing">⚠ 0g</span>
+                  <span v-else>{{ item.weight }}g</span>
+                  {{ item.qty > 1 ? ` × ${item.qty}` : '' }}
+                </span>
               </div>
+              <img v-if="item.imageUrl" :src="item.imageUrl" class="recap-piece-img" alt="" />
               <span class="recap-piece-price">{{ fmtEur(item.totalTTC) }}</span>
             </div>
           </div>
@@ -507,23 +513,29 @@ export default {
       const taxRate   = ((s.taxRate || 20) / 100)
       const coeff     = s.projectCoeff || 1
       const overhead  = (c.equipmentCost || 0) + (c.workCost || 0) + (c.packagingCost || 0)
-      const totalMat  = c.materialCost || 0.001
+      const totalMat  = c.materialCost
+      const totalQty  = s.pieces.reduce((sum, p) => sum + Math.max(1, p.quantity || 1), 0)
       const r = v => Math.round(v * 100) / 100
-      return s.pieces.map(p => {
+      return s.pieces.map((p, idx) => {
         const qty        = Math.max(1, p.quantity || 1)
         const loss       = (p.lossPercent || 0) / 100
         const purge      = p.colorCount > 1 ? (p.purgeWaste || 0) : 0
         const pieceW     = (p.weight || 0) * qty * (1 + loss) + purge * qty
         const pieceMat   = (pieceW / 1000) * (p.costPerKg || 0)
-        const pieceOver  = totalMat > 0 ? (pieceMat / totalMat) * overhead : 0
+        // Si aucun coût matière, répartir l'overhead proportionnellement à la quantité
+        const pieceOver  = totalMat > 0
+          ? (pieceMat / totalMat) * overhead
+          : (qty / totalQty) * overhead
         const pieceTTC   = (pieceMat + pieceOver) * coeff * (1 + margin) * (1 + taxRate)
         return {
-          id:       p.id,
-          name:     p.name || `Pièce ${s.pieces.indexOf(p) + 1}`,
-          material: p.material || '—',
-          weight:   Math.round(pieceW * 10) / 10,
+          id:           p.id,
+          name:         p.name || `Pièce ${idx + 1}`,
+          material:     p.material || '—',
+          weight:       Math.round(pieceW * 10) / 10,
           qty,
-          totalTTC: r(pieceTTC),
+          totalTTC:     r(pieceTTC),
+          imageUrl:     p.referenceImageUrl || null,
+          weightMissing: !(p.weight > 0),
         }
       })
     },
@@ -786,7 +798,7 @@ export default {
 /* ── Stepper ── */
 .stepper {
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   background: #fff;
   border-radius: 16px;
   padding: 0.75rem 1.25rem;
@@ -870,7 +882,7 @@ export default {
 /* ── Zone de contenu ── */
 .content-area {
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -902,7 +914,7 @@ export default {
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  max-height: calc(100dvh - 172px);
+  max-height: calc(100dvh - 360px);
   overflow: hidden;
 }
 .recap-aside-header {
@@ -990,6 +1002,18 @@ export default {
   flex-shrink: 0;
   white-space: nowrap;
 }
+.recap-piece-img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.recap-weight-warn {
+  color: #f59e0b;
+  font-weight: 700;
+  font-size: 0.64rem;
+}
 .recap-aside-footer {
   padding: 0.7rem 1rem;
   border-top: 1.5px solid #e2e8f0;
@@ -1027,7 +1051,7 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: calc(100dvh - 172px);
+  max-height: calc(100dvh - 360px);
   flex-shrink: 1;
 }
 
@@ -1094,7 +1118,7 @@ export default {
 /* ── Navigation bas ── */
 .step-nav {
   width: 100%;
-  max-width: 640px;
+  max-width: 760px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1286,7 +1310,7 @@ export default {
   }
 
   .step-card {
-    max-height: calc(100dvh - 214px);
+    max-height: calc(100dvh - 360px);
     border-radius: 16px;
   }
 

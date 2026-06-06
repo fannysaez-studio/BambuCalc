@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 // Reconstruit le tableau pieces[] depuis un devis DB (new items[] ou legacy flat fields)
 export function buildPiecesFromQuote(q) {
   if (q.items?.length) {
+    const fallbackCpk = q.cost_per_kg || 0
     return q.items.map((item, i) => ({
       id:               item.id || `piece-${i + 1}`,
       name:             item.name || '',
@@ -13,7 +14,7 @@ export function buildPiecesFromQuote(q) {
       purgeWaste:       item.purgeWaste ?? 0,
       materialId:       item.materialId || null,
       material:         item.material || '',
-      costPerKg:        item.costPerKg ?? 0,
+      costPerKg:        item.costPerKg || fallbackCpk,
       referenceImage:   null,
       referenceImageUrl: item.referenceImageUrl || '',
     }))

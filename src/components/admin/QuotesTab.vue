@@ -239,7 +239,10 @@ async function changeStatus(quote, newStatus) {
   emit('reload')
 }
 function editQuote(q) {
-  const firstPiece = buildPiecesFromQuote(q)[0]
+  const rawPieces  = buildPiecesFromQuote(q)
+  const firstPiece = rawPieces[0]
+  const defaultCpk = Number(firstPiece?.costPerKg) || Number(q.cost_per_kg) || 16.99
+  const pieces = rawPieces.map(p => ({ ...p, costPerKg: Number(p.costPerKg) || defaultCpk }))
   calculatorStore.$patch({
     editingQuoteId:      q.id,
     quoteNumber:         q.quote_number        || '',
@@ -279,12 +282,12 @@ function editQuote(q) {
     taxRate:             q.tax_rate            ?? 20,
     selectedPricing:     q.selected_pricing    || 'standard',
     customMargin:        q.custom_margin       ?? 50,
-    defaultMaterial:     firstPiece.material   || q.material || 'PLA+',
-    defaultCostPerKg:    (firstPiece.costPerKg  || q.cost_per_kg) ?? 16.99,
-    defaultLossPercent:  firstPiece.lossPercent ?? 5,
-    defaultColorCount:   firstPiece.colorCount  ?? 1,
-    defaultMaterialId:   firstPiece.materialId  || null,
-    pieces:              buildPiecesFromQuote(q),
+    defaultMaterial:     firstPiece?.material   || q.material || 'PLA+',
+    defaultCostPerKg:    defaultCpk,
+    defaultLossPercent:  firstPiece?.lossPercent ?? 5,
+    defaultColorCount:   firstPiece?.colorCount  ?? 1,
+    defaultMaterialId:   firstPiece?.materialId  || null,
+    pieces,
   })
   router.push({ path: '/calculator/3', query: { editId: q.id } })
 }
