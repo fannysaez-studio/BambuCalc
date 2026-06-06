@@ -14,6 +14,8 @@
       </span>
     </div>
 
+    <div class="sep"></div>
+
     <!-- ── Section client ── -->
     <div class="section-label">Client</div>
 
@@ -93,8 +95,10 @@
     </div>
 
     <!-- Ligne 3 : Adresse -->
+    <div class="sep"></div>
+    <div class="section-label" style="margin-top:0">Adresse <span style="font-weight:400;text-transform:none;font-size:0.65rem;color:#cbd5e0;">optionnel</span></div>
     <div :class="formStyles.formGroup">
-      <label :class="formStyles.label">Adresse <span class="optional">optionnel</span></label>
+      <label :class="formStyles.label">Adresse</label>
       <input :class="formStyles.input" type="text" :value="clientAddress"
         @input="$emit('update:clientAddress', $event.target.value)"
         placeholder="15 rue de la Paix" />
@@ -223,14 +227,14 @@ export default {
 .grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.6rem;
-  margin-bottom: 0.5rem;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.6rem;
-  margin-bottom: 0.5rem;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
 }
 
 .sep { height: 1px; background: #e2e8f0; margin: 0.5rem 0; }

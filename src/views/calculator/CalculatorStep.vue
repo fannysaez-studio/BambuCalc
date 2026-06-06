@@ -448,7 +448,7 @@ export default {
           id:               p.id,
           name:             p.name || '—',
           quantity:         qty,
-          weight:           Math.round(pieceWeight * 10) / 10,
+          weight:           r(pieceWeight),
           material:         p.material || '—',
           colorCount:       p.colorCount || 1,
           referenceImageUrl: p.referenceImageUrl || '',
@@ -706,7 +706,7 @@ export default {
           const path = `${Date.now()}-${i}-${Math.random().toString(36).slice(2)}.${ext}`
           const { error: upErr } = await supabase.storage
             .from('quote-images').upload(path, piece.referenceImage, { upsert: true })
-          if (upErr) return piece
+          if (upErr) return { ...piece, referenceImage: null }
           const { data: urlData } = supabase.storage.from('quote-images').getPublicUrl(path)
           return { ...piece, referenceImageUrl: urlData.publicUrl, referenceImage: null }
         }))
@@ -781,7 +781,8 @@ export default {
           setTimeout(() => { s.resetForNewQuote(); this.$router.push('/dashboard') }, 1500)
         }
         this.saveStatus = 'ok'
-      } catch {
+      } catch (err) {
+        console.error('[BambuCalc] Erreur sauvegarde:', err)
         this.saveStatus = null
         this.$refs.toast.show('Erreur lors de la sauvegarde. Réessaie.', 'error')
       } finally {
@@ -816,7 +817,7 @@ export default {
   max-width: 760px;
   background: #fff;
   border-radius: 16px;
-  padding: 0.75rem 1.25rem;
+  padding: 0.65rem 1rem;
   box-shadow: 0 4px 12px rgba(0,0,0,0.07);
   border: 1px solid #e2e8f0;
   flex-shrink: 0;
@@ -842,9 +843,9 @@ export default {
 
 .step-line {
   position: absolute;
-  top: 1rem;
-  right: calc(50% + 1.1rem);
-  left: calc(-50% + 1.1rem);
+  top: 0.9rem;
+  right: calc(50% + 1rem);
+  left: calc(-50% + 1rem);
   height: 2px;
   background: #e2e8f0;
   transition: background 0.3s ease;
@@ -855,8 +856,8 @@ export default {
 .step-dot {
   position: relative;
   z-index: 1;
-  width: 2rem;
-  height: 2rem;
+  width: 1.8rem;
+  height: 1.8rem;
   border-radius: 999px;
   border: 2px solid #e2e8f0;
   background: #fff;
@@ -876,8 +877,7 @@ export default {
   border-color: #2e9cab;
   background: #2e9cab;
   color: #fff;
-  box-shadow: 0 0 0 4px rgba(46,156,171,0.15);
-  transform: scale(1.12);
+  box-shadow: 0 0 0 3px rgba(46,156,171,0.22);
 }
 
 .dot-done {
@@ -887,10 +887,10 @@ export default {
   cursor: pointer;
 }
 
-.dot-icon  { width: 0.9rem; height: 0.9rem; }
-.dot-check { font-size: 0.78rem; font-weight: 700; }
+.dot-icon  { width: 0.82rem; height: 0.82rem; }
+.dot-check { font-size: 0.72rem; font-weight: 700; }
 
-.step-label { font-size: 0.65rem; font-weight: 600; color: #a0aec0; text-align: center; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.step-label { font-size: 0.6rem; font-weight: 600; color: #a0aec0; text-align: center; max-width: 100%; line-height: 1.2; }
 .label-active { color: #2e9cab; font-weight: 700; }
 .label-done   { color: #1f7f97; }
 

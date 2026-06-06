@@ -278,22 +278,33 @@ async function _buildDoc(quote, mode = 'client') {
   const IMG_H = 22
   const ROW_H = IMG_H + 10  // hauteur minimale par ligne
 
-  const tableHead = hasAnyImage
-    ? [['Désignation / Spécifications', 'Photo réf.', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']]
-    : [['Désignation / Spécifications', 'Qté', 'PU HT', `TVA ${taxRate}%`, 'Total TTC']]
+  const showTva = taxRate > 0
+  const puLabel = showTva ? 'PU HT' : 'PU TTC'
 
-  const tableBody = items.map(item => hasAnyImage
-    ? ['', '', item.quantity, fmtEur(item.unitPriceHT), fmtEur(item.tvaPart), fmtEur(item.totalTTC)]
-    : ['', item.quantity, fmtEur(item.unitPriceHT), fmtEur(item.tvaPart), fmtEur(item.totalTTC)]
-  )
+  const headRow = ['Désignation / Spécifications']
+  if (hasAnyImage) headRow.push('Photo réf.')
+  headRow.push('Qté', puLabel)
+  if (showTva) headRow.push(`TVA ${taxRate}%`)
+  headRow.push('Total TTC')
+  const tableHead = [headRow]
 
-  const colStyles = hasAnyImage
-    ? { 0: { cellWidth: 'auto' }, 1: { cellWidth: PHOTO_COL_W, halign: 'center' },
-        2: { cellWidth: 14, halign: 'center' }, 3: { cellWidth: 27, halign: 'right' },
-        4: { cellWidth: 22, halign: 'right' }, 5: { cellWidth: 30, halign: 'right', fontStyle: 'bold' } }
-    : { 0: { cellWidth: 'auto' }, 1: { cellWidth: 14, halign: 'center' },
-        2: { cellWidth: 27, halign: 'right' }, 3: { cellWidth: 22, halign: 'right' },
-        4: { cellWidth: 30, halign: 'right', fontStyle: 'bold' } }
+  const tableBody = items.map(item => {
+    const row = ['']
+    if (hasAnyImage) row.push('')
+    row.push(item.quantity, fmtEur(item.unitPriceHT))
+    if (showTva) row.push(fmtEur(item.tvaPart))
+    row.push(fmtEur(item.totalTTC))
+    return row
+  })
+
+  let ci = 0
+  const colStyles = {}
+  colStyles[ci++] = { cellWidth: 'auto' }
+  if (hasAnyImage) colStyles[ci++] = { cellWidth: PHOTO_COL_W, halign: 'center' }
+  colStyles[ci++] = { cellWidth: 14, halign: 'center' }
+  colStyles[ci++] = { cellWidth: 27, halign: 'right' }
+  if (showTva) colStyles[ci++] = { cellWidth: 22, halign: 'right' }
+  colStyles[ci++] = { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
 
   autoTable(doc, {
     startY: y,
