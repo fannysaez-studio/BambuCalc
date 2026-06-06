@@ -332,15 +332,17 @@
                 </td>
                 <td class="td-rdv-obj">{{ getObjectRdv(a) }}</td>
                 <td class="td-rdv-devis">
-                  <template v-if="linkedQuoteForRdv(a)">
-                    <span :class="['status-badge', 'status-' + (linkedQuoteForRdv(a).status || 'pending')]">
-                      #{{ linkedQuoteForRdv(a).quote_number }}
-                    </span>
-                  </template>
-                  <span v-else-if="linkedQuotes.length" class="rdv-devis-count">
-                    {{ linkedQuotes.length }} devis
-                  </span>
-                  <span v-else class="rdv-none">—</span>
+                  <select
+                    v-model="a.linked_quote_id"
+                    class="client-devis-select"
+                    :disabled="a.status === 'canceled'"
+                    @change="saveLinkedQuote(a)"
+                  >
+                    <option :value="null">— Aucun —</option>
+                    <option v-for="q in quotes" :key="q.id" :value="q.id">
+                      #{{ q.quote_number }}
+                    </option>
+                  </select>
                 </td>
               </tr>
             </tbody>
@@ -360,13 +362,18 @@
               </span>
             </div>
             <p v-if="getObjectRdv(a) !== '—'" class="rdv-mcard-obj">{{ getObjectRdv(a) }}</p>
-            <div v-if="linkedQuoteForRdv(a)" class="rdv-mcard-devis">
-              <span :class="['status-badge', 'status-' + (linkedQuoteForRdv(a).status || 'pending')]">
-                #{{ linkedQuoteForRdv(a).quote_number }}
-              </span>
-            </div>
-            <div v-else-if="linkedQuotes.length" class="rdv-mcard-devis">
-              <span class="rdv-devis-count">{{ linkedQuotes.length }} devis</span>
+            <div class="rdv-mcard-devis">
+              <select
+                v-model="a.linked_quote_id"
+                class="client-devis-select"
+                :disabled="a.status === 'canceled'"
+                @change="saveLinkedQuote(a)"
+              >
+                <option :value="null">— Aucun —</option>
+                <option v-for="q in quotes" :key="q.id" :value="q.id">
+                  #{{ q.quote_number }}
+                </option>
+              </select>
             </div>
           </div>
         </div>
@@ -711,6 +718,11 @@ const linkedQuotes = computed(() =>
 function linkedQuoteForRdv(a) {
   if (!a.linked_quote_id) return null
   return quotes.value.find(q => q.id === a.linked_quote_id) || null
+}
+
+async function saveLinkedQuote(a) {
+  const val = a.linked_quote_id || null
+  await supabase.from('appointments').update({ linked_quote_id: val }).eq('id', a.id)
 }
 
 // ── Onglets contextuels sidebar ──
@@ -1778,6 +1790,20 @@ async function linkAccount() {
 .td-rdv-devis { white-space: nowrap; }
 .rdv-none { color: #a0aec0; font-size: 0.72rem; }
 .rdv-devis-count { font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
+.client-devis-select {
+  padding: 0.28rem 0.4rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: #2d3748;
+  background: #fff;
+  cursor: pointer;
+  min-width: 110px;
+  max-width: 160px;
+}
+.client-devis-select:focus { outline: none; border-color: #2e9cab; }
+.client-devis-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .rdv-fmt-badge {
   display: inline-flex;
