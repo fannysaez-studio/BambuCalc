@@ -886,14 +886,15 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
 }
 
 /* Mode dual (étape 4 Pièces admin) */
 .content-area--dual {
   max-width: 940px;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 1rem;
 }
 .main-col {
@@ -914,8 +915,9 @@ export default {
   border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  max-height: calc(100dvh - 360px);
   overflow: hidden;
+  align-self: flex-start;
+  max-height: 100%;
 }
 .recap-aside-header {
   display: flex;
@@ -1051,8 +1053,8 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: calc(100dvh - 360px);
-  flex-shrink: 1;
+  flex: 1;
+  min-height: 0;
 }
 
 .step-card-header {
@@ -1310,7 +1312,6 @@ export default {
   }
 
   .step-card {
-    max-height: calc(100dvh - 360px);
     border-radius: 16px;
   }
 
