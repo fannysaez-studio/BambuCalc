@@ -50,6 +50,9 @@ router.beforeEach(async (to) => {
 
   if (to.name === 'maintenance') return
 
+  // Le calculateur est public — skip la vérification auth pour éviter tout blocage réseau
+  if (to.name === 'calculator-step') return
+
   let isAuth = false
   try {
     const { data } = await supabase.auth.getSession()

@@ -93,16 +93,19 @@
             </td>
 
             <td class="td-devis">
-              <div v-if="quotesByEmail[a.invitee_email]?.length" class="devis-list">
-                <button
-                  v-for="q in quotesByEmail[a.invitee_email]"
+              <select
+                v-model="a.linked_quote_id"
+                class="rdv-devis-select"
+                :disabled="a.status === 'canceled'"
+                @change="saveLinkedQuote(a)"
+              >
+                <option :value="null">— Aucun —</option>
+                <option
+                  v-for="q in (quotesByEmail[a.invitee_email] || [])"
                   :key="q.id"
-                  :class="['arch-status', `arch-status--${q.status || 'pending'}`]"
-                  :style="clientByEmail[a.invitee_email] ? '' : 'cursor:default;pointer-events:none'"
-                  @click="clientByEmail[a.invitee_email] && $emit('go-to-quotes', clientByEmail[a.invitee_email])"
-                >#{{ q.quote_number }}</button>
-              </div>
-              <span v-else class="devis-none">—</span>
+                  :value="q.id"
+                >#{{ q.quote_number }}</option>
+              </select>
             </td>
 
             <td class="td-object">
@@ -269,12 +272,13 @@ async function load() {
   loading.value = true
   const { data } = await supabase
     .from('appointments')
-    .select('id, event_name, invitee_name, invitee_email, start_at, end_at, status, presence, format, admin_note, raw, created_at')
+    .select('id, event_name, invitee_name, invitee_email, start_at, end_at, status, presence, format, admin_note, raw, created_at, linked_quote_id')
     .order('start_at', { ascending: false, nullsFirst: true })
   appointments.value = (data ?? []).map(a => ({
     ...a,
-    format:   a.format   ?? deriveFormat(a),
-    presence: a.presence ?? '',
+    format:          a.format          ?? deriveFormat(a),
+    presence:        a.presence        ?? '',
+    linked_quote_id: a.linked_quote_id ?? null,
   }))
   emit('count-change', appointments.value.filter(a => !isPast(a) && a.status === 'active').length)
   loading.value = false
@@ -345,6 +349,11 @@ async function saveNote(a, val) {
   await supabase.from('appointments').update({ admin_note: note }).eq('id', a.id)
 }
 
+async function saveLinkedQuote(a) {
+  const val = a.linked_quote_id || null
+  await supabase.from('appointments').update({ linked_quote_id: val }).eq('id', a.id)
+}
+
 onMounted(() => {
   load()
   broadcastChannel = supabase.channel('admin-appointments-bus').subscribe()
@@ -395,8 +404,16 @@ onUnmounted(() => {
 .td-duration { display: block; font-size: 0.7rem; color: #a0aec0; margin-top: 1px; }
 .td-email    { font-size: 0.72rem; max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .td-object   { font-size: 0.75rem; color: #4a5568; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.td-devis   { min-width: 90px; white-space: nowrap; }
-.devis-list { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 4px; }
+.td-devis   { min-width: 110px; }
+.rdv-devis-select {
+  padding: 0.26rem 0.32rem;
+  border: 1px solid #e2e8f0; border-radius: 7px;
+  font-size: 0.72rem; font-family: inherit; color: #2d3748;
+  background: #fff; cursor: pointer;
+  min-width: 110px; max-width: 150px;
+}
+.rdv-devis-select:focus { outline: none; border-color: #a78bfa; }
+.rdv-devis-select:disabled { opacity: 0.45; cursor: not-allowed; }
 .devis-none { color: #a0aec0; font-size: 0.72rem; }
 .td-format, .td-presence { white-space: nowrap; }
 
@@ -434,17 +451,19 @@ onUnmounted(() => {
 .rdv-select:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ── Note ── */
-.td-note { min-width: 100px; }
+.td-note { min-width: 120px; }
 .rdv-note-input {
-  width: 100%; max-width: 140px; border: 1px solid transparent;
-  border-radius: 6px; padding: 0.25rem 0.5rem;
+  width: 100%; max-width: 170px; border: 1px solid #e2e8f0;
+  border-radius: 6px; padding: 0.28rem 0.5rem;
   font-size: 0.75rem; font-family: inherit; color: #1b2f39;
-  background: transparent; transition: all 0.15s;
+  background: #f7fafc; transition: all 0.15s;
 }
+.rdv-note-input::placeholder { color: #a0aec0; }
+.rdv-note-input:hover { border-color: #cbd5e0; background: #fff; }
 .rdv-note-input:focus, .rdv-note-input--focus {
   outline: none; border-color: #2e9cab; background: #fff;
 }
-.rdv-note-input:disabled { color: #a0aec0; cursor: not-allowed; }
+.rdv-note-input:disabled { color: #a0aec0; cursor: not-allowed; background: transparent; border-color: transparent; }
 
 /* ── Actions ── */
 .td-actions { display: flex; justify-content: flex-end; align-items: center; gap: 0.2rem; white-space: nowrap; }

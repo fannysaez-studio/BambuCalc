@@ -332,14 +332,14 @@
                 </td>
                 <td class="td-rdv-obj">{{ getObjectRdv(a) }}</td>
                 <td class="td-rdv-devis">
-                  <template v-if="linkedQuotes.length">
-                    <span
-                      v-for="q in linkedQuotes"
-                      :key="q.id"
-                      :class="['status-badge', 'status-' + (q.status || 'pending')]"
-                      style="font-size:0.68rem"
-                    >#{{ q.quote_number }}</span>
+                  <template v-if="linkedQuoteForRdv(a)">
+                    <span :class="['status-badge', 'status-' + (linkedQuoteForRdv(a).status || 'pending')]">
+                      #{{ linkedQuoteForRdv(a).quote_number }}
+                    </span>
                   </template>
+                  <span v-else-if="linkedQuotes.length" class="rdv-devis-count">
+                    {{ linkedQuotes.length }} devis
+                  </span>
                   <span v-else class="rdv-none">—</span>
                 </td>
               </tr>
@@ -360,13 +360,13 @@
               </span>
             </div>
             <p v-if="getObjectRdv(a) !== '—'" class="rdv-mcard-obj">{{ getObjectRdv(a) }}</p>
-            <div v-if="linkedQuotes.length" class="rdv-mcard-devis">
-              <span
-                v-for="q in linkedQuotes"
-                :key="q.id"
-                :class="['status-badge', 'status-' + (q.status || 'pending')]"
-                style="font-size:0.68rem"
-              >#{{ q.quote_number }}</span>
+            <div v-if="linkedQuoteForRdv(a)" class="rdv-mcard-devis">
+              <span :class="['status-badge', 'status-' + (linkedQuoteForRdv(a).status || 'pending')]">
+                #{{ linkedQuoteForRdv(a).quote_number }}
+              </span>
+            </div>
+            <div v-else-if="linkedQuotes.length" class="rdv-mcard-devis">
+              <span class="rdv-devis-count">{{ linkedQuotes.length }} devis</span>
             </div>
           </div>
         </div>
@@ -708,6 +708,11 @@ const linkedQuotes = computed(() =>
   quotes.value.filter(q => !q.archived && q.client_email === userEmail.value)
 )
 
+function linkedQuoteForRdv(a) {
+  if (!a.linked_quote_id) return null
+  return quotes.value.find(q => q.id === a.linked_quote_id) || null
+}
+
 // ── Onglets contextuels sidebar ──
 const clientContextTabs = computed(() => [
   { id: 'quotes',  label: 'Mes devis',        icon: markRaw(FileText),  count: quotes.value.length },
@@ -759,7 +764,7 @@ async function loadAppointments(email) {
   loadingRdv.value = true
   const { data } = await supabase
     .from('appointments')
-    .select('id, event_name, invitee_name, start_at, end_at, status, format, raw')
+    .select('id, event_name, invitee_name, start_at, end_at, status, format, raw, linked_quote_id')
     .eq('invitee_email', email)
     .order('start_at', { ascending: false })
   appointments.value = (data ?? []).map(a => ({
@@ -1772,6 +1777,7 @@ async function linkAccount() {
 
 .td-rdv-devis { white-space: nowrap; }
 .rdv-none { color: #a0aec0; font-size: 0.72rem; }
+.rdv-devis-count { font-size: 0.72rem; color: #2e9cab; font-weight: 600; }
 
 .rdv-fmt-badge {
   display: inline-flex;
