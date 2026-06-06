@@ -152,6 +152,7 @@
               :costs="store.calculatedCosts"
               :sellingPrices="store.sellingPrices"
               :isAdmin="true"
+              :taxRate="Number(store.taxRate) || 0"
             />
 
           </template>
@@ -744,15 +745,26 @@ export default {
           total_cost: sp.totalTTC, cost_per_unit: sp.pricePerUnit,
           // Image rétrocompat (première pièce avec image)
           reference_image_url: s.pieces.find(p => p.referenceImageUrl)?.referenceImageUrl || null,
-          // Tableau complet des pièces
-          items: s.pieces.map(p => ({
-            id: p.id, name: p.name, quantity: p.quantity || 1,
-            weight: p.weight || 0, lossPercent: p.lossPercent || 5,
-            colorCount: p.colorCount || 1, purgeWaste: p.purgeWaste || 0,
-            materialId: p.materialId || null, material: p.material || '',
-            costPerKg: p.costPerKg || 0,
-            referenceImageUrl: p.referenceImageUrl || null,
-          })),
+          // Tableau complet des pièces — inclut les prix calculés pour la génération PDF
+          items: this.previewQuote.items.map((pi, idx) => {
+            const p = s.pieces[idx] || {}
+            return {
+              id: p.id || pi.id,
+              name: p.name || '',
+              quantity: pi.quantity || 1,
+              weight: pi.weight || 0,
+              lossPercent: p.lossPercent || 5,
+              colorCount: pi.colorCount || 1,
+              purgeWaste: p.purgeWaste || 0,
+              materialId: p.materialId || null,
+              material: p.material || '',
+              costPerKg: p.costPerKg || 0,
+              referenceImageUrl: p.referenceImageUrl || null,
+              unitPriceHT: pi.unitPriceHT || 0,
+              totalTTC: pi.totalTTC || 0,
+              tvaPart: pi.tvaPart || 0,
+            }
+          }),
         }
 
         let savedQuote
@@ -878,7 +890,7 @@ export default {
 .dot-icon  { width: 0.9rem; height: 0.9rem; }
 .dot-check { font-size: 0.78rem; font-weight: 700; }
 
-.step-label { font-size: 0.68rem; font-weight: 600; color: #a0aec0; text-align: center; white-space: nowrap; }
+.step-label { font-size: 0.65rem; font-weight: 600; color: #a0aec0; text-align: center; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .label-active { color: #2e9cab; font-weight: 700; }
 .label-done   { color: #1f7f97; }
 

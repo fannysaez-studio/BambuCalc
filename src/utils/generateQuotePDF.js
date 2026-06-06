@@ -90,7 +90,7 @@ async function loadImageDataUrl(url) {
 }
 
 async function _buildDoc(quote, mode = 'client') {
-  const taxRate = quote.tax_rate ?? 20
+  const taxRate = quote.tax_rate != null ? Number(quote.tax_rate) : 0
 
   // ── Construction des lignes (multi-pièces ou legacy) ─────────────
   let items
@@ -444,10 +444,8 @@ async function _buildDoc(quote, mode = 'client') {
   const totalsX = W - margin - 80
   const condWidth = totalsX - margin - 6
 
-  const totals = [
-    ['Sous-total HT', fmtEur(allTotalHT)],
-    [`TVA (${taxRate}%)`, fmtEur(allTotalTVA)],
-  ]
+  const totals = [['Sous-total HT', fmtEur(allTotalHT)]]
+  if (taxRate > 0) totals.push([`TVA (${taxRate}%)`, fmtEur(allTotalTVA)])
   if (quote.deposit_percent > 0) {
     const acompte = allTotalTTC * (quote.deposit_percent / 100)
     totals.push([`Acompte (${quote.deposit_percent}%)`, fmtEur(acompte)])

@@ -74,15 +74,15 @@
             <span>Sous-total HT</span>
             <span>{{ fmt(costs.subtotal) }}</span>
           </div>
-          <div class="recap-line">
-            <span>TVA (20 %)</span>
+          <div v-if="taxRate > 0" class="recap-line">
+            <span>TVA ({{ taxRate }} %)</span>
             <span>{{ fmt(costs.tax) }}</span>
           </div>
 
           <div class="recap-sep" />
 
           <div class="recap-line recap-line--cost">
-            <span>Revient TTC</span>
+            <span>{{ taxRate > 0 ? 'Revient TTC' : 'Coût total HT' }}</span>
             <span>{{ fmt(costs.totalCost) }}</span>
           </div>
           <div v-if="costs.quantity > 1" class="unit-line unit-line--muted">
@@ -100,8 +100,8 @@
             <span>Sous-total HT</span>
             <span>{{ fmt(sellingPrices.subtotalHT) }}</span>
           </div>
-          <div class="recap-line">
-            <span>TVA (20 %)</span>
+          <div v-if="taxRate > 0" class="recap-line">
+            <span>TVA ({{ taxRate }} %)</span>
             <span>{{ fmt(sellingPrices.tax) }}</span>
           </div>
 
@@ -131,6 +131,7 @@ export default {
   name: 'CostBreakdown',
   props: {
     isAdmin: { type: Boolean, default: true },
+    taxRate: { type: Number, default: 0 },
     costs: {
       type: Object,
       required: true,
