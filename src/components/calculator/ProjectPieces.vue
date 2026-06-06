@@ -212,13 +212,6 @@ export default {
         }))
     },
   },
-  watch: {
-    pieces(newPieces) {
-      newPieces.forEach(p => {
-        if (p.id && !this.expandedIds.includes(p.id)) this.expandedIds.push(p.id)
-      })
-    },
-  },
 
   async mounted() {
     this.loading = true

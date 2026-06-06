@@ -50,8 +50,13 @@ router.beforeEach(async (to) => {
 
   if (to.name === 'maintenance') return
 
-  const { data } = await supabase.auth.getSession()
-  const isAuth = !!data.session
+  let isAuth = false
+  try {
+    const { data } = await supabase.auth.getSession()
+    isAuth = !!data?.session
+  } catch {
+    // getSession() a échoué (réseau, token corrompu) — on laisse passer les routes non protégées
+  }
 
   if (isAuth && (to.name === 'login' || to.name === 'signup' || to.name === 'landing')) {
     const { data: isAdmin } = await supabase.rpc('is_admin')

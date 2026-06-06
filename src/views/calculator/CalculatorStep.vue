@@ -422,7 +422,7 @@ export default {
       const c   = s.calculatedCosts
       const sp  = s.sellingPrices
       const margin   = sp.margin / 100
-      const taxRate  = (Number(s.taxRate) || 20) / 100
+      const taxRate  = (s.taxRate != null ? Number(s.taxRate) : 0) / 100
       const coeff    = s.projectCoeff
       const overhead = c.equipmentCost + c.workCost + c.packagingCost
       const totalMat = c.materialCost || 0.001
@@ -642,7 +642,10 @@ export default {
         'Tarif sélectionné ✓',
       ]
       this.$refs.toast.show(messages[this.currentStep - 1] || 'Étape validée ✓', 'success', 2000)
-      this.$router.push(`/calculator/${this.currentStep + 1}`)
+      const nextStep = this.currentStep + 1
+      this.$router.push(`/calculator/${nextStep}`)
+        .then(failure => { if (failure) window.location.assign(`/calculator/${nextStep}`) })
+        .catch(() => { window.location.assign(`/calculator/${nextStep}`) })
     },
 
     goBack() {
