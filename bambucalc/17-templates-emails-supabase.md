@@ -683,6 +683,121 @@ Dans Supabase → Authentication → Email Templates :
 
 ---
 
+### 12. Méthode MFA ajoutée
+
+**Subject :** `Une double authentification a été activée sur votre compte — BambuCalc`
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>MFA ajoutée</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+
+        <tr>
+          <td style="background-color:#7961E9;padding:36px 40px;text-align:center;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 16px;">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l4 2.18V11c0 3.14-2.12 6.1-4 7.07C10.12 17.1 8 14.14 8 11V7.18L12 5zm0 3a1 1 0 00-1 1v3a1 1 0 002 0V9a1 1 0 00-1-1zm0 5a1 1 0 100 2 1 1 0 000-2z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            <p style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">BambuCalc</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:40px 40px 32px;">
+            <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#1a1a2e;">Double authentification activée</h1>
+            <p style="margin:0 0 12px;font-size:15px;color:#4a5568;line-height:1.6;">Une méthode d'authentification multifacteur (MFA) a été ajoutée à votre compte BambuCalc.</p>
+            <p style="margin:0 0 24px;font-size:15px;color:#4a5568;line-height:1.6;">Votre compte bénéficie désormais d'une couche de sécurité supplémentaire. Chaque connexion nécessitera une vérification via votre application d'authentification.</p>
+            <table cellpadding="0" cellspacing="0" style="width:100%;background-color:#f0fdf4;border-left:4px solid #27ae60;border-radius:0 8px 8px 0;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="margin:0;font-size:14px;color:#166534;line-height:1.5;"><strong>Bonne pratique :</strong> conservez vos codes de secours dans un endroit sûr en cas de perte d'accès à votre application d'authentification.</p>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;text-align:center;">Ce n'est pas vous ? Contactez-nous immédiatement et changez votre mot de passe.</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background-color:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #e8ecf0;">
+            <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">Fanny Saez — BambuCalc</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Outil de gestion pour prestataires d'impression 3D Bambu Lab</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+```
+
+---
+
+### 13. Méthode MFA supprimée
+
+**Subject :** `La double authentification a été désactivée sur votre compte — BambuCalc`
+
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>MFA supprimée</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f8;font-family:Arial,Helvetica,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f8;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+
+        <tr>
+          <td style="background-color:#7961E9;padding:36px 40px;text-align:center;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 16px;">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l4 2.18V11c0 3.14-2.12 6.1-4 7.07C10.12 17.1 8 14.14 8 11V7.18L12 5zm0 3a1 1 0 00-1 1v3a1 1 0 002 0V9a1 1 0 00-1-1zm0 5a1 1 0 100 2 1 1 0 000-2z" fill="rgba(255,255,255,0.9)"/>
+            </svg>
+            <p style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">BambuCalc</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:40px 40px 32px;">
+            <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#1a1a2e;">Double authentification désactivée</h1>
+            <p style="margin:0 0 12px;font-size:15px;color:#4a5568;line-height:1.6;">Une méthode d'authentification multifacteur (MFA) a été supprimée de votre compte BambuCalc.</p>
+            <p style="margin:0 0 24px;font-size:15px;color:#4a5568;line-height:1.6;">Si vous êtes à l'origine de cette action, votre compte n'est plus protégé par la double authentification.</p>
+            <table cellpadding="0" cellspacing="0" style="width:100%;background-color:#fff4e5;border-left:4px solid #ea6c0a;border-radius:0 8px 8px 0;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="margin:0;font-size:14px;color:#92400e;line-height:1.5;"><strong>Ce n'est pas vous ?</strong> Contactez-nous immédiatement, changez votre mot de passe et réactivez la double authentification.</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background-color:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #e8ecf0;">
+            <p style="margin:0 0 4px;font-size:13px;color:#6b7280;">Fanny Saez — BambuCalc</p>
+            <p style="margin:0;font-size:12px;color:#9ca3af;">Outil de gestion pour prestataires d'impression 3D Bambu Lab</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+```
+
+---
+
 ## Récapitulatif — où coller chaque template
 
 | # | Template Supabase | Subject à copier | Couleur |
@@ -698,5 +813,8 @@ Dans Supabase → Authentication → Email Templates :
 | 9 | Sécurité → Numéro de téléphone changé | `Votre numéro de téléphone a été modifié — BambuCalc` | Violet |
 | 10 | Sécurité → Méthode de connexion liée | `Une nouvelle méthode de connexion a été ajoutée — BambuCalc` | Violet |
 | 11 | Sécurité → Méthode de connexion supprimée | `Une méthode de connexion a été supprimée — BambuCalc` | Violet |
+| 12 | Sécurité → Méthode MFA ajoutée | `Une double authentification a été activée sur votre compte — BambuCalc` | Violet |
+| 13 | Sécurité → Méthode MFA supprimée | `La double authentification a été désactivée sur votre compte — BambuCalc` | Violet |
 
-> Quand tu auras un logo, remplace le bloc SVG imprimante par `<img src="URL_LOGO" width="48" height="48" alt="BambuCalc">` dans chaque header.
+> Quand tu auras un logo, remplace le bloc SVG bouclier par `<img src="URL_LOGO" width="48" height="48" alt="BambuCalc">` dans chaque header.
+> Ces 2 templates MFA ne se déclenchent que si le MFA est activé dans Supabase → Authentication → Sign In / MFA.
