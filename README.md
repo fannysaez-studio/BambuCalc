@@ -15,7 +15,9 @@
 
 ---
 
-## Documentation
+<div align="center">
+
+## Documentation complète
 
 | # | Page | Ce qu'on y trouve |
 |---|---|---|
@@ -33,6 +35,8 @@
 | 12 | [Notifications & Push](./bambucalc/12-notifications-push.md) | Notifs in-app Realtime + Web Push VAPID |
 | 13 | [RDV & Calendly](./bambucalc/13-rdv-calendly.md) | Webhook Calendly, table appointments, admin RdvTab |
 | 14 | [SEO & Méta](./bambucalc/14-seo-meta.md) | Titres, descriptions, OG, canonical pour les 16 pages |
+
+</div>
 
 ---
 
