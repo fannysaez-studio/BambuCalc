@@ -38,27 +38,6 @@ BambuCalc est une application web B2B permettant à un prestataire d'impression 
 
 ---
 
-## Architecture globale
-
-```
-Navigateur (Vue 3 SPA)
-  │
-  ├── Supabase JS SDK ──► Supabase Cloud (Frankfurt)
-  │     ├── auth.users          (authentification JWT)
-  │     ├── PostgreSQL (RLS)    (toutes les tables métier)
-  │     ├── Realtime            (notifications live)
-  │     └── Edge Functions      (10 fonctions Deno)
-  │           ├── Brevo         (emails devis, bienvenue, rappel)
-  │           ├── Resend        (email contact)
-  │           ├── Stripe        (PaymentIntent + webhook)
-  │           ├── Calendly      (webhook RDV)
-  │           └── VAPID         (push navigateur)
-  │
-  └── Netlify CDN              (build dist/ + headers HTTP)
-```
-
----
-
 ## Modèle utilisateur
 
 | Rôle | Obtenu comment | Ce qu'il peut faire |
