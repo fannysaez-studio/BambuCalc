@@ -120,4 +120,4 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_...
 
 ---
 
-**Dernière mise à jour** : 06 juin 2026 — Fanny Saez
+**Dernière mise à jour** : 07 juin 2026 — Fanny Saez

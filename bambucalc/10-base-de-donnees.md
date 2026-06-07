@@ -86,6 +86,9 @@ CREATE TABLE quotes (
   packaging_cost         numeric(10,2) DEFAULT 0,
   tax_rate               numeric(5,2) DEFAULT 20,
 
+  -- Pièces multiples (multi-pièces)
+  items                  jsonb DEFAULT '[]'::jsonb, -- tableau JSON des pièces (id, name, weight, material…)
+
   -- Production en série
   series_mode            boolean DEFAULT false,
   series_settings        jsonb,                    -- quantité, remise, rebut, setup…
@@ -199,6 +202,7 @@ CREATE TABLE appointments (
   start_at           timestamptz,
   end_at             timestamptz,
   status             text DEFAULT 'active' CHECK (status IN ('active', 'canceled')),
+  linked_quote_id    uuid REFERENCES quotes(id) ON DELETE SET NULL,  -- devis lié (optionnel)
   format             text,  -- 'online' | 'inperson' (rempli par l'admin)
   presence           text,  -- '' | 'present' | 'absent'
   admin_note         text,
@@ -212,7 +216,8 @@ CREATE TABLE appointments (
 
 **RLS** :
 - Admins : SELECT, UPDATE, DELETE sur tous les RDV
-- Clients : SELECT sur les RDV où `invitee_email = (SELECT email FROM profiles WHERE id = auth.uid())`
+- Clients : SELECT sur les RDV où `invitee_email = auth.email()`
+- Clients : UPDATE sur `linked_quote_id` uniquement (policy `client_update_linked_quote_id`)
 - INSERT uniquement via `service_role` (webhook Calendly)
 
 ---
@@ -304,6 +309,9 @@ CREATE TABLE contact_rate_limit (
 | `20260602000002_appointments_client_read.sql` | 02/06 | RLS clients lire leurs RDV |
 | `20260605000001_appointments_reminder_sent.sql` | 05/06 | Colonne reminder_sent |
 | `20260605000002_delete_own_account.sql` | 05/06 | Fonction delete_own_account() |
+| `20260606000001_quotes_items_column.sql` | 06/06 | Colonne items (jsonb) sur quotes — multi-pièces |
+| `20260606000002_appointments_linked_quote.sql` | 06/06 | Colonne linked_quote_id sur appointments |
+| `20260606000003_client_update_linked_quote.sql` | 06/06 | RLS client UPDATE linked_quote_id sur ses RDV |
 
 ---
 

@@ -24,6 +24,7 @@ npm run dev                  # → http://localhost:5173
 VITE_SUPABASE_URL=https://xxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJ...
 VITE_STRIPE_PUBLIC_KEY=pk_live_...   # pk_test_... en dev
+VITE_VAPID_PUBLIC_KEY=BM...          # générer via node scripts/generate-vapid.mjs
 ```
 
 ### Secrets backend

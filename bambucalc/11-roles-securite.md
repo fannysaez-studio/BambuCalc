@@ -94,8 +94,10 @@ La vérification admin est faite **deux fois** :
 
 | Opération | Client | Admin |
 |---|---|---|
-| SELECT | RDV où `invitee_email` = son email | Tous |
-| UPDATE/DELETE | ❌ | ✅ |
+| SELECT | RDV où `invitee_email = auth.email()` | Tous |
+| UPDATE `linked_quote_id` | ✅ sur ses propres RDV (`client_update_linked_quote_id`) | ✅ |
+| UPDATE (autres colonnes) | ❌ | ✅ |
+| DELETE | ❌ | ✅ |
 | INSERT | ❌ | Via `service_role` (webhook Calendly) |
 
 ### Table `email_settings`

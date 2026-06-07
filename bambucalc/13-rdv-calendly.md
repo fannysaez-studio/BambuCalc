@@ -85,7 +85,7 @@ La colonne `calendly_event_id` est `UNIQUE`. Si le webhook est reçu deux fois (
 | Date & Heure | Date formatée + heure en teal |
 | Client | Nom + durée du RDV |
 | Email | Lien cliquable → onglet Clients si client connu |
-| Devis liés | Badges statut cliquables → onglet Devis |
+| Devis lié | `<select>` des devis du client filtré par email → `saveLinkedQuote()` → UPDATE `linked_quote_id` |
 | Objet | Extrait du `event_name` ou `raw.name` |
 | Format | Select LED : En ligne (bleu) / Extérieur (vert) |
 | Présence | Select LED : À confirmer (gris/clignotant) / Présent (vert) / Absent (rouge) |
@@ -161,12 +161,13 @@ POST https://xxxx.supabase.co/functions/v1/remind-rdv
 
 Les clients voient leurs propres RDV grâce à la RLS :
 ```sql
-WHERE invitee_email = (SELECT email FROM profiles WHERE id = auth.uid())
+WHERE invitee_email = auth.email()
 ```
 
 Affichage :
 - Même structure de filtres (À venir / Passés / Annulés / Tous)
-- Lecture seule — le client ne peut pas modifier ses RDV
+- Colonne **Devis lié** : `<select>` des propres devis du client → `saveLinkedQuote()` → UPDATE `linked_quote_id`
+- Lecture seule pour les autres colonnes — le client ne peut pas modifier ses RDV
 - Lien CalendarPanel dans le hero bar pour réserver un nouveau RDV
 
 ---
