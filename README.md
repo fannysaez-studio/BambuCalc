@@ -65,7 +65,8 @@ Navigateur (Vue 3 SPA)
 | 13  | [RDV & Calendly](./bambucalc/13-rdv-calendly.md)             | Webhook Calendly, table appointments, admin RdvTab    |
 | 14  | [SEO & Méta](./bambucalc/14-seo-meta.md)                     | Titres, descriptions, OG, canonical pour les 16 pages |
 | 15  | [Tests](./bambucalc/15-tests.md)                             | Vitest (140 tests) + Playwright E2E (5 fichiers × 3 navigateurs) |
-| 16  | [Audit complet](./bambucalc/16-audit-complet.md)             | Vision A–Z : cadrage, BDD, sécurité, déploiement, RGPD |
+| 16  | [Audit complet](./bambucalc/16-audit-complet.md)             | Vision A–Z : cadrage, BDD, sécurité, déploiement, RGPD  |
+| 17  | [Templates emails Supabase](./bambucalc/17-templates-emails-supabase.md) | 11 templates HTML prêts à coller dans Supabase Auth |
 
 </div>
 
