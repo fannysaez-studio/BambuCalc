@@ -244,6 +244,6 @@ Ces meta ne changent pas selon la page — les autres sont gérées par `useHead
 
 <div align="center">
 
-**Précédent :** [← RDV & Calendly](./13-rdv-calendly.md) &nbsp;|&nbsp; **Suivant :** [Tests →](./15-tests.md) &nbsp;|&nbsp; **Retour à l'index :** [← README](../README.md)
+**Précédent :** [← RDV & Calendly](./13-rdv-calendly.md) &nbsp;|&nbsp; **Suivant :** [Tests →](./15-tests.md) &nbsp;
 
 </div>
