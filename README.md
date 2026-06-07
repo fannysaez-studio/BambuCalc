@@ -15,30 +15,7 @@
 
 ---
 
-## Vue d'ensemble
-
-BambuCalc est un outil SaaS complet développé par **Fanny Saez** pour gérer l'activité d'un prestataire d'impression 3D sur imprimantes Bambu Lab. Il couvre l'ensemble du flux métier : du calcul des coûts jusqu'au paiement, en passant par la gestion des RDV et les notifications temps réel.
-
-### Fonctionnalités principales
-
-| Domaine | Ce que ça fait |
-|---|---|
-| **Calculateur 5 étapes** | Calcule matière + machine + main d'œuvre + marge → devis en temps réel |
-| **Devis PDF** | Génération côté client via jsPDF, export professionnel avec coordonnées client |
-| **Dashboard client** | Mes devis / Mes RDV / Mon profil — avec stats et mode invité |
-| **Dashboard admin** | Clients, devis, emails, RDV, catalogue, statistiques, paramètres |
-| **Emails automatiques** | Devis (Brevo + PDF joint), bienvenue (Brevo), contact (Resend), rappel RDV (Brevo) |
-| **Paiements** | Stripe Payment Element (carte, Apple Pay, Google Pay), PayPal, virement, chèque, espèces |
-| **Rendez-vous** | Calendly intégré — booking page + webhook → BDD + notifications |
-| **Notifications in-app** | Cloche temps réel Supabase Realtime, lecture/suppression |
-| **Push web** | Notifications navigateur VAPID — nouveaux devis, statuts, RDV |
-| **Mode maintenance** | Activation par variable d'env, bypass par secret URL |
-| **SEO complet** | `useHead()` sur 16 pages, JSON-LD, sitemap.xml, canonical, OG/Twitter |
-| **Sécurité** | RLS PostgreSQL, JWT Edge Functions, CSP, HSTS, CORS restreint, rate limiting |
-
----
-
-## Documentation complète
+## Documentation
 
 | # | Page | Ce qu'on y trouve |
 |---|---|---|
@@ -75,48 +52,7 @@ VITE_SUPABASE_ANON_KEY=eyJ...
 VITE_STRIPE_PUBLIC_KEY=pk_test_...
 ```
 
----
-
-## Stack technique
-
-| Couche | Technologie | Rôle |
-|---|---|---|
-| **Frontend** | Vue 3.5 + Vite 8 | Framework UI + build |
-| **Routage** | Vue Router 5 | Navigation + guards auth/admin |
-| **État** | Pinia 3 | Store calculateur |
-| **Icons** | Lucide Vue Next | Icônes cohérentes |
-| **Head** | @vueuse/head | Meta SEO dynamiques |
-| **PDF** | jsPDF 4 + jspdf-autotable | Génération devis PDF côté client |
-| **Auth + DB** | Supabase (PostgreSQL) | Auth, RLS, Realtime, Storage |
-| **Serverless** | Supabase Edge Functions (Deno) | Emails, paiements, push, webhooks |
-| **Email devis** | Brevo | Devis + PDF joint, bienvenue, rappel RDV |
-| **Email contact** | Resend | Formulaire de contact |
-| **Paiements** | Stripe | Payment Element + webhook |
-| **RDV** | Calendly | Booking + webhook vers BDD |
-| **Push** | Web Push VAPID | Notifications navigateur |
-| **Hébergement** | Netlify | Frontend SPA + headers HTTP |
-| **Tests** | Vitest + Playwright | 140 tests unitaires + 5 fichiers E2E |
-
----
-
-## Performances Lighthouse (PageSpeed Insights)
-
-| | Performances | Accessibilité | Bonnes pratiques | SEO |
-|---|:---:|:---:|:---:|:---:|
-| Desktop | **100** | **100** | **100** | **100** |
-| Mobile | **99** | **100** | **100** | **100** |
-
-→ [Voir le rapport complet](./bambucalc/09-lighthouse.md)
-
----
-
-## Rôles utilisateurs
-
-| Rôle | Accès | Identification |
-|---|---|---|
-| **Visiteur** | Landing, calculateur, contact, /rdv | Non connecté |
-| **Client** | Dashboard + ses devis + ses RDV + profil | Connecté, non admin |
-| **Admin** | Tout — dashboard admin complet | Entrée dans table `admins` |
+→ [Variables complètes et secrets backend](./bambucalc/02-installation.md)
 
 ---
 
