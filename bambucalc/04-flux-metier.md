@@ -127,18 +127,7 @@ Côté serveur (en temps réel) :
     └── invitee.canceled → UPDATE appointments.status = 'canceled'
 ```
 
-### Rappel automatique 24h avant
-
-```
-remind-rdv (Edge Function — à déclencher via cron ou webhook)
-  → Requête appointments WHERE start_at BETWEEN +23h ET +25h
-                            AND status = 'active'
-                            AND reminder_sent = false
-  → Pour chaque RDV :
-      ├── Push navigateur au client (via push_subscriptions)
-      ├── Email Brevo "Votre RDV est demain"
-      └── PATCH appointments.reminder_sent = true
-```
+→ Détail du rappel automatique 24h : [RDV & Calendly → remind-rdv](./13-rdv-calendly.md)
 
 ---
 
