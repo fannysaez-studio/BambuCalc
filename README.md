@@ -1,3 +1,5 @@
+<div align="center">
+
 # BambuCalc
 
 > Application web B2B pour prestataires d'impression 3D **Bambu Lab** — calculateur de coûts, devis PDF, gestion clients, emails automatiques, paiements multi-méthodes, rendez-vous Calendly et notifications push.
@@ -12,6 +14,8 @@
 ![Calendly](https://img.shields.io/badge/Calendly-rdv-006BFF)
 ![Lighthouse](https://img.shields.io/badge/Lighthouse-100%20%2F%2099-00C853?logo=googlechrome&logoColor=white)
 ![Licence MIT](https://img.shields.io/badge/Licence-MIT-blue)
+
+</div>
 
 ---
 
@@ -40,6 +44,8 @@
 
 ---
 
+<div align="center">
+
 ## Démarrage rapide
 
 ```sh
@@ -61,3 +67,5 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_...
 ---
 
 **Dernière mise à jour** : 07 juin 2026 — Fanny Saez
+
+</div>
