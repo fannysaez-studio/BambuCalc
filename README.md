@@ -90,11 +90,11 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_...
 
 ---
 
+<div align="center">
+
 [Variables complètes et secrets backend](./bambucalc/02-installation.md)
 
 ---
-
-<div align="center">
 
 **Dernière mise à jour** : 07 juin 2026 — Fanny Saez
 
