@@ -14,20 +14,20 @@ serve(async (req) => {
   const SERVICE_KEY   = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
   const authHeader = req.headers.get('Authorization') ?? ''
   if (!authHeader.startsWith('Bearer ')) {
-    return errorResponse('Token d\'authentification requis', 401)
+    return errorResponse('Token d\'authentification requis', 401, req)
   }
   const userToken = authHeader.replace('Bearer ', '')
   const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${userToken}` },
   })
   if (!userRes.ok) {
-    return errorResponse('Token invalide ou session expirée', 401)
+    return errorResponse('Token invalide ou session expirée', 401, req)
   }
   // ──────────────────────────────────────────────────────────────
 
   try {
     const { email, firstName, lastName, appUrl = 'https://bambucalc.fr' } = await req.json()
-    if (!email) return errorResponse('No email', 400)
+    if (!email) return errorResponse('No email', 400, req)
 
     const displayName   = [firstName, lastName].filter(Boolean).join(' ') || 'là'
     const firstNameOnly = firstName || displayName
@@ -163,11 +163,11 @@ serve(async (req) => {
 
     if (!res.ok) {
       const body = await res.text()
-      return errorResponse(body, 500)
+      return errorResponse(body, 500, req)
     }
 
-    return jsonResponse({ ok: true })
+    return jsonResponse({ ok: true }, 200, req)
   } catch (err) {
-    return errorResponse(String(err), 500)
+    return errorResponse(String(err), 500, req)
   }
 })

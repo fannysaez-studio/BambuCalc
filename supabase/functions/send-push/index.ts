@@ -15,19 +15,19 @@ serve(async (req) => {
   // ── Authentification obligatoire ─────────────────────────────────────────
   const authHeader = req.headers.get('Authorization') ?? ''
   if (!authHeader.startsWith('Bearer ')) {
-    return errorResponse('Token d\'authentification requis', 401)
+    return errorResponse('Token d\'authentification requis', 401, req)
   }
   const userToken = authHeader.replace('Bearer ', '')
   const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${userToken}` },
   })
   if (!userRes.ok) {
-    return errorResponse('Token invalide ou session expirée', 401)
+    return errorResponse('Token invalide ou session expirée', 401, req)
   }
   // ─────────────────────────────────────────────────────────────────────────
 
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    return errorResponse('VAPID keys non configurées — ajoutez-les dans Supabase Secrets', 500)
+    return errorResponse('VAPID keys non configurées — ajoutez-les dans Supabase Secrets', 500, req)
   }
 
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
@@ -47,7 +47,7 @@ serve(async (req) => {
     const subs = await res.json()
 
     if (!Array.isArray(subs) || subs.length === 0) {
-      return jsonResponse({ ok: true, sent: 0, reason: 'no subscriptions' })
+      return jsonResponse({ ok: true, sent: 0, reason: 'no subscriptions' }, 200, req)
     }
 
     const payload = JSON.stringify({ title, body: message, url })
@@ -72,8 +72,8 @@ serve(async (req) => {
       }
     }
 
-    return jsonResponse({ ok: true, sent })
+    return jsonResponse({ ok: true, sent }, 200, req)
   } catch (err) {
-    return errorResponse(String(err), 500)
+    return errorResponse(String(err), 500, req)
   }
 })

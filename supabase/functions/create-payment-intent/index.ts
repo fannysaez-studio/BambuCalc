@@ -44,7 +44,7 @@ serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return handlePreflight(req)
 
   if (req.method !== 'POST') {
-    return errorResponse('Méthode non autorisée — seul POST est accepté', 405)
+    return errorResponse('Méthode non autorisée — seul POST est accepté', 405, req)
   }
 
   try {
@@ -53,7 +53,7 @@ serve(async (req: Request) => {
 
     if (!authHeader.startsWith('Bearer ')) {
       console.error('[AUTH] Header Authorization absent ou mal formé')
-      return errorResponse('Token d\'authentification requis', 401)
+      return errorResponse('Token d\'authentification requis', 401, req)
     }
 
     const userToken = authHeader.replace('Bearer ', '')
@@ -68,7 +68,7 @@ serve(async (req: Request) => {
 
     if (!userRes.ok) {
       console.error('[AUTH] Token rejeté par Supabase — HTTP:', userRes.status)
-      return errorResponse('Token invalide ou session expirée', 401)
+      return errorResponse('Token invalide ou session expirée', 401, req)
     }
 
     const user = await userRes.json()
@@ -80,13 +80,13 @@ serve(async (req: Request) => {
     try {
       body = await req.json()
     } catch {
-      return errorResponse('Body JSON invalide')
+      return errorResponse('Body JSON invalide', 400, req)
     }
 
     const { quoteId, currency = 'eur' } = body
 
     if (!quoteId) {
-      return errorResponse('Paramètre requis manquant : quoteId')
+      return errorResponse('Paramètre requis manquant : quoteId', 400, req)
     }
 
     // ── Étape 3 : Récupérer le devis depuis la BDD ───────────────────────────
@@ -106,7 +106,7 @@ serve(async (req: Request) => {
 
     if (!Array.isArray(quotes) || quotes.length === 0) {
       console.error('[SECURITY] Devis introuvable ou accès refusé — quoteId:', quoteId, '— userId:', user.id)
-      return errorResponse('Devis introuvable ou accès non autorisé', 403)
+      return errorResponse('Devis introuvable ou accès non autorisé', 403, req)
     }
 
     const quote = quotes[0]
@@ -114,7 +114,7 @@ serve(async (req: Request) => {
 
     // Bloquer si le devis est déjà payé
     if (quote.payment_status === 'paid') {
-      return errorResponse('Ce devis a déjà été réglé', 409)
+      return errorResponse('Ce devis a déjà été réglé', 409, req)
     }
 
     // ── Étape 4 : Créer le PaymentIntent chez Stripe ─────────────────────────
@@ -122,7 +122,7 @@ serve(async (req: Request) => {
     const amountInCents = Math.round((quote.total_cost ?? 0) * 100)
 
     if (amountInCents <= 0) {
-      return errorResponse('Le montant du devis est invalide (doit être > 0)', 422)
+      return errorResponse('Le montant du devis est invalide (doit être > 0)', 422, req)
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -173,11 +173,11 @@ serve(async (req: Request) => {
     return jsonResponse({
       clientSecret: paymentIntent.client_secret,
       intentId:     paymentIntent.id,
-    })
+    }, 200, req)
 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err)
     console.error('[ERROR] create-payment-intent — exception non catchée:', message)
-    return errorResponse('Erreur interne du serveur', 500)
+    return errorResponse('Erreur interne du serveur', 500, req)
   }
 })

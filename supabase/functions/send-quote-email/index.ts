@@ -103,14 +103,14 @@ serve(async (req) => {
   // ── Authentification obligatoire ──────────────────────────────
   const authHeader = req.headers.get('Authorization') ?? ''
   if (!authHeader.startsWith('Bearer ')) {
-    return errorResponse('Token d\'authentification requis', 401)
+    return errorResponse('Token d\'authentification requis', 401, req)
   }
   const userToken = authHeader.replace('Bearer ', '')
   const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${userToken}` },
   })
   if (!userRes.ok) {
-    return errorResponse('Token invalide ou session expirée', 401)
+    return errorResponse('Token invalide ou session expirée', 401, req)
   }
   // ──────────────────────────────────────────────────────────────
 
@@ -128,7 +128,7 @@ serve(async (req) => {
   if (!BREVO_API_KEY) {
     const msg = 'BREVO_API_KEY vide — ajoutez le secret dans le dashboard Supabase puis redéployez'
     console.log('[ERREUR FATALE]', msg)
-    return errorResponse(msg, 500)
+    return errorResponse(msg, 500, req)
   }
 
   try {
@@ -142,7 +142,7 @@ serve(async (req) => {
 
     if (!quote) {
       console.log('[ERREUR] Champ "quote" absent du body')
-      return errorResponse('No quote data', 400)
+      return errorResponse('No quote data', 400, req)
     }
 
     // ── LOG 4 : Informations devis & PDF ─────────────────────────
@@ -367,11 +367,11 @@ serve(async (req) => {
     console.log('[SUCCÈS] tous les emails ont été acceptés par Brevo')
     console.log('═══════════════════════════════════════════════')
 
-    return jsonResponse({ ok: true })
+    return jsonResponse({ ok: true }, 200, req)
 
   } catch (err) {
     console.log('[ERREUR FATALE]', String(err))
     console.log('═══════════════════════════════════════════════')
-    return errorResponse(String(err), 500)
+    return errorResponse(String(err), 500, req)
   }
 })
