@@ -67,6 +67,7 @@ Navigateur (Vue 3 SPA)
 | 15  | [Tests](./bambucalc/15-tests.md)                             | Vitest (140 tests) + Playwright E2E (5 fichiers × 3 navigateurs) |
 | 16  | [Audit complet](./bambucalc/16-audit-complet.md)             | Vision A–Z : cadrage, BDD, sécurité, déploiement, RGPD  |
 | 17  | [Templates emails Supabase](./bambucalc/17-templates-emails-supabase.md) | 11 templates HTML prêts à coller dans Supabase Auth |
+| 18  | [Stripe + PayPal](./bambucalc/18-stripe-paypal.md)           | Guide complet : clés API, webhook, PayPal, test, prod |
 
 </div>
 
@@ -99,6 +100,6 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_...
 
 ---
 
-**Dernière mise à jour** : 07 juin 2026 — Fanny Saez
+**Dernière mise à jour** : 17 juin 2026 — Fanny Saez
 
 </div>
