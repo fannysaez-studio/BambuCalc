@@ -89,10 +89,28 @@ serve(async (req: Request) => {
       return errorResponse('Paramètre requis manquant : quoteId', 400, req)
     }
 
-    // ── Étape 3 : Récupérer le devis depuis la BDD ───────────────────────────
+    // ── Étape 3 : Vérifier si l'utilisateur est admin ─────────────────────────
+    const adminRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/admins?user_id=eq.${user.id}&select=user_id`,
+      {
+        headers: {
+          apikey:        SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`,
+        },
+      }
+    )
+    const admins = await adminRes.json()
+    const isAdmin = Array.isArray(admins) && admins.length > 0
+
+    // ── Étape 4 : Récupérer le devis depuis la BDD ───────────────────────────
     // Le montant provient de la BDD — jamais du front (sécurité anti-manipulation)
+    // Admin : accès à tous les devis — Client : uniquement ses propres devis
+    const quoteFilter = isAdmin
+      ? `id=eq.${quoteId}`
+      : `id=eq.${quoteId}&user_id=eq.${user.id}`
+
     const quoteRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/quotes?id=eq.${quoteId}&user_id=eq.${user.id}&select=id,total_cost,project_name,payment_status`,
+      `${SUPABASE_URL}/rest/v1/quotes?${quoteFilter}&select=id,total_cost,project_name,payment_status`,
       {
         headers: {
           apikey:        SERVICE_KEY,
