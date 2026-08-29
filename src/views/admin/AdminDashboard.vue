@@ -623,6 +623,7 @@ watch(activeTab, (val) => {
 
 onUnmounted(() => navStore.clearContext())
 
+// ── Initialisation : on lit uniquement l'email Supabase, indépendant du profil client ──
 ;(async () => {
   const { data, error } = await supabase.auth.getUser()
   if (error || !data.user) {
@@ -630,9 +631,7 @@ onUnmounted(() => navStore.clearContext())
     return
   }
   currentUserId.value = data.user.id
-  const meta = data.user.user_metadata || {}
-  const full = meta.full_name || meta.name || ''
-  displayName.value = full.split(' ')[0] || data.user.email?.split('@')[0] || ''
+  displayName.value = 'Administrateur'
 })()
 
 let lockScrollFn = null
@@ -767,4 +766,3 @@ async function sendQuote() {
 
 
 <style src="@/styles/admin-dashboard.css"></style>
-
