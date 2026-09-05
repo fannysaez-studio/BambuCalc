@@ -210,7 +210,6 @@ import { useRoute } from 'vue-router'
 import {
   Home,
   ShieldCheck,
-  _User,
   LogIn,
   LogOut,
   Mail,
