@@ -1,10 +1,15 @@
 <template>
   <!-- Desktop / tablette : sidebar verticale collapsible -->
   <nav v-if="showNav" :class="['nav-sidebar', sidebarOpen && 'nav-sidebar--open']">
-
     <!-- ── En-tête fixe : logo BambuCalc ── -->
     <div class="sidebar-logo">
-      <img src="/assets/icons/icon.svg" class="sidebar-logo-img" alt="BambuCalc" width="32" height="32" />
+      <img
+        src="/assets/icons/icon.svg"
+        class="sidebar-logo-img"
+        alt="BambuCalc"
+        width="32"
+        height="32"
+      />
       <span class="sidebar-label sidebar-logo-name">BambuCalc</span>
     </div>
     <div class="sidebar-logo-sep" />
@@ -28,17 +33,31 @@
         <span class="sidebar-label">Accueil</span>
       </router-link>
 
-      <router-link to="/contact" class="sidebar-item" :class="{ 'sidebar-item--on': isActive(['/contact']) }">
+      <router-link
+        to="/contact"
+        class="sidebar-item"
+        :class="{ 'sidebar-item--on': isActive(['/contact']) }"
+      >
         <span class="sidebar-icon-wrap"><Mail :size="16" /></span>
         <span class="sidebar-label">Contact</span>
       </router-link>
 
-      <router-link v-if="isAdminUser" to="/admin" class="sidebar-item sidebar-item--admin" :class="{ 'sidebar-item--on': isActive(['/admin']) }">
+      <router-link
+        v-if="isAdminUser"
+        to="/admin"
+        class="sidebar-item sidebar-item--admin"
+        :class="{ 'sidebar-item--on': isActive(['/admin']) }"
+      >
         <span class="sidebar-icon-wrap"><ShieldCheck :size="16" /></span>
         <span class="sidebar-label">Admin</span>
       </router-link>
 
-      <router-link v-if="isAuth" to="/dashboard" class="sidebar-item" :class="{ 'sidebar-item--on': isActive(['/dashboard', '/profile']) }">
+      <router-link
+        v-if="isAuth"
+        to="/dashboard"
+        class="sidebar-item"
+        :class="{ 'sidebar-item--on': isActive(['/dashboard', '/profile']) }"
+      >
         <span class="sidebar-icon-wrap"><LayoutGrid :size="16" /></span>
         <span class="sidebar-label">{{ displayName || 'Dashboard' }}</span>
       </router-link>
@@ -52,8 +71,7 @@
     <!-- ── Onglets contextuels scrollables (admin / client) ── -->
     <div v-if="navStore.contextTabs.length" class="sidebar-ctx-scroll">
       <div class="sidebar-ctx-sep" />
-      <template v-for="(tab, i) in navStore.contextTabs" :key="tab.id ?? ('sep-' + i)">
-
+      <template v-for="(tab, i) in navStore.contextTabs" :key="tab.id ?? 'sep-' + i">
         <div v-if="tab.separator" class="sidebar-ctx-line" />
 
         <template v-else-if="tab.group">
@@ -65,11 +83,18 @@
             <span class="sidebar-icon-wrap"><component :is="tab.icon" :size="15" /></span>
             <span class="sidebar-label">{{ tab.label }}</span>
             <span v-if="tab.count > 0" class="sidebar-ctx-count">{{ tab.count }}</span>
-            <ChevronRight :size="10" :class="['sidebar-group-chevron', expandedGroups.has(tab.id) && 'sidebar-group-chevron--open']" />
+            <ChevronRight
+              :size="10"
+              :class="[
+                'sidebar-group-chevron',
+                expandedGroups.has(tab.id) && 'sidebar-group-chevron--open',
+              ]"
+            />
           </button>
           <template v-if="sidebarOpen && expandedGroups.has(tab.id)">
             <button
-              v-for="child in tab.children" :key="child.id"
+              v-for="child in tab.children"
+              :key="child.id"
               class="sidebar-item sidebar-item--ctx sidebar-item--child"
               :class="{ 'sidebar-item--on': navStore.activeContextTab === child.id }"
               @click="navStore.setActiveTab(child.id)"
@@ -91,7 +116,6 @@
           <span class="sidebar-label">{{ tab.label }}</span>
           <span v-if="tab.count > 0" class="sidebar-ctx-count">{{ tab.count }}</span>
         </button>
-
       </template>
     </div>
 
@@ -116,21 +140,22 @@
 
       <div class="sidebar-sep" />
 
-      <button class="sidebar-toggle" @click="toggleSidebar" :title="sidebarOpen ? 'Réduire' : 'Développer'">
-        <ChevronRight :size="13" :class="['sidebar-toggle-chevron', sidebarOpen && 'sidebar-toggle-chevron--open']" />
+      <button
+        class="sidebar-toggle"
+        @click="toggleSidebar"
+        :title="sidebarOpen ? 'Réduire' : 'Développer'"
+      >
+        <ChevronRight
+          :size="13"
+          :class="['sidebar-toggle-chevron', sidebarOpen && 'sidebar-toggle-chevron--open']"
+        />
       </button>
     </div>
-
   </nav>
 
   <!-- Mobile : bottom tab bar (inchangée) -->
   <nav v-if="showNav" class="nav-bar">
-
-    <router-link
-      to="/"
-      class="nav-bar-item"
-      :class="{ 'nav-bar-item--on': route.path === '/' }"
-    >
+    <router-link to="/" class="nav-bar-item" :class="{ 'nav-bar-item--on': route.path === '/' }">
       <Home :size="21" />
       <span>Accueil</span>
     </router-link>
@@ -164,11 +189,7 @@
       <span>Dashboard</span>
     </router-link>
 
-    <router-link
-      v-if="!isAuth"
-      to="/login"
-      class="nav-bar-item"
-    >
+    <router-link v-if="!isAuth" to="/login" class="nav-bar-item">
       <LogIn :size="21" />
       <span>Connexion</span>
     </router-link>
@@ -176,22 +197,27 @@
     <!-- RDV : admin uniquement dans la nav mobile -->
     <CalendarPanel v-if="isAdminUser" :tab="true" />
 
-    <button
-      v-if="isAuth"
-      class="nav-bar-item nav-bar-item--logout"
-      @click="handleLogout"
-    >
+    <button v-if="isAuth" class="nav-bar-item nav-bar-item--logout" @click="handleLogout">
       <LogOut :size="21" />
       <span>Déco.</span>
     </button>
-
   </nav>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { Home, ShieldCheck, User, LogIn, LogOut, Mail, LayoutGrid, ChevronRight, Search } from 'lucide-vue-next'
+import {
+  Home,
+  ShieldCheck,
+  _User,
+  LogIn,
+  LogOut,
+  Mail,
+  LayoutGrid,
+  ChevronRight,
+  Search,
+} from 'lucide-vue-next'
 import NotificationBell from '@/components/ui/NotificationBell.vue'
 import CalendarPanel from '@/components/ui/CalendarPanel.vue'
 import { useNavigationStore } from '@/stores/navigation'
@@ -199,11 +225,11 @@ import { useNavigationStore } from '@/stores/navigation'
 const navStore = useNavigationStore()
 
 defineProps({
-  isAuth:       { type: Boolean, default: false },
-  isAdminUser:  { type: Boolean, default: false },
-  displayName:  { type: String,  default: '' },
-  userInitials: { type: String,  default: '' },
-  userAvatar:   { type: String,  default: '' },
+  isAuth: { type: Boolean, default: false },
+  isAdminUser: { type: Boolean, default: false },
+  displayName: { type: String, default: '' },
+  userInitials: { type: String, default: '' },
+  userAvatar: { type: String, default: '' },
 })
 
 const emit = defineEmits(['logout'])
@@ -239,29 +265,56 @@ function toggleGroup(id) {
     return
   }
   const next = new Set(expandedGroups.value)
-  next.has(id) ? next.delete(id) : next.add(id)
+  if (next.has(id)) {
+    next.delete(id)
+  } else {
+    next.add(id)
+  }
   expandedGroups.value = next
 }
 
 function isGroupActive(tab) {
-  return tab.children?.some(c => c.id === navStore.activeContextTab)
+  return tab.children?.some((c) => c.id === navStore.activeContextTab)
 }
 
 // Auto-expand le groupe qui contient l'onglet actif
-watch(() => navStore.activeContextTab, (activeId) => {
-  for (const tab of navStore.contextTabs) {
-    if (tab.group && tab.children?.some(c => c.id === activeId)) {
-      expandedGroups.value = new Set([...expandedGroups.value, tab.id])
+watch(
+  () => navStore.activeContextTab,
+  (activeId) => {
+    for (const tab of navStore.contextTabs) {
+      if (tab.group && tab.children?.some((c) => c.id === activeId)) {
+        expandedGroups.value = new Set([...expandedGroups.value, tab.id])
+      }
     }
-  }
-}, { immediate: true })
-
-const showNav = computed(() =>
-  !!route.name && !['landing', 'login', 'signup', 'reset-password', 'privacy', 'mentions-legales', 'contact', 'rdv', 'not-found', 'forbidden', 'maintenance', 'calculator-step'].includes(route.name)
+  },
+  { immediate: true },
 )
 
-function handleLogout() { emit('logout') }
-function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
+const showNav = computed(
+  () =>
+    !!route.name &&
+    ![
+      'landing',
+      'login',
+      'signup',
+      'reset-password',
+      'privacy',
+      'mentions-legales',
+      'contact',
+      'rdv',
+      'not-found',
+      'forbidden',
+      'maintenance',
+      'calculator-step',
+    ].includes(route.name),
+)
+
+function handleLogout() {
+  emit('logout')
+}
+function isActive(paths) {
+  return paths.some((p) => route.path.startsWith(p))
+}
 </script>
 
 <style scoped>
@@ -281,8 +334,10 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(20px) saturate(1.6);
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
-  border-right: 1px solid rgba(255, 255, 255, 0.70);
-  box-shadow: 2px 0 20px rgba(0, 0, 0, 0.08), inset -1px 0 0 rgba(0, 0, 0, 0.04);
+  border-right: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    2px 0 20px rgba(0, 0, 0, 0.08),
+    inset -1px 0 0 rgba(0, 0, 0, 0.04);
   border-radius: 0 16px 16px 0;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
@@ -301,7 +356,9 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   padding: 1.2rem 0 0.9rem calc((60px - 1.9rem) / 2);
   gap: 0;
   flex-shrink: 0;
-  transition: padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    padding-left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    gap 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-sidebar--open .sidebar-logo {
@@ -380,13 +437,17 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   opacity: 0;
   overflow: hidden;
   white-space: nowrap;
-  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+  transition:
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
 }
 
 .nav-sidebar--open .sidebar-logo-name {
   max-width: 120px;
   opacity: 1;
-  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease 0.12s;
+  transition:
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease 0.12s;
 }
 
 .sidebar-logo-sep {
@@ -435,7 +496,7 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 
 .sidebar-item--on {
   color: #2e9cab !important;
-  background: rgba(46, 156, 171, 0.10);
+  background: rgba(46, 156, 171, 0.1);
 }
 
 /* Indicateur actif — barre gauche */
@@ -458,7 +519,7 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 /* Admin — accent violet pour correspondre au thème admin */
 .sidebar-item--admin.sidebar-item--on {
   color: #7c3aed !important;
-  background: rgba(124, 58, 237, 0.10);
+  background: rgba(124, 58, 237, 0.1);
 }
 .sidebar-item--admin.sidebar-item--on::after {
   background: #7c3aed;
@@ -512,7 +573,9 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   scrollbar-width: none;
   padding-bottom: 0.25rem;
 }
-.sidebar-ctx-scroll::-webkit-scrollbar { display: none; }
+.sidebar-ctx-scroll::-webkit-scrollbar {
+  display: none;
+}
 
 /* ── Pied fixe ── */
 .sidebar-bottom {
@@ -596,7 +659,10 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   opacity: 0;
   max-width: 0;
   overflow: hidden;
-  transition: opacity 0.15s ease, max-width 0.25s ease, transform 0.25s ease;
+  transition:
+    opacity 0.15s ease,
+    max-width 0.25s ease,
+    transform 0.25s ease;
 }
 
 .nav-sidebar--open .sidebar-group-chevron {
@@ -637,13 +703,17 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   max-width: 0;
   overflow: hidden;
   opacity: 0;
-  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.15s ease;
+  transition:
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.15s ease;
 }
 
 .nav-sidebar--open .sidebar-ctx-count {
   max-width: 40px;
   opacity: 1;
-  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease 0.12s;
+  transition:
+    max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease 0.12s;
 }
 
 .sidebar-item--on .sidebar-ctx-count {
@@ -736,7 +806,9 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   cursor: pointer;
   font-family: Inter, 'Segoe UI', Arial, sans-serif;
   padding: 0 0.25rem;
-  transition: color 0.18s ease, background 0.18s ease;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
   -webkit-tap-highlight-color: transparent;
   position: relative;
 }
@@ -749,8 +821,12 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   line-height: 1;
 }
 
-.nav-bar-item:hover { color: #2e9cab; }
-.nav-bar-item--on   { color: #2e9cab; }
+.nav-bar-item:hover {
+  color: #2e9cab;
+}
+.nav-bar-item--on {
+  color: #2e9cab;
+}
 
 .nav-bar-item--on::before {
   content: '';
@@ -763,7 +839,9 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   background: #2e9cab;
 }
 
-.nav-bar-item--logout:hover { color: #dc2626; }
+.nav-bar-item--logout:hover {
+  color: #dc2626;
+}
 
 /* ── CalendarPanel dans la nav bar mobile ── */
 .nav-bar :deep(.cal-wrap) {
@@ -791,7 +869,9 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
   position: relative;
   -webkit-tap-highlight-color: transparent;
 }
-.nav-bar :deep(.cal-btn--tab):hover { color: #2e9cab; }
+.nav-bar :deep(.cal-btn--tab):hover {
+  color: #2e9cab;
+}
 .nav-bar :deep(.cal-badge--dot) {
   position: absolute;
   top: 6px;
@@ -804,11 +884,17 @@ function isActive(paths) { return paths.some(p => route.path.startsWith(p)) }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .nav-sidebar { display: none !important; }
-  .nav-bar     { display: flex; }
+  .nav-sidebar {
+    display: none !important;
+  }
+  .nav-bar {
+    display: flex;
+  }
 }
 
 @media (max-width: 380px) {
-  .nav-bar-item span { font-size: 0.5rem; }
+  .nav-bar-item span {
+    font-size: 0.5rem;
+  }
 }
 </style>

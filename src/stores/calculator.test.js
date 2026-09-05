@@ -272,7 +272,7 @@ describe('resetForNewQuote', () => {
 
   it('génère un nouveau numéro de devis', () => {
     const store = useCalculatorStore()
-    const before = store.quoteNumber
+    const _before = store.quoteNumber
     store.resetForNewQuote()
     expect(store.quoteNumber).toMatch(/^DEV-\d{8}-\d{3}$/)
   })

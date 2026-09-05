@@ -301,12 +301,12 @@ const allTotalHT = computed(() =>
 const allTotalTVA = computed(() => allTotalTTC.value - allTotalHT.value)
 
 // Gardés pour compatibilité avec d-internal (mode admin)
-const unitPriceHT = computed(() =>
+const _unitPriceHT = computed(() =>
   (q.value.cost_per_unit || 0) / (1 + taxRate.value / 100)
 )
-const totalTVA = computed(() => allTotalTVA.value)
+const _totalTVA = computed(() => allTotalTVA.value)
 
-const specParts = computed(() => {
+const _specParts = computed(() => {
   const printTime = q.value.print_hours || q.value.print_minutes
     ? `${q.value.print_hours || 0}h${String(q.value.print_minutes || 0).padStart(2, '0')}`
     : null

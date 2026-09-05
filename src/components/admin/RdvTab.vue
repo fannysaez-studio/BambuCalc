@@ -198,8 +198,8 @@ const noteRefs = ref({})
 
 const selectedIds = reactive(new Set())
 const allSelected = computed(() => filtered.value.length > 0 && filtered.value.every(a => selectedIds.has(a.id)))
-function toggleAll() { allSelected.value ? filtered.value.forEach(a => selectedIds.delete(a.id)) : filtered.value.forEach(a => selectedIds.add(a.id)) }
-function toggleOne(id) { selectedIds.has(id) ? selectedIds.delete(id) : selectedIds.add(id) }
+function toggleAll() { if (allSelected.value) { filtered.value.forEach(a => selectedIds.delete(a.id)) } else { filtered.value.forEach(a => selectedIds.add(a.id)) } }
+function toggleOne(id) { if (selectedIds.has(id)) { selectedIds.delete(id) } else { selectedIds.add(id) } }
 
 async function deleteSelected() {
   const ids = [...selectedIds]

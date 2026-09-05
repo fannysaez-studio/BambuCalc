@@ -26,9 +26,15 @@ export default defineConfig([
   js.configs.recommended,
   ...pluginVue.configs['flat/essential'],
 
+  // ── Playwright e2e : environnement Node ──
   {
     ...pluginPlaywright.configs['flat/recommended'],
     files: ['e2e/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
   },
 
   {
@@ -36,7 +42,49 @@ export default defineConfig([
     files: ['src/**/__tests__/*'],
   },
 
+  // ── Scripts Node (generate-vapid, test-push, etc.) ──
+  {
+    files: ['scripts/**/*.{js,mjs}', 'test-push.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
+  // ── Service Worker ──
+  {
+    files: ['public/sw.js'],
+    languageOptions: {
+      globals: {
+        ...globals.serviceworker,
+      },
+    },
+  },
+
+  // ── Vues/pages : noms mono-mot acceptés ──
+  {
+    files: ['src/views/**/*.vue', 'src/components/**/*.vue'],
+    rules: {
+      'vue/multi-word-component-names': 'off',
+    },
+  },
+
   ...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json'),
+
+  // ── Override no-unused-vars APRÈS tous les plugins ──
+  {
+    rules: {
+      'no-unused-vars': ['error', {
+        vars: 'all',
+        args: 'after-used',
+        ignoreRestSiblings: true,
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+      }],
+    },
+  },
 
   skipFormatting,
 ])

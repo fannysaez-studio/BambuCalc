@@ -498,7 +498,7 @@ import {
   Bell,
   BellOff,
   Plus,
-  LayoutDashboard,
+  _LayoutDashboard,
 } from 'lucide-vue-next'
 
 useHead({

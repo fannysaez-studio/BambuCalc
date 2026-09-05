@@ -122,6 +122,6 @@ test.describe('Calculateur — structure et navigation', () => {
 
   test('étape 4 — pas de bouton "Suivant →" (dernière étape)', async ({ page }) => {
     await page.goto('/calculator/4')
-    await expect(page.getByRole('button', { name: 'Suivant →' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'Suivant →' })).toBeHidden()
   })
 })

@@ -297,14 +297,14 @@ async function _buildDoc(quote, mode = 'client') {
     return row
   })
 
-  let ci = 0
+  let _ci = 0
   const colStyles = {}
-  colStyles[ci++] = { cellWidth: 'auto' }
-  if (hasAnyImage) colStyles[ci++] = { cellWidth: PHOTO_COL_W, halign: 'center' }
-  colStyles[ci++] = { cellWidth: 14, halign: 'center' }
-  colStyles[ci++] = { cellWidth: 27, halign: 'right' }
-  if (showTva) colStyles[ci++] = { cellWidth: 22, halign: 'right' }
-  colStyles[ci++] = { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
+  colStyles[_ci++] = { cellWidth: 'auto' }
+  if (hasAnyImage) colStyles[_ci++] = { cellWidth: PHOTO_COL_W, halign: 'center' }
+  colStyles[_ci++] = { cellWidth: 14, halign: 'center' }
+  colStyles[_ci++] = { cellWidth: 27, halign: 'right' }
+  if (showTva) colStyles[_ci++] = { cellWidth: 22, halign: 'right' }
+  colStyles[_ci] = { cellWidth: 30, halign: 'right', fontStyle: 'bold' }
 
   autoTable(doc, {
     startY: y,
@@ -318,7 +318,7 @@ async function _buildDoc(quote, mode = 'client') {
     didParseCell(data) {
       if (data.section !== 'body') return
       const rowIdx = data.row.index
-      const imgData = itemImages[rowIdx]
+      const _imgData = itemImages[rowIdx]
       if (data.column.index === 0) {
         const item = items[rowIdx]
         const specs = [

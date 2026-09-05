@@ -711,11 +711,11 @@ const filteredRdv = computed(() => {
   return appointments.value.filter(a => a.status === 'canceled')
 })
 
-const linkedQuotes = computed(() =>
+const _linkedQuotes = computed(() =>
   quotes.value.filter(q => !q.archived && q.client_email === userEmail.value)
 )
 
-function linkedQuoteForRdv(a) {
+function _linkedQuoteForRdv(a) {
   if (!a.linked_quote_id) return null
   return quotes.value.find(q => q.id === a.linked_quote_id) || null
 }

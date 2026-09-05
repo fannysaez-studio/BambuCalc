@@ -93,7 +93,7 @@ function onResize() { isMobile.value = window.innerWidth <= 640 }
 import { CalendarDays, CalendarOff, CalendarPlus } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
-const props = defineProps({
+const _props = defineProps({
   tab: { type: Boolean, default: false },
 })
 

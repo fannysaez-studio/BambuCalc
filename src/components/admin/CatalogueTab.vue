@@ -43,11 +43,12 @@ const materialsLoading = ref(false)
 const materialsSaving  = ref(false)
 const matUploading     = ref(false)
 const matPage          = ref(1)
+
 const matPerPage       = ref(4)
 
 const knownBrands = ['Bambu Lab', 'Eryone', 'Sunlu']
 
-const TYPE_DEFAULTS = {
+const _TYPE_DEFAULTS = {
   'PLA':        { cost_per_kg: 20, default_waste_percentage: 10 },
   'Matt':       { cost_per_kg: 20, default_waste_percentage: 10 },
   'PLA+':       { cost_per_kg: 22, default_waste_percentage: 10 },

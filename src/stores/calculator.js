@@ -111,9 +111,8 @@ export const useCalculatorStore = defineStore('calculator', {
     // Marge en % selon l'option choisie à l'étape 5
     marginPercent(state) {
       const presets = { ami: 15, standard: 40, pro: 65 }
-      return presets[state.selectedPricing] ?? Number(state.customMargin) ?? 40
+      return presets[state.selectedPricing] ?? (Number(state.customMargin) || 40)
     },
-
     // Nom affiché selon le type de client
     displayClientName(state) {
       if (state.clientType === 'particulier') {
@@ -301,19 +300,52 @@ export const useCalculatorStore = defineStore('calculator', {
     key: 'bambucalc-calculator',
     storage: localStorage,
     pick: [
-      'quoteNumber', 'quoteDate', 'quoteValidityDays',
-      'paymentMethod', 'depositPercent', 'processingDelay', 'deliveryDelay', 'quoteNotes',
-      'clientType', 'clientCivility', 'clientFirstName', 'clientLastName',
-      'clientContactName', 'clientEmail', 'clientPhone',
-      'clientAddress', 'clientPostalCode', 'clientCity', 'clientCountry',
-      'clientSiret', 'clientVatNumber',
-      'projectType', 'projectSeriesType', 'projectDescription',
-      'projectLength', 'projectWidth', 'projectHeight', 'projectFinish', 'projectFinishNote',
-      'defaultMaterial', 'defaultCostPerKg', 'defaultWastePercent', 'defaultColorCount',
+      'quoteNumber',
+      'quoteDate',
+      'quoteValidityDays',
+      'paymentMethod',
+      'depositPercent',
+      'processingDelay',
+      'deliveryDelay',
+      'quoteNotes',
+      'clientType',
+      'clientCivility',
+      'clientFirstName',
+      'clientLastName',
+      'clientContactName',
+      'clientEmail',
+      'clientPhone',
+      'clientAddress',
+      'clientPostalCode',
+      'clientCity',
+      'clientCountry',
+      'clientSiret',
+      'clientVatNumber',
+      'projectType',
+      'projectSeriesType',
+      'projectDescription',
+      'projectLength',
+      'projectWidth',
+      'projectHeight',
+      'projectFinish',
+      'projectFinishNote',
+      'defaultMaterial',
+      'defaultCostPerKg',
+      'defaultWastePercent',
+      'defaultColorCount',
       'pieces',
-      'printHours', 'printMinutes', 'prepTime', 'postTime', 'hourlyRate',
-      'packagingCost', 'taxRate', 'selectedPricing', 'customMargin',
-      'printProfile', 'printerModel', 'nozzleSize',
+      'printHours',
+      'printMinutes',
+      'prepTime',
+      'postTime',
+      'hourlyRate',
+      'packagingCost',
+      'taxRate',
+      'selectedPricing',
+      'customMargin',
+      'printProfile',
+      'printerModel',
+      'nozzleSize',
       'editingQuoteId',
     ],
     serializer: {
@@ -321,7 +353,7 @@ export const useCalculatorStore = defineStore('calculator', {
       serialize: (state) => {
         const clean = { ...state }
         if (clean.pieces) {
-          clean.pieces = clean.pieces.map(p => ({ ...p, referenceImage: null }))
+          clean.pieces = clean.pieces.map((p) => ({ ...p, referenceImage: null }))
         }
         return JSON.stringify(clean)
       },
@@ -329,10 +361,12 @@ export const useCalculatorStore = defineStore('calculator', {
       deserialize: (str) => {
         const state = JSON.parse(str)
         if (state.pieces) {
-          state.pieces = state.pieces.map(p => ({
+          state.pieces = state.pieces.map((p) => ({
             ...p,
             referenceImage: null,
-            referenceImageUrl: (p.referenceImageUrl || '').startsWith('blob:') ? '' : (p.referenceImageUrl || ''),
+            referenceImageUrl: (p.referenceImageUrl || '').startsWith('blob:')
+              ? ''
+              : p.referenceImageUrl || '',
           }))
         }
         return state

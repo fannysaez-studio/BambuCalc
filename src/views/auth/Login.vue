@@ -213,7 +213,7 @@ export default defineComponent({
         await login({ email: this.email, password: this.password })
         const isAdmin = await checkIsAdmin()
         this.$router.push(isAdmin ? '/admin' : '/dashboard')
-      } catch (err) {
+      } catch (_err) {
         this.error = 'Email ou mot de passe incorrect.'
       } finally {
         this.loading = false
@@ -222,7 +222,7 @@ export default defineComponent({
     async onGoogle() {
       try {
         await loginWithGoogle()
-      } catch (err) {
+      } catch (_err) {
         this.error = 'Connexion Google impossible. Réessaie.'
       }
     },
@@ -232,7 +232,7 @@ export default defineComponent({
       try {
         await resetPasswordForEmail(this.forgotEmail)
         this.forgotSent = true
-      } catch (err) {
+      } catch (_err) {
         this.forgotError = 'Adresse introuvable ou erreur. Vérifie ton email.'
       } finally {
         this.forgotLoading = false

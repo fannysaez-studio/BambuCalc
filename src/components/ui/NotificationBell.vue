@@ -93,7 +93,7 @@ function onResize() { isMobile.value = window.innerWidth <= 640 }
 import { Bell, BellOff, FileText, CheckCircle, Pencil } from 'lucide-vue-next'
 import { supabase } from '@/lib/supabase'
 
-const props = defineProps({
+const _props = defineProps({
   up:       { type: Boolean, default: false },
   compact:  { type: Boolean, default: false },
   tab:      { type: Boolean, default: false },
@@ -197,7 +197,7 @@ onMounted(async () => {
     await setupRealtime()
   }
 
-  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, _session) => {
     if (event === 'SIGNED_IN') {
       await loadNotifications()
       await setupRealtime()

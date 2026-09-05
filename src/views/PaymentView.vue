@@ -135,7 +135,7 @@ useHead({
 })
 
 const route  = useRoute()
-const router = useRouter()
+const _router = useRouter()
 
 // ── State machine ─────────────────────────────────────────────────────────────
 // 'loading' | 'no-consent' | 'ready' | 'paying' | 'success' | 'error'

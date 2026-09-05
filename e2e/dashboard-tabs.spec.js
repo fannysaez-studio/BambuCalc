@@ -24,8 +24,8 @@ test.describe('Dashboard client — navigation onglets', () => {
   test('onglet Mes rendez-vous affiche section RDV, masque devis', async ({ page }) => {
     await page.click('.ctab-btn:has-text("Mes rendez-vous")')
     await expect(page.locator('.rdv-section-card')).toBeVisible()
-    await expect(page.locator('.quotes-card')).not.toBeVisible()
-    await expect(page.locator('.stats-row')).not.toBeVisible()
+    await expect(page.locator('.quotes-card')).toBeHidden()
+    await expect(page.locator('.stats-row')).toBeHidden()
   })
 
   test('onglet Mon profil affiche identité et sécurité', async ({ page }) => {
@@ -33,13 +33,13 @@ test.describe('Dashboard client — navigation onglets', () => {
     await expect(page.locator('.profile-inline')).toBeVisible()
     await expect(page.locator('.pi-col-title').first()).toContainText('Identité')
     await expect(page.locator('.pi-col-title').last()).toContainText('Sécurité')
-    await expect(page.locator('.quotes-card')).not.toBeVisible()
-    await expect(page.locator('.stats-row')).not.toBeVisible()
+    await expect(page.locator('.quotes-card')).toBeHidden()
+    await expect(page.locator('.stats-row')).toBeHidden()
   })
 
   test('retour sur Mes devis depuis Mon profil restaure les stats', async ({ page }) => {
     await page.click('.ctab-btn:has-text("Mon profil")')
-    await expect(page.locator('.stats-row')).not.toBeVisible()
+    await expect(page.locator('.stats-row')).toBeHidden()
     await page.click('.ctab-btn:has-text("Mes devis")')
     await expect(page.locator('.stats-row')).toBeVisible()
     await expect(page.locator('.quotes-card')).toBeVisible()
