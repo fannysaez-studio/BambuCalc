@@ -301,7 +301,6 @@ export const useCalculatorStore = defineStore('calculator', {
     storage: localStorage,
     pick: [
       'quoteNumber',
-      'quoteDate',
       'quoteValidityDays',
       'paymentMethod',
       'depositPercent',
