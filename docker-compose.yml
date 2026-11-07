@@ -1,0 +1,13 @@
+services:
+  projet_perso:
+    build:
+      context: .
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+        VITE_STRIPE_PUBLIC_KEY: ${VITE_STRIPE_PUBLIC_KEY}
+        VITE_APP_URL: ${VITE_APP_URL}
+        VITE_VAPID_PUBLIC_KEY: ${VITE_VAPID_PUBLIC_KEY}
+        VITE_MAINTENANCE_MODE: ${VITE_MAINTENANCE_MODE}
+    ports:
+      - "8083:80"
